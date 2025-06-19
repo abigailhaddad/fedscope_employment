@@ -47,7 +47,7 @@ This is a cleaned and processed version of the official FedScope Employment Cube
 - **Processing Code Repository:** https://github.com/abigailhaddad/fedscope_employment
 - **Original Authoritative Data Source:** https://www.opm.gov/data/datasets/
 - **Official OPM Web Interface:** https://www.fedscope.opm.gov/ (includes additional variables not in downloadable files)
-- **Original Data Format:** 62 separate quarterly ZIP files with fact and lookup tables
+- **Original Data Format:** 72 separate quarterly ZIP files with fact and lookup tables
 
 ## Uses
 
