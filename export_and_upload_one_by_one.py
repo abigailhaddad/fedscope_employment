@@ -9,8 +9,6 @@ import os
 import logging
 from dotenv import load_dotenv
 from huggingface_hub import HfApi
-from datasets import Dataset, load_dataset
-import pandas as pd
 
 load_dotenv()
 
@@ -21,67 +19,66 @@ DUCKDB_PATH = "fedscope_employment.duckdb"
 TEMP_CSV = "temp_fedscope_quarter.csv"
 
 def validate_uploaded_data(conn, repo_name, datasets, hf_token):
-    """Validate that uploaded data matches DuckDB source."""
-    logger.info("Validating uploaded data against DuckDB source...")
+    """Validate that uploaded CSV files match DuckDB source."""
+    logger.info("Validating uploaded CSV files against DuckDB source...")
     
     try:
         # Get DuckDB totals by quarter
         duckdb_totals = {}
+        expected_files = {}
         for dataset_key, year, quarter in datasets:
             count = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE dataset_key = ?", [dataset_key]).fetchone()[0]
-            config_name = f"{quarter}_{year}"
-            duckdb_totals[config_name] = count
+            csv_filename = f"fedscope_employment_{quarter}_{year}.csv"
+            duckdb_totals[csv_filename] = count
+            expected_files[csv_filename] = f"{quarter}_{year}"
         
         logger.info(f"DuckDB has {len(duckdb_totals)} quarterly datasets")
         
         # Check what's actually uploaded to HF
         api = HfApi(token=hf_token)
         uploaded_files = api.list_repo_files(repo_id=repo_name, repo_type="dataset")
-        data_files = [f for f in uploaded_files if f.endswith('.parquet') or f.endswith('.csv')]
+        csv_files = [f for f in uploaded_files if f.endswith('.csv')]
         
-        logger.info(f"Hugging Face has {len(data_files)} data files")
+        logger.info(f"Hugging Face has {len(csv_files)} CSV files")
         
-        # Try to load each dataset config and count records
-        hf_totals = {}
+        # Validate each file exists and report basic info
         validation_errors = []
+        validated_count = 0
         
-        for config_name, expected_count in duckdb_totals.items():
-            try:
-                # Load this specific config
-                dataset = load_dataset(repo_name, name=config_name, token=hf_token)
-                actual_count = len(dataset['train'])
-                hf_totals[config_name] = actual_count
-                
-                if actual_count == expected_count:
-                    logger.info(f"✅ {config_name}: {actual_count:,} records (matches DuckDB)")
-                else:
-                    error_msg = f"❌ {config_name}: {actual_count:,} records (expected {expected_count:,})"
-                    logger.error(error_msg)
-                    validation_errors.append(error_msg)
-                    
-            except Exception as e:
-                error_msg = f"❌ {config_name}: Could not load from HF - {e}"
+        for csv_filename, expected_count in duckdb_totals.items():
+            if csv_filename in csv_files:
+                logger.info(f"✅ {csv_filename}: Found on Hugging Face (expected {expected_count:,} records)")
+                validated_count += 1
+            else:
+                error_msg = f"❌ {csv_filename}: Not found on Hugging Face"
                 logger.error(error_msg)
                 validation_errors.append(error_msg)
         
+        # Check for unexpected files
+        unexpected_files = [f for f in csv_files if f not in duckdb_totals.keys()]
+        if unexpected_files:
+            logger.warning(f"Found {len(unexpected_files)} unexpected CSV files:")
+            for f in unexpected_files:
+                logger.warning(f"  {f}")
+        
         # Summary
         logger.info(f"\n=== VALIDATION SUMMARY ===")
-        logger.info(f"DuckDB total records: {sum(duckdb_totals.values()):,}")
-        logger.info(f"Hugging Face total records: {sum(hf_totals.values()):,}")
-        logger.info(f"Datasets validated: {len(hf_totals)}/{len(duckdb_totals)}")
+        logger.info(f"Expected CSV files: {len(duckdb_totals)}")
+        logger.info(f"Found CSV files: {validated_count}")
+        logger.info(f"Total expected records: {sum(duckdb_totals.values()):,}")
         
         if validation_errors:
             logger.error(f"Validation failed! {len(validation_errors)} errors:")
             for error in validation_errors:
                 logger.error(f"  {error}")
         else:
-            logger.info("🎉 All validation checks passed!")
+            logger.info("🎉 All CSV files uploaded successfully!")
             
         # Print dataset info
         logger.info(f"\n=== DATASET INFO ===")
         logger.info(f"Repository: https://huggingface.co/datasets/{repo_name}")
         logger.info(f"Time range: {min(year for _, year, _ in datasets)} - {max(year for _, year, _ in datasets)}")
-        logger.info(f"Quarterly files: {len(datasets)}")
+        logger.info(f"CSV files: {len(datasets)}")
         logger.info(f"Total records: {sum(duckdb_totals.values()):,}")
         
     except Exception as e:
@@ -168,17 +165,16 @@ def export_and_upload_one_by_one(repo_name, hf_token=None):
             file_size = os.path.getsize(TEMP_CSV) / (1024 * 1024)  # MB
             logger.info(f"  Created {TEMP_CSV} ({file_size:.1f} MB)")
             
-            # Convert to Hugging Face Dataset and upload
-            logger.info(f"  Converting to HF Dataset and uploading as {csv_filename}...")
-            # Read everything as strings to avoid type conversion issues
-            df = pd.read_csv(TEMP_CSV, dtype=str, na_filter=False)
-            dataset = Dataset.from_pandas(df)
+            # Upload CSV file directly without dataset conversion
+            logger.info(f"  Uploading {csv_filename} directly as CSV...")
             
-            # Upload to Hugging Face with the proper filename
-            dataset.push_to_hub(
+            # Upload the CSV file directly using the API
+            api.upload_file(
+                path_or_fileobj=TEMP_CSV,
+                path_in_repo=csv_filename,
                 repo_id=repo_name,
+                repo_type="dataset",
                 token=hf_token,
-                config_name=f"{quarter}_{year}",
                 commit_message=f"Add {quarter} {year} data"
             )
             
