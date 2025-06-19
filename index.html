@@ -127,10 +127,10 @@
         <h2>Table of Contents</h2>
         <ul>
             <li><a href="#overview">Overview</a></li>
+            <li><a href="#why-use-this">Why Use This Dataset</a></li>
             <li><a href="#data-fields">Data Fields Reference</a></li>
             <li><a href="#coding-schemes">Coding Schemes</a></li>
             <li><a href="#data-quality">Data Quality Notes</a></li>
-            <li><a href="#usage-guide">Usage Guide</a></li>
             <li><a href="#resources">Additional Resources</a></li>
         </ul>
     </div>
@@ -138,7 +138,7 @@
     <div class="section" id="overview">
         <h2>Overview</h2>
         <div class="note" style="background-color: #fee; border-left-color: #e53e3e;">
-            <strong>Important:</strong> This documentation is created by an independent researcher based on publicly available FedScope data. For official documentation and authoritative information, please visit <a href="https://www.opm.gov/data/">OPM's official website</a>.
+            <strong>Important:</strong> This documentation is created by an independent researcher based on publicly available FedScope data. For official documentation and authoritative information, please visit <a href="https://www.fedscope.opm.gov/">OPM's official FedScope website</a>.
         </div>
         <p>The FedScope Employment Cube contains snapshots of federal civilian employment data collected quarterly by the U.S. Office of Personnel Management (OPM). This dataset provides comprehensive information about federal employees including demographics, job characteristics, compensation, and organizational details.</p>
         
@@ -153,6 +153,29 @@
         <div class="note">
             <strong>Privacy Note:</strong> All data is anonymized. Individual employees cannot be identified from the dataset.
         </div>
+    </div>
+
+    <div class="section" id="why-use-this">
+        <h2>Why Use This Dataset</h2>
+        
+        <h3>The Challenge with Original FedScope Data</h3>
+        <p>Working with the original FedScope data from OPM presents several challenges:</p>
+        <ul>
+            <li><strong>Manual Processing Required:</strong> Each quarterly dataset is a separate ZIP file containing multiple text files that must be downloaded, extracted, and merged manually</li>
+            <li><strong>Complex Joins:</strong> Each ZIP contains one fact table and 13+ lookup tables that must be joined using proper keys</li>
+            <li><strong>Duplicate Lookup Entries:</strong> Earlier datasets (1998-2003) contain duplicate entries in lookup tables that can cause merge errors if not handled properly</li>
+            <li><strong>Schema Evolution:</strong> The data structure changes over time (e.g., pay plan field added in 2016), requiring careful handling</li>
+        </ul>
+
+        <h3>What This Processed Dataset Provides</h3>
+        <ul>
+            <li><strong>Ready-to-Use Format:</strong> All 72 quarterly datasets are already extracted, cleaned, and denormalized</li>
+            <li><strong>Single Table per Quarter:</strong> Each CSV file contains all fields with human-readable descriptions already joined</li>
+            <li><strong>Duplicate Resolution:</strong> Lookup table duplicates have been resolved consistently (using first occurrence within each dataset)</li>
+            <li><strong>Consistent Schema:</strong> Schema changes are handled transparently with appropriate null values where fields don't exist</li>
+            <li><strong>No Technical Barriers:</strong> Download and analyze immediately without needing to write merge code or handle edge cases</li>
+        </ul>
+
     </div>
 
     <div class="section" id="data-fields">
@@ -372,7 +395,7 @@
 
         <h3>Known Issues</h3>
         <div class="note">
-            <strong>Duplicate Agencies (1998-2003):</strong> Some agencies appear with multiple names but the same code due to reorganizations. The processing pipeline uses the first occurrence of each code.
+            <strong>Within-Dataset Duplicate Agencies (1998-2003):</strong> Within individual quarterly datasets, some agencies appear with multiple names but the same code due to reorganizations. The processing pipeline uses the first occurrence of each code within each dataset. See the complete list of duplicates in <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/lookup_duplicates_summary.txt">lookup_duplicates_summary.txt</a>.
         </div>
 
         <h3>Data Coverage</h3>
@@ -384,41 +407,6 @@
         </ul>
     </div>
 
-    <div class="section" id="usage-guide">
-        <h2>Usage Guide</h2>
-        
-        <h3>Common Analyses</h3>
-        <ul>
-            <li><strong>Workforce Demographics:</strong> Analyze age, education, and length of service distributions</li>
-            <li><strong>Compensation Studies:</strong> Compare salaries across agencies, occupations, and locations</li>
-            <li><strong>Organizational Analysis:</strong> Track agency size and composition over time</li>
-            <li><strong>Career Progression:</strong> Study grade distributions and supervisory ratios</li>
-            <li><strong>Geographic Distribution:</strong> Analyze federal employment by state/location</li>
-        </ul>
-
-        <h3>Important Considerations</h3>
-        <ul>
-            <li>Each record represents a position snapshot, not a unique individual</li>
-            <li>Salary data reflects adjusted basic pay, not total compensation</li>
-            <li>Some agencies (intelligence, postal service) are excluded</li>
-            <li>Data is aggregated to protect individual privacy</li>
-        </ul>
-
-        <h3>Example Queries</h3>
-        <p><strong>Average salary by agency (2024):</strong></p>
-        <code>SELECT agency_name, AVG(CAST(salary AS FLOAT)) as avg_salary 
-FROM fedscope_data 
-WHERE year = 2024 
-GROUP BY agency_name 
-ORDER BY avg_salary DESC</code>
-
-        <p><strong>STEM workforce trends:</strong></p>
-        <code>SELECT year, COUNT(*) as stem_employees 
-FROM fedscope_data 
-WHERE stem_occupation_indicator = '1' 
-GROUP BY year 
-ORDER BY year</code>
-    </div>
 
     <div class="section" id="resources">
         <h2>Additional Resources</h2>
@@ -433,8 +421,8 @@ ORDER BY year</code>
         <h3>Official Documentation</h3>
         <p><strong>For official information about FedScope data:</strong></p>
         <ul>
-            <li>Visit the <a href="https://www.opm.gov/data/">Official OPM Data Portal</a></li>
-            <li>Use the <a href="https://www.fedscope.opm.gov/">Official FedScope Web Interface</a></li>
+            <li>Visit the <a href="https://www.fedscope.opm.gov/">Official FedScope Web Interface</a></li>
+            <li>Download raw data from <a href="https://www.opm.gov/data/datasets/">OPM Data Datasets</a></li>
             <li>Original OPM documentation PDFs for each quarterly dataset are preserved in the <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/documentation_pdfs">documentation_pdfs</a> folder</li>
         </ul>
 
@@ -445,7 +433,7 @@ ORDER BY year</code>
 
     <div style="text-align: center; padding: 2rem; color: #718096;">
         <p><strong>This is UNOFFICIAL documentation</strong> created as part of an independent data processing project</p>
-        <p>For official information, visit <a href="https://www.opm.gov/data/">opm.gov/data</a></p>
+        <p>For official information, visit <a href="https://www.fedscope.opm.gov/">fedscope.opm.gov</a></p>
         <p>Last updated: 2024</p>
     </div>
 </body>
