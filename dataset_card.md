@@ -48,6 +48,7 @@ This is a cleaned and processed version of the official FedScope Employment Cube
 - **Original Authoritative Data Source:** https://www.opm.gov/data/datasets/
 - **Official OPM Web Interface:** https://www.fedscope.opm.gov/ (includes additional variables not in downloadable files)
 - **Original Data Format:** 72 separate quarterly ZIP files with fact and lookup tables
+- **Documentation PDFs:** Original OPM documentation for each quarterly dataset available at https://github.com/abigailhaddad/fedscope_employment/tree/main/documentation_pdfs
 
 ## Uses
 
@@ -177,6 +178,8 @@ Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. Hugging Face. ht
 ## More Information
 
 For technical details about data processing, schema handling, and quality issues, see the source repository: https://github.com/abigailhaddad/fedscope_employment
+
+The original OPM documentation PDFs for each quarterly dataset are available at: https://github.com/abigailhaddad/fedscope_employment/tree/main/documentation_pdfs
 
 For questions about the original data collection methodology, contact the U.S. Office of Personnel Management at https://www.opm.gov/data/
 

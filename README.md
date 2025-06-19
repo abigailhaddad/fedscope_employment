@@ -73,8 +73,10 @@ fedscope_employment/
 ├── fix_and_extract.py          # Identifies, renames, and extracts ZIP files
 ├── load_to_duckdb_robust.py    # Loads data into DuckDB with schema handling
 ├── export_and_upload_one_by_one.py  # Exports and uploads quarterly CSV files to Hugging Face
+├── collect_pdfs.py             # Collects PDF documentation files
 ├── validate_duckdb.py          # Validates loaded data
-└── requirements.txt            # Python dependencies
+├── requirements.txt            # Python dependencies
+└── documentation_pdfs/         # PDF documentation for each quarterly dataset
 ```
 
 ## Data Structure
@@ -173,6 +175,7 @@ The pipeline produces:
 - `fedscope_employment.duckdb` - Complete database with all fact and lookup tables (~10GB)
 - `lookup_duplicates_summary.txt` - Documentation of data quality issues
 - `lookup_duplicates_log.json` - Machine-readable duplicate records log
+- `documentation_pdfs/` - Original OPM documentation PDFs for each quarterly dataset
 - Hugging Face dataset with 72 quarterly CSV files (uploaded directly, no local storage)
 
 ## License
