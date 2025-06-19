@@ -72,7 +72,7 @@ fedscope_employment/
 ├── main.py                     # Main orchestration script
 ├── fix_and_extract.py          # Identifies, renames, and extracts ZIP files
 ├── load_to_duckdb_robust.py    # Loads data into DuckDB with schema handling
-├── export_to_huggingface.py    # Exports to CSV for Hugging Face
+├── export_and_upload_one_by_one.py  # Exports and uploads quarterly CSV files to Hugging Face
 ├── validate_duckdb.py          # Validates loaded data
 └── requirements.txt            # Python dependencies
 ```
@@ -103,7 +103,7 @@ The pipeline uses DuckDB as a central data warehouse that:
 1. Loads all 140M+ records into a single database
 2. Handles schema evolution (e.g., 'pp' column added in 2016)
 3. Creates a denormalized table with all lookups joined
-4. Can export to CSV for upload to Hugging Face
+4. Exports and uploads quarterly CSV files directly to Hugging Face
 
 ### Data Quality Note
 
@@ -116,11 +116,11 @@ This primarily affects early years (1998-2003). When creating the denormalized t
 ## Architecture
 
 ```
-FedScope ZIP files → Extract → DuckDB → Export to Hugging Face
+FedScope ZIP files → Extract → DuckDB → Upload quarterly CSV files to Hugging Face
 ```
 
 - **DuckDB**: Local data warehouse containing all historical data (~10GB)
-- **CSV Export**: Creates a denormalized CSV file ready for Hugging Face upload
+- **Hugging Face Upload**: Exports and uploads 72 quarterly CSV files directly to Hugging Face dataset repository
 
 ## Usage
 
@@ -141,12 +141,12 @@ python main.py --extract
 python main.py --load-duckdb
 ```
 
-3. **Export to CSV for Hugging Face**:
+3. **Export and Upload to Hugging Face**:
 ```bash
-python main.py --export-huggingface
+python export_and_upload_one_by_one.py <your-repo-name>
 ```
 
-This creates `fedscope_employment_cube.csv` (~10GB) ready for upload to Hugging Face.
+This exports each quarterly dataset as a CSV file and uploads it directly to Hugging Face, processing one file at a time to minimize disk usage.
 
 ## Data Schema
 
@@ -173,6 +173,7 @@ The pipeline produces:
 - `fedscope_employment.duckdb` - Complete database with all fact and lookup tables (~10GB)
 - `lookup_duplicates_summary.txt` - Documentation of data quality issues
 - `lookup_duplicates_log.json` - Machine-readable duplicate records log
+- Hugging Face dataset with 72 quarterly CSV files (uploaded directly, no local storage)
 
 ## License
 
