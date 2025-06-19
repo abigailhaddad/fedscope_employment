@@ -8,19 +8,19 @@ This repository contains the **processing pipeline** that creates a cleaned, den
 
 ## About the Data
 
-I downloaded all available FedScope Employment Cube files from the Office of Personnel Management (OPM). This dataset contains snapshots of federal civilian employment data from 1998 to 2022, totaling approximately 127 million employee records across 62 datasets.
+I downloaded all available FedScope Employment Cube files from the Office of Personnel Management (OPM). This dataset contains snapshots of federal civilian employment data from 1998 to 2024, totaling approximately 140+ million employee records across 72 datasets.
 
 ### Data Sources and Alternatives
 
 - **Raw Data**: The original FedScope files are available at https://www.opm.gov/data/datasets/ as individual ZIP archives that require extraction and manual merging of fact and lookup tables for each quarter
-- **Official Web Interface**: OPM also provides an interactive data exploration tool at https://www.fedscope.opm.gov/ for querying the data through a web interface
-- **This Processed Dataset**: For researchers and analysts who prefer working with complete, pre-processed data files, this repository provides the entire dataset as a single table
+- **Official Web Interface**: OPM also provides an interactive data exploration tool at https://www.fedscope.opm.gov/ for querying the data through a web interface. Note that the Cognos web interface includes additional variables not available in the downloadable cube files.
+- **This Processed Dataset**: For researchers and analysts who prefer working with complete, pre-processed data files, this repository provides the entire dataset as a single table based on the downloadable cube data
 
 **Note**: This repository currently processes only the Employment Cube data. The FedScope system also includes Separations and Accessions data cubes, which are not included in this processed dataset.
 
 ## Data Files
 
-The raw data consists of 62 ZIP files, one for each quarter where data is available:
+The raw data consists of 72 ZIP files, one for each quarter where data is available:
 
 ### Files by Year
 - **1998**: September
@@ -47,7 +47,9 @@ The raw data consists of 62 ZIP files, one for each quarter where data is availa
 - **2019**: March, June, September, December
 - **2020**: March, June, September, December
 - **2021**: March, June, September, December
-- **2022**: March, June
+- **2022**: March, June, September, December
+- **2023**: March, June, September, December
+- **2024**: March, June, September
 
 ## Data Preparation
 
@@ -98,7 +100,7 @@ Each quarterly dataset contains:
 ## Pipeline Overview
 
 The pipeline uses DuckDB as a central data warehouse that:
-1. Loads all 127M+ records into a single database
+1. Loads all 140M+ records into a single database
 2. Handles schema evolution (e.g., 'pp' column added in 2016)
 3. Creates a denormalized table with all lookups joined
 4. Can export to CSV for upload to Hugging Face
@@ -169,7 +171,6 @@ pip install -r requirements.txt
 
 The pipeline produces:
 - `fedscope_employment.duckdb` - Complete database with all fact and lookup tables (~10GB)
-- `fedscope_employment_cube.csv` - Denormalized CSV file ready for Hugging Face upload (~10GB)
 - `lookup_duplicates_summary.txt` - Documentation of data quality issues
 - `lookup_duplicates_log.json` - Machine-readable duplicate records log
 
