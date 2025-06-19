@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedScope Employment Data Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #1a365d;
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        .section {
+            background-color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #1a365d;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: #2d3748;
+            margin-top: 1.5rem;
+        }
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .field-table th {
+            background-color: #f7fafc;
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .field-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .field-table tr:hover {
+            background-color: #f7fafc;
+        }
+        code {
+            background-color: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .note {
+            background-color: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .links a {
+            background-color: #3182ce;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .links a:hover {
+            background-color: #2c5282;
+        }
+        .toc {
+            background-color: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 0.5rem 0;
+        }
+        .toc a {
+            color: #3182ce;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FedScope Employment Data Documentation</h1>
+        <p>UNOFFICIAL guide to understanding the U.S. Office of Personnel Management's Federal Employment Data</p>
+        <p style="background-color: #e53e3e; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+            <strong>⚠️ DISCLAIMER: This is NOT official government documentation. This is an independent project that processes publicly available data.</strong>
+        </p>
+    </div>
+
+    <div class="toc section">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#data-fields">Data Fields Reference</a></li>
+            <li><a href="#coding-schemes">Coding Schemes</a></li>
+            <li><a href="#data-quality">Data Quality Notes</a></li>
+            <li><a href="#usage-guide">Usage Guide</a></li>
+            <li><a href="#resources">Additional Resources</a></li>
+        </ul>
+    </div>
+
+    <div class="section" id="overview">
+        <h2>Overview</h2>
+        <div class="note" style="background-color: #fee; border-left-color: #e53e3e;">
+            <strong>Important:</strong> This documentation is created by an independent researcher based on publicly available FedScope data. For official documentation and authoritative information, please visit <a href="https://www.opm.gov/data/">OPM's official website</a>.
+        </div>
+        <p>The FedScope Employment Cube contains snapshots of federal civilian employment data collected quarterly by the U.S. Office of Personnel Management (OPM). This dataset provides comprehensive information about federal employees including demographics, job characteristics, compensation, and organizational details.</p>
+        
+        <h3>Coverage</h3>
+        <ul>
+            <li><strong>Time Period:</strong> 1998 - 2024 (quarterly snapshots)</li>
+            <li><strong>Population:</strong> Federal civilian employees</li>
+            <li><strong>Exclusions:</strong> Military personnel, intelligence agencies, postal service employees</li>
+            <li><strong>Total Records:</strong> Approximately 140+ million employee records across 72 quarterly datasets</li>
+        </ul>
+
+        <div class="note">
+            <strong>Privacy Note:</strong> All data is anonymized. Individual employees cannot be identified from the dataset.
+        </div>
+    </div>
+
+    <div class="section" id="data-fields">
+        <h2>Data Fields Reference</h2>
+        
+        <h3>Core Identifiers</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field Name</th>
+                <th>Description</th>
+                <th>Type</th>
+            </tr>
+            <tr>
+                <td><code>dataset_key</code></td>
+                <td>Unique identifier for each quarterly dataset</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>year</code></td>
+                <td>Calendar year of the snapshot</td>
+                <td>Integer</td>
+            </tr>
+            <tr>
+                <td><code>quarter</code></td>
+                <td>Quarter of the snapshot (March, June, September, December)</td>
+                <td>String</td>
+            </tr>
+        </table>
+
+        <h3>Demographics</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field Name</th>
+                <th>Description</th>
+                <th>Example Values</th>
+            </tr>
+            <tr>
+                <td><code>agelvl</code></td>
+                <td>Age level (5-year bands)</td>
+                <td>A: < 20, B: 20-24, C: 25-29, etc.</td>
+            </tr>
+            <tr>
+                <td><code>edlvl</code></td>
+                <td>Education level</td>
+                <td>00-22 (High school through Doctorate)</td>
+            </tr>
+            <tr>
+                <td><code>los</code></td>
+                <td>Length of service</td>
+                <td>Years of federal service</td>
+            </tr>
+        </table>
+
+        <h3>Job Characteristics</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field Name</th>
+                <th>Description</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td><code>occ</code></td>
+                <td>Occupation code and series</td>
+                <td>4-digit OPM occupation codes</td>
+            </tr>
+            <tr>
+                <td><code>patco</code></td>
+                <td>PATCO category</td>
+                <td>Professional, Administrative, Technical, Clerical, Other</td>
+            </tr>
+            <tr>
+                <td><code>pp</code></td>
+                <td>Pay plan</td>
+                <td>GS, ES, SL, ST, etc. (added in 2016)</td>
+            </tr>
+            <tr>
+                <td><code>ppgrd</code></td>
+                <td>Pay plan and grade</td>
+                <td>Combined pay plan and grade level</td>
+            </tr>
+            <tr>
+                <td><code>gsegrd</code></td>
+                <td>GS equivalent grade</td>
+                <td>01-15, SES, or blank</td>
+            </tr>
+            <tr>
+                <td><code>super</code></td>
+                <td>Supervisory status</td>
+                <td>2: Supervisor, 4: Manager, 6: Leader, 8: Non-supervisor</td>
+            </tr>
+        </table>
+
+        <h3>Compensation & Work Details</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field Name</th>
+                <th>Description</th>
+                <th>Notes</th>
+            </tr>
+            <tr>
+                <td><code>salary</code></td>
+                <td>Annual salary</td>
+                <td>Adjusted basic pay</td>
+            </tr>
+            <tr>
+                <td><code>sallvl</code></td>
+                <td>Salary level</td>
+                <td>Salary ranges in $10K bands</td>
+            </tr>
+            <tr>
+                <td><code>wrksch</code></td>
+                <td>Work schedule</td>
+                <td>F: Full-time, P: Part-time, etc.</td>
+            </tr>
+            <tr>
+                <td><code>toa</code></td>
+                <td>Type of appointment</td>
+                <td>Permanent, temporary, term, etc.</td>
+            </tr>
+            <tr>
+                <td><code>wkstat</code></td>
+                <td>Work status</td>
+                <td>Active, leave without pay, etc.</td>
+            </tr>
+        </table>
+
+        <h3>Organization & Location</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field Name</th>
+                <th>Description</th>
+                <th>Format</th>
+            </tr>
+            <tr>
+                <td><code>agy</code></td>
+                <td>Agency code</td>
+                <td>4-character agency identifier</td>
+            </tr>
+            <tr>
+                <td><code>subagy</code></td>
+                <td>Sub-agency code</td>
+                <td>4-character sub-agency identifier</td>
+            </tr>
+            <tr>
+                <td><code>loc</code></td>
+                <td>Location code</td>
+                <td>State abbreviation or country code</td>
+            </tr>
+            <tr>
+                <td><code>stemocc</code></td>
+                <td>STEM occupation indicator</td>
+                <td>1: STEM, 0: Non-STEM</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section" id="coding-schemes">
+        <h2>Coding Schemes</h2>
+        
+        <h3>Age Levels (agelvl)</h3>
+        <p>Age is reported in 5-year bands to protect privacy:</p>
+        <ul>
+            <li><strong>A:</strong> Less than 20 years</li>
+            <li><strong>B:</strong> 20-24 years</li>
+            <li><strong>C:</strong> 25-29 years</li>
+            <li><strong>D:</strong> 30-34 years</li>
+            <li><strong>E:</strong> 35-39 years</li>
+            <li><strong>F:</strong> 40-44 years</li>
+            <li><strong>G:</strong> 45-49 years</li>
+            <li><strong>H:</strong> 50-54 years</li>
+            <li><strong>I:</strong> 55-59 years</li>
+            <li><strong>J:</strong> 60-64 years</li>
+            <li><strong>K:</strong> 65 years and over</li>
+        </ul>
+
+        <h3>Education Levels (edlvl)</h3>
+        <p>Education codes range from 00 to 22:</p>
+        <ul>
+            <li><strong>00-05:</strong> Less than high school</li>
+            <li><strong>06-11:</strong> High school diploma/GED</li>
+            <li><strong>12-14:</strong> Some college</li>
+            <li><strong>15:</strong> Bachelor's degree</li>
+            <li><strong>16-17:</strong> Some graduate work</li>
+            <li><strong>18:</strong> Master's degree</li>
+            <li><strong>19-21:</strong> Professional/Doctoral degree</li>
+            <li><strong>22:</strong> Post-doctoral</li>
+        </ul>
+
+        <h3>PATCO Categories</h3>
+        <ul>
+            <li><strong>P:</strong> Professional - Requires knowledge in specialized field (engineers, scientists, doctors)</li>
+            <li><strong>A:</strong> Administrative - Management or staff functions (HR, budget, procurement)</li>
+            <li><strong>T:</strong> Technical - Support to professional/administrative (technicians, assistants)</li>
+            <li><strong>C:</strong> Clerical - Structured work support (data entry, filing)</li>
+            <li><strong>O:</strong> Other - Trades, crafts, labor, protective services</li>
+        </ul>
+
+        <h3>Major Pay Plans</h3>
+        <ul>
+            <li><strong>GS:</strong> General Schedule (most common)</li>
+            <li><strong>ES:</strong> Senior Executive Service</li>
+            <li><strong>SL/ST:</strong> Senior Level/Scientific & Technical</li>
+            <li><strong>AD:</strong> Administratively Determined</li>
+            <li><strong>FW:</strong> Federal Wage System</li>
+        </ul>
+    </div>
+
+    <div class="section" id="data-quality">
+        <h2>Data Quality Notes</h2>
+        
+        <h3>Schema Evolution</h3>
+        <ul>
+            <li>The <code>pp</code> (pay plan) field was added in 2016</li>
+            <li>Some fields may have null or blank values in earlier years</li>
+            <li>Agency codes and names may change over time due to reorganizations</li>
+        </ul>
+
+        <h3>Known Issues</h3>
+        <div class="note">
+            <strong>Duplicate Agencies (1998-2003):</strong> Some agencies appear with multiple names but the same code due to reorganizations. The processing pipeline uses the first occurrence of each code.
+        </div>
+
+        <h3>Data Coverage</h3>
+        <ul>
+            <li><strong>1998-2008:</strong> Annual September snapshots only</li>
+            <li><strong>2009:</strong> September and December</li>
+            <li><strong>2010-2024:</strong> Full quarterly coverage (March, June, September, December)</li>
+            <li><strong>2024:</strong> Data through September</li>
+        </ul>
+    </div>
+
+    <div class="section" id="usage-guide">
+        <h2>Usage Guide</h2>
+        
+        <h3>Common Analyses</h3>
+        <ul>
+            <li><strong>Workforce Demographics:</strong> Analyze age, education, and length of service distributions</li>
+            <li><strong>Compensation Studies:</strong> Compare salaries across agencies, occupations, and locations</li>
+            <li><strong>Organizational Analysis:</strong> Track agency size and composition over time</li>
+            <li><strong>Career Progression:</strong> Study grade distributions and supervisory ratios</li>
+            <li><strong>Geographic Distribution:</strong> Analyze federal employment by state/location</li>
+        </ul>
+
+        <h3>Important Considerations</h3>
+        <ul>
+            <li>Each record represents a position snapshot, not a unique individual</li>
+            <li>Salary data reflects adjusted basic pay, not total compensation</li>
+            <li>Some agencies (intelligence, postal service) are excluded</li>
+            <li>Data is aggregated to protect individual privacy</li>
+        </ul>
+
+        <h3>Example Queries</h3>
+        <p><strong>Average salary by agency (2024):</strong></p>
+        <code>SELECT agency_name, AVG(CAST(salary AS FLOAT)) as avg_salary 
+FROM fedscope_data 
+WHERE year = 2024 
+GROUP BY agency_name 
+ORDER BY avg_salary DESC</code>
+
+        <p><strong>STEM workforce trends:</strong></p>
+        <code>SELECT year, COUNT(*) as stem_employees 
+FROM fedscope_data 
+WHERE stem_occupation_indicator = '1' 
+GROUP BY year 
+ORDER BY year</code>
+    </div>
+
+    <div class="section" id="resources">
+        <h2>Additional Resources</h2>
+        
+        <div class="links">
+            <a href="https://github.com/abigailhaddad/fedscope_employment">GitHub Repository</a>
+            <a href="https://huggingface.co/datasets/abigailhaddad/fedscope">Hugging Face Dataset</a>
+            <a href="https://www.opm.gov/data/datasets/">Original OPM Data</a>
+            <a href="https://www.fedscope.opm.gov/">FedScope Web Interface</a>
+        </div>
+
+        <h3>Official Documentation</h3>
+        <p><strong>For official information about FedScope data:</strong></p>
+        <ul>
+            <li>Visit the <a href="https://www.opm.gov/data/">Official OPM Data Portal</a></li>
+            <li>Use the <a href="https://www.fedscope.opm.gov/">Official FedScope Web Interface</a></li>
+            <li>Original OPM documentation PDFs for each quarterly dataset are preserved in the <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/documentation_pdfs">documentation_pdfs</a> folder</li>
+        </ul>
+
+        <h3>Citation</h3>
+        <p>If you use this dataset in your research, please cite:</p>
+        <code>Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. Hugging Face. https://huggingface.co/datasets/abigailhaddad/fedscope</code>
+    </div>
+
+    <div style="text-align: center; padding: 2rem; color: #718096;">
+        <p><strong>This is UNOFFICIAL documentation</strong> created as part of an independent data processing project</p>
+        <p>For official information, visit <a href="https://www.opm.gov/data/">opm.gov/data</a></p>
+        <p>Last updated: 2024</p>
+    </div>
+</body>
+</html>

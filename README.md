@@ -4,6 +4,8 @@ This repository contains the **processing pipeline** that creates a cleaned, den
 
 **📊 Final Dataset**: https://huggingface.co/datasets/abigailhaddad/fedscope
 
+**📚 Documentation**: https://abigailhaddad.github.io/fedscope_employment/
+
 **⚠️ Note**: This repository contains only the processing code, not the raw data files. To recreate the dataset, you'll need to download the original ZIP files from https://www.opm.gov/data/datasets/.
 
 ## About the Data
