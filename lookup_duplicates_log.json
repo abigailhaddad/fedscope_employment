@@ -1,0 +1,1829 @@
+{
+  "agency": [
+    {
+      "dataset_key": "1998_Q3",
+      "code": "AMAG",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+        "agysub": "AMAG",
+        "agysubt": "AMAG-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+          "agysub": "AMAG",
+          "agysubt": "AMAG-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "AMPC",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+        "agysub": "AMPC",
+        "agysubt": "AMPC-OVERSEAS PRIVATE INVESTMENT CORPORATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+          "agysub": "AMPC",
+          "agysubt": "AMPC-OVERSEAS PRIVATE INVESTMENT CORPORATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "CG00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "CG",
+        "agyt": "CG-COMMISSION ON CENTRAL INTELLIGENCE AGENCY ACTIVITIES WITHIN THE UNITED STAT",
+        "agysub": "CG00",
+        "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "CG",
+          "agyt": "CG-NATIONAL EDUCATION GOALS PANEL",
+          "agysub": "CG00",
+          "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "EQ00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EQ",
+        "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY",
+        "agysub": "EQ00",
+        "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EQ",
+          "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY",
+          "agysub": "EQ00",
+          "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "EX00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EX",
+        "agyt": "EX-EXECUTIVE RESIDENCE AT THE WHITE HOUSE",
+        "agysub": "EX00",
+        "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EX",
+          "agyt": "EX-EXECUTIVE MANSION AND GROUNDS",
+          "agysub": "EX00",
+          "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "HB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "HB",
+        "agyt": "HB-COMMITTEE FOR PURCHASE OF PRODUCTS AND SERVICES OF THE BLIND AND OTHER SEVE",
+        "agysub": "HB00",
+        "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "HB",
+          "agyt": "HB-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED",
+          "agysub": "HB00",
+          "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "IB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "IB",
+        "agyt": "IB-U.S. INFORMATION AGENCY",
+        "agysub": "IB00",
+        "agysubt": "IB00-U.S. INFORMATION AGENCY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "IB",
+          "agyt": "IB-INTERNATIONAL COMMUNICATION AGENCY",
+          "agysub": "IB00",
+          "agysubt": "IB00-U.S. INFORMATION AGENCY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "NK00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "NK",
+        "agyt": "NK-NATIONAL COUNCIL ON THE HANDICAPPED",
+        "agysub": "NK00",
+        "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "NK",
+          "agyt": "NK-NATIONAL COUNCIL ON DISABILITY",
+          "agysub": "NK00",
+          "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "PC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "PC",
+        "agyt": "PC-PANAMA CANAL COMPANY",
+        "agysub": "PC00",
+        "agysubt": "PC00-PANAMA CANAL COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "PC",
+          "agyt": "PC-PANAMA CANAL COMMISSION",
+          "agysub": "PC00",
+          "agysubt": "PC00-PANAMA CANAL COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "RE00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RE",
+        "agyt": "RE-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION",
+        "agysub": "RE00",
+        "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RE",
+          "agyt": "RE-NAVAJO AND HOPI INDIAN RELOCATION COMMISSION",
+          "agysub": "RE00",
+          "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "RS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RS",
+        "agyt": "RS-UNKNOWN",
+        "agysub": "RS00",
+        "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RS",
+          "agyt": "RS-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION",
+          "agysub": "RS00",
+          "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "TC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TC",
+        "agyt": "TC-U.S. TARIFF COMMISSION",
+        "agysub": "TC00",
+        "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TC",
+          "agyt": "TC-U.S. INTERNATIONAL TRADE COMMISSION",
+          "agysub": "TC00",
+          "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1998_Q3",
+      "code": "TN00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1998_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TN",
+        "agyt": "TN-OFFICE OF THE U.S. TRADE REPRESENTATIVE",
+        "agysub": "TN00",
+        "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1998_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TN",
+          "agyt": "TN-OFFICE OF THE SPECIAL REPRESENTATIVE FOR TRADE NEGOTIATIONS",
+          "agysub": "TN00",
+          "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "AM00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+        "agysub": "AM00",
+        "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+          "agysub": "AM00",
+          "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "AMPC",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+        "agysub": "AMPC",
+        "agysubt": "AMPC-OVERSEAS PRIVATE INVESTMENT CORPORATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+          "agysub": "AMPC",
+          "agysubt": "AMPC-OVERSEAS PRIVATE INVESTMENT CORPORATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "CG00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "CG",
+        "agyt": "CG-NATIONAL EDUCATION GOALS PANEL",
+        "agysub": "CG00",
+        "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "CG",
+          "agyt": "CG-COMMISSION ON CENTRAL INTELLIGENCE AGENCY ACTIVITIES WITHIN THE UNITED STAT",
+          "agysub": "CG00",
+          "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "EQ00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EQ",
+        "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY",
+        "agysub": "EQ00",
+        "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EQ",
+          "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY",
+          "agysub": "EQ00",
+          "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "EX00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EX",
+        "agyt": "EX-EXECUTIVE RESIDENCE AT THE WHITE HOUSE",
+        "agysub": "EX00",
+        "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EX",
+          "agyt": "EX-EXECUTIVE MANSION AND GROUNDS",
+          "agysub": "EX00",
+          "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "HB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "HB",
+        "agyt": "HB-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED",
+        "agysub": "HB00",
+        "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "HB",
+          "agyt": "HB-COMMITTEE FOR PURCHASE OF PRODUCTS AND SERVICES OF THE BLIND AND OTHER SEVE",
+          "agysub": "HB00",
+          "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "IB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "IB",
+        "agyt": "IB-U.S. INFORMATION AGENCY",
+        "agysub": "IB00",
+        "agysubt": "IB00-U.S. INFORMATION AGENCY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "IB",
+          "agyt": "IB-INTERNATIONAL COMMUNICATION AGENCY",
+          "agysub": "IB00",
+          "agysubt": "IB00-U.S. INFORMATION AGENCY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "NK00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "NK",
+        "agyt": "NK-NATIONAL COUNCIL ON THE HANDICAPPED",
+        "agysub": "NK00",
+        "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "NK",
+          "agyt": "NK-NATIONAL COUNCIL ON DISABILITY",
+          "agysub": "NK00",
+          "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "PC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "PC",
+        "agyt": "PC-PANAMA CANAL COMPANY",
+        "agysub": "PC00",
+        "agysubt": "PC00-PANAMA CANAL COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "PC",
+          "agyt": "PC-PANAMA CANAL COMMISSION",
+          "agysub": "PC00",
+          "agysubt": "PC00-PANAMA CANAL COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "RE00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RE",
+        "agyt": "RE-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION",
+        "agysub": "RE00",
+        "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RE",
+          "agyt": "RE-NAVAJO AND HOPI INDIAN RELOCATION COMMISSION",
+          "agysub": "RE00",
+          "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "RS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RS",
+        "agyt": "RS-UNKNOWN",
+        "agysub": "RS00",
+        "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RS",
+          "agyt": "RS-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION",
+          "agysub": "RS00",
+          "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "TC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TC",
+        "agyt": "TC-U.S. TARIFF COMMISSION",
+        "agysub": "TC00",
+        "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TC",
+          "agyt": "TC-U.S. INTERNATIONAL TRADE COMMISSION",
+          "agysub": "TC00",
+          "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "1999_Q3",
+      "code": "TN00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "1999_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TN",
+        "agyt": "TN-OFFICE OF THE U.S. TRADE REPRESENTATIVE",
+        "agysub": "TN00",
+        "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "1999_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TN",
+          "agyt": "TN-OFFICE OF THE SPECIAL REPRESENTATIVE FOR TRADE NEGOTIATIONS",
+          "agysub": "TN00",
+          "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "AM00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+        "agysub": "AM00",
+        "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+          "agysub": "AM00",
+          "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "CG00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "CG",
+        "agyt": "CG-NATIONAL EDUCATION GOALS PANEL",
+        "agysub": "CG00",
+        "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "CG",
+          "agyt": "CG-COMMISSION ON CENTRAL INTELLIGENCE AGENCY ACTIVITIES WITHIN THE UNITED STAT",
+          "agysub": "CG00",
+          "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "EQ00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EQ",
+        "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY",
+        "agysub": "EQ00",
+        "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EQ",
+          "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY",
+          "agysub": "EQ00",
+          "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "EX00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EX",
+        "agyt": "EX-EXECUTIVE RESIDENCE AT THE WHITE HOUSE",
+        "agysub": "EX00",
+        "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EX",
+          "agyt": "EX-EXECUTIVE MANSION AND GROUNDS",
+          "agysub": "EX00",
+          "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "HB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "HB",
+        "agyt": "HB-COMMITTEE FOR PURCHASE OF PRODUCTS AND SERVICES OF THE BLIND AND OTHER SEVE",
+        "agysub": "HB00",
+        "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "HB",
+          "agyt": "HB-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED",
+          "agysub": "HB00",
+          "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "IB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "IB",
+        "agyt": "IB-INTERNATIONAL COMMUNICATION AGENCY",
+        "agysub": "IB00",
+        "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "IB",
+          "agyt": "IB-BROADCASTING BOARD OF GOVERNORS",
+          "agysub": "IB00",
+          "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "NK00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "NK",
+        "agyt": "NK-NATIONAL COUNCIL ON THE HANDICAPPED",
+        "agysub": "NK00",
+        "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "NK",
+          "agyt": "NK-NATIONAL COUNCIL ON DISABILITY",
+          "agysub": "NK00",
+          "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "PC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "PC",
+        "agyt": "PC-PANAMA CANAL COMPANY",
+        "agysub": "PC00",
+        "agysubt": "PC00-PANAMA CANAL COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "PC",
+          "agyt": "PC-PANAMA CANAL COMMISSION",
+          "agysub": "PC00",
+          "agysubt": "PC00-PANAMA CANAL COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "RE00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RE",
+        "agyt": "RE-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION",
+        "agysub": "RE00",
+        "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RE",
+          "agyt": "RE-NAVAJO AND HOPI INDIAN RELOCATION COMMISSION",
+          "agysub": "RE00",
+          "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "RS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RS",
+        "agyt": "RS-UNKNOWN",
+        "agysub": "RS00",
+        "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RS",
+          "agyt": "RS-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION",
+          "agysub": "RS00",
+          "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "TC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TC",
+        "agyt": "TC-U.S. TARIFF COMMISSION",
+        "agysub": "TC00",
+        "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TC",
+          "agyt": "TC-U.S. INTERNATIONAL TRADE COMMISSION",
+          "agysub": "TC00",
+          "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2000_Q3",
+      "code": "TN00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2000_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TN",
+        "agyt": "TN-OFFICE OF THE U.S. TRADE REPRESENTATIVE",
+        "agysub": "TN00",
+        "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2000_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TN",
+          "agyt": "TN-OFFICE OF THE SPECIAL REPRESENTATIVE FOR TRADE NEGOTIATIONS",
+          "agysub": "TN00",
+          "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "AM00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+        "agysub": "AM00",
+        "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+          "agysub": "AM00",
+          "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "CG00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "CG",
+        "agyt": "CG-NATIONAL EDUCATION GOALS PANEL",
+        "agysub": "CG00",
+        "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "CG",
+          "agyt": "CG-COMMISSION ON CENTRAL INTELLIGENCE AGENCY ACTIVITIES WITHIN THE UNITED STAT",
+          "agysub": "CG00",
+          "agysubt": "CG00-NATIONAL EDUCATION GOALS PANEL"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "EQ00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EQ",
+        "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY",
+        "agysub": "EQ00",
+        "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EQ",
+          "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY",
+          "agysub": "EQ00",
+          "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "EX00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EX",
+        "agyt": "EX-EXECUTIVE RESIDENCE AT THE WHITE HOUSE",
+        "agysub": "EX00",
+        "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EX",
+          "agyt": "EX-EXECUTIVE MANSION AND GROUNDS",
+          "agysub": "EX00",
+          "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "HB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "HB",
+        "agyt": "HB-COMMITTEE FOR PURCHASE OF PRODUCTS AND SERVICES OF THE BLIND AND OTHER SEVE",
+        "agysub": "HB00",
+        "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "HB",
+          "agyt": "HB-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED",
+          "agysub": "HB00",
+          "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "HD00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "HD",
+        "agyt": "HD-U.S. HOLOCAUST MEMORIAL MUSEUM",
+        "agysub": "HD00",
+        "agysubt": "HD00-U.S. HOLOCAUST MEMORIAL MUSEUM"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "HD",
+          "agyt": "HD-U.S. HOLOCAUST MEMORIAL COUNCIL",
+          "agysub": "HD00",
+          "agysubt": "HD00-U.S. HOLOCAUST MEMORIAL MUSEUM"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "IB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "IB",
+        "agyt": "IB-INTERNATIONAL COMMUNICATION AGENCY",
+        "agysub": "IB00",
+        "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "IB",
+          "agyt": "IB-BROADCASTING BOARD OF GOVERNORS",
+          "agysub": "IB00",
+          "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "NK00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "NK",
+        "agyt": "NK-NATIONAL COUNCIL ON THE HANDICAPPED",
+        "agysub": "NK00",
+        "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "NK",
+          "agyt": "NK-NATIONAL COUNCIL ON DISABILITY",
+          "agysub": "NK00",
+          "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "RE00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RE",
+        "agyt": "RE-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION",
+        "agysub": "RE00",
+        "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RE",
+          "agyt": "RE-NAVAJO AND HOPI INDIAN RELOCATION COMMISSION",
+          "agysub": "RE00",
+          "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "RS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RS",
+        "agyt": "RS-UNKNOWN",
+        "agysub": "RS00",
+        "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RS",
+          "agyt": "RS-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION",
+          "agysub": "RS00",
+          "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "TC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TC",
+        "agyt": "TC-U.S. TARIFF COMMISSION",
+        "agysub": "TC00",
+        "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TC",
+          "agyt": "TC-U.S. INTERNATIONAL TRADE COMMISSION",
+          "agysub": "TC00",
+          "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2001_Q3",
+      "code": "TN00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2001_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TN",
+        "agyt": "TN-OFFICE OF THE U.S. TRADE REPRESENTATIVE",
+        "agysub": "TN00",
+        "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2001_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TN",
+          "agyt": "TN-OFFICE OF THE SPECIAL REPRESENTATIVE FOR TRADE NEGOTIATIONS",
+          "agysub": "TN00",
+          "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "AM00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+        "agysub": "AM00",
+        "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+          "agysub": "AM00",
+          "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "EQ00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EQ",
+        "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY",
+        "agysub": "EQ00",
+        "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EQ",
+          "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY",
+          "agysub": "EQ00",
+          "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "EX00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EX",
+        "agyt": "EX-EXECUTIVE RESIDENCE AT THE WHITE HOUSE",
+        "agysub": "EX00",
+        "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EX",
+          "agyt": "EX-EXECUTIVE MANSION AND GROUNDS",
+          "agysub": "EX00",
+          "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "HB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "HB",
+        "agyt": "HB-COMMITTEE FOR PURCHASE OF PRODUCTS AND SERVICES OF THE BLIND AND OTHER SEVE",
+        "agysub": "HB00",
+        "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "HB",
+          "agyt": "HB-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED",
+          "agysub": "HB00",
+          "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "HD00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "HD",
+        "agyt": "HD-U.S. HOLOCAUST MEMORIAL MUSEUM",
+        "agysub": "HD00",
+        "agysubt": "HD00-U.S. HOLOCAUST MEMORIAL MUSEUM"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "HD",
+          "agyt": "HD-U.S. HOLOCAUST MEMORIAL COUNCIL",
+          "agysub": "HD00",
+          "agysubt": "HD00-U.S. HOLOCAUST MEMORIAL MUSEUM"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "IB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "IB",
+        "agyt": "IB-INTERNATIONAL COMMUNICATION AGENCY",
+        "agysub": "IB00",
+        "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "IB",
+          "agyt": "IB-BROADCASTING BOARD OF GOVERNORS",
+          "agysub": "IB00",
+          "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "NK00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "NK",
+        "agyt": "NK-NATIONAL COUNCIL ON THE HANDICAPPED",
+        "agysub": "NK00",
+        "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "NK",
+          "agyt": "NK-NATIONAL COUNCIL ON DISABILITY",
+          "agysub": "NK00",
+          "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "RE00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RE",
+        "agyt": "RE-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION",
+        "agysub": "RE00",
+        "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RE",
+          "agyt": "RE-NAVAJO AND HOPI INDIAN RELOCATION COMMISSION",
+          "agysub": "RE00",
+          "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "RS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RS",
+        "agyt": "RS-UNKNOWN",
+        "agysub": "RS00",
+        "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RS",
+          "agyt": "RS-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION",
+          "agysub": "RS00",
+          "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "TC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TC",
+        "agyt": "TC-U.S. TARIFF COMMISSION",
+        "agysub": "TC00",
+        "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TC",
+          "agyt": "TC-U.S. INTERNATIONAL TRADE COMMISSION",
+          "agysub": "TC00",
+          "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2002_Q3",
+      "code": "TN00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2002_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TN",
+        "agyt": "TN-OFFICE OF THE U.S. TRADE REPRESENTATIVE",
+        "agysub": "TN00",
+        "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2002_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TN",
+          "agyt": "TN-OFFICE OF THE SPECIAL REPRESENTATIVE FOR TRADE NEGOTIATIONS",
+          "agysub": "TN00",
+          "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "AM00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "AM",
+        "agyt": "AM-U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY",
+        "agysub": "AM00",
+        "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "AM",
+          "agyt": "AM-U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT",
+          "agysub": "AM00",
+          "agysubt": "AM00-AGENCY FOR INTERNATIONAL DEVELOPMENT"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "EQ00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EQ",
+        "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY",
+        "agysub": "EQ00",
+        "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EQ",
+          "agyt": "EQ-COUNCIL ON ENVIRONMENTAL QUALITY",
+          "agysub": "EQ00",
+          "agysubt": "EQ00-COUNCIL ON ENVIRONMENTAL QUALITY/OFFICE OF ENVIRONMENTAL QUALITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "EX00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "EX",
+        "agyt": "EX-EXECUTIVE RESIDENCE AT THE WHITE HOUSE",
+        "agysub": "EX00",
+        "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "EX",
+          "agyt": "EX-EXECUTIVE MANSION AND GROUNDS",
+          "agysub": "EX00",
+          "agysubt": "EX00-EXECUTIVE RESIDENCE AT THE WHITE HOUSE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "HB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "HB",
+        "agyt": "HB-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED",
+        "agysub": "HB00",
+        "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "HB",
+          "agyt": "HB-COMMITTEE FOR PURCHASE OF PRODUCTS AND SERVICES OF THE BLIND AND OTHER SEVE",
+          "agysub": "HB00",
+          "agysubt": "HB00-COMMITTEE FOR PURCHASE FROM PEOPLE WHO ARE BLIND OR SEVERELY DISABLED"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "HD00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "HD",
+        "agyt": "HD-U.S. HOLOCAUST MEMORIAL MUSEUM",
+        "agysub": "HD00",
+        "agysubt": "HD00-U.S. HOLOCAUST MEMORIAL MUSEUM"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "HD",
+          "agyt": "HD-U.S. HOLOCAUST MEMORIAL COUNCIL",
+          "agysub": "HD00",
+          "agysubt": "HD00-U.S. HOLOCAUST MEMORIAL MUSEUM"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "IB00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "2",
+        "agytypt": "Large Independent Agencies (1000 or more employees)",
+        "agy": "IB",
+        "agyt": "IB-INTERNATIONAL COMMUNICATION AGENCY",
+        "agysub": "IB00",
+        "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "2",
+          "agytypt": "Large Independent Agencies (1000 or more employees)",
+          "agy": "IB",
+          "agyt": "IB-BROADCASTING BOARD OF GOVERNORS",
+          "agysub": "IB00",
+          "agysubt": "IB00-BROADCASTING BOARD OF GOVERNORS"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "NK00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "NK",
+        "agyt": "NK-NATIONAL COUNCIL ON THE HANDICAPPED",
+        "agysub": "NK00",
+        "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "NK",
+          "agyt": "NK-NATIONAL COUNCIL ON DISABILITY",
+          "agysub": "NK00",
+          "agysubt": "NK00-NATIONAL COUNCIL ON DISABILITY"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "RE00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RE",
+        "agyt": "RE-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION",
+        "agysub": "RE00",
+        "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RE",
+          "agyt": "RE-NAVAJO AND HOPI INDIAN RELOCATION COMMISSION",
+          "agysub": "RE00",
+          "agysubt": "RE00-OFFICE OF NAVAJO AND HOPI INDIAN RELOCATION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "RS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "RS",
+        "agyt": "RS-UNKNOWN",
+        "agysub": "RS00",
+        "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "RS",
+          "agyt": "RS-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION",
+          "agysub": "RS00",
+          "agysubt": "RS00-FEDERAL MINE SAFETY AND HEALTH REVIEW COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "TC00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TC",
+        "agyt": "TC-U.S. TARIFF COMMISSION",
+        "agysub": "TC00",
+        "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TC",
+          "agyt": "TC-U.S. INTERNATIONAL TRADE COMMISSION",
+          "agysub": "TC00",
+          "agysubt": "TC00-U.S. INTERNATIONAL TRADE COMMISSION"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "TN00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "3",
+        "agytypt": "Medium Independent Agencies (100-999 employees)",
+        "agy": "TN",
+        "agyt": "TN-OFFICE OF THE U.S. TRADE REPRESENTATIVE",
+        "agysub": "TN00",
+        "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "3",
+          "agytypt": "Medium Independent Agencies (100-999 employees)",
+          "agy": "TN",
+          "agyt": "TN-OFFICE OF THE SPECIAL REPRESENTATIVE FOR TRADE NEGOTIATIONS",
+          "agysub": "TN00",
+          "agysubt": "TN00-OFFICE OF THE U.S. TRADE REPRESENTATIVE"
+        }
+      ]
+    },
+    {
+      "dataset_key": "2003_Q3",
+      "code": "ZS00",
+      "count": 2,
+      "kept": {
+        "dataset_key": "2003_Q3",
+        "agytyp": "4",
+        "agytypt": "Small Independent Agencies (less than 100 employees)",
+        "agy": "ZS",
+        "agyt": "ZS-UNITED STATES-CHINA SECURITY REVIEW COMMISSION",
+        "agysub": "ZS00",
+        "agysubt": "ZS00-UNITED STATES-CHINA ECONOMIC AND SECURITY REVIEW COMMISSION"
+      },
+      "discarded": [
+        {
+          "dataset_key": "2003_Q3",
+          "agytyp": "4",
+          "agytypt": "Small Independent Agencies (less than 100 employees)",
+          "agy": "ZS",
+          "agyt": "ZS-UNITED STATES-CHINA ECONOMIC AND SECURITY REVIEW COMMISSION",
+          "agysub": "ZS00",
+          "agysubt": "ZS00-UNITED STATES-CHINA ECONOMIC AND SECURITY REVIEW COMMISSION"
+        }
+      ]
+    }
+  ]
+}
