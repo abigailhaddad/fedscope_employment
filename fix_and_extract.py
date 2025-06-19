@@ -69,15 +69,25 @@ def rename_and_extract_files():
     fedscope_dir = "fedscope_data"
     extracted_dir = os.path.join(fedscope_dir, "extracted")
     
-    # Find all UUID-named zip files
+    # Create extracted directory if it doesn't exist
+    os.makedirs(extracted_dir, exist_ok=True)
+    
+    # Find all zip files
+    all_zip_files = []
     uuid_files = []
+    fedscope_files = []
+    
     for file in os.listdir(fedscope_dir):
-        if file.endswith('.zip') and not file.startswith('FedScope_'):
-            # Check if it looks like a UUID (has dashes)
-            if '-' in file and len(file) == 40:  # UUID + .zip
+        if file.endswith('.zip'):
+            all_zip_files.append(file)
+            if file.startswith('FedScope_'):
+                fedscope_files.append(file)
+            elif '-' in file and len(file) == 40:  # UUID + .zip
                 uuid_files.append(file)
     
-    logger.info(f"Found {len(uuid_files)} UUID-named files to process")
+    logger.info(f"Found {len(all_zip_files)} total zip files")
+    logger.info(f"  - {len(uuid_files)} UUID-named files to rename")
+    logger.info(f"  - {len(fedscope_files)} properly named FedScope files to extract")
     
     for uuid_file in uuid_files:
         zip_path = os.path.join(fedscope_dir, uuid_file)
@@ -109,6 +119,28 @@ def rename_and_extract_files():
                 os.remove(zip_path)  # Remove the duplicate
         else:
             logger.warning(f"  Could not identify period for {uuid_file}")
+    
+    # Now process properly named FedScope files
+    for fedscope_file in fedscope_files:
+        zip_path = os.path.join(fedscope_dir, fedscope_file)
+        logger.info(f"Processing {fedscope_file}...")
+        
+        # Extract quarter and year from filename
+        quarter, year = identify_fedscope_file(zip_path)
+        
+        if quarter and year:
+            extract_path = os.path.join(extracted_dir, f"FedScope_Employment_{quarter}_{year}")
+            if not os.path.exists(extract_path):
+                try:
+                    with zipfile.ZipFile(zip_path, 'r') as zf:
+                        zf.extractall(extract_path)
+                    logger.info(f"  Extracted to: {extract_path}")
+                except Exception as e:
+                    logger.error(f"  Error extracting {fedscope_file}: {e}")
+            else:
+                logger.info(f"  Already extracted: {extract_path}")
+        else:
+            logger.warning(f"  Could not identify period for {fedscope_file}")
 
 def main():
     """Main function to fix file naming and extraction."""
