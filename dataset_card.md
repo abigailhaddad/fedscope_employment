@@ -109,7 +109,7 @@ All coded fields include both the original code and human-readable description f
 
 The original FedScope data is published as separate quarterly ZIP files with complex fact and lookup table structures that require significant technical expertise to merge and analyze. This processed dataset addresses several key challenges:
 
-1. **Accessibility**: Combines 72 separate quarterly datasets into a single table
+1. **Accessibility**: Processes 72 separate quarterly datasets into individual CSV files ready for analysis
 2. **Usability**: Joins all lookup tables to provide human-readable descriptions
 3. **Consistency**: Handles schema evolution (e.g., pay plan field added in 2016)
 4. **Quality**: Documents and resolves duplicate entries in lookup tables
@@ -128,6 +128,35 @@ The original FedScope data is published as separate quarterly ZIP files with com
 4. **Lookup Resolution**: Joins fact tables with 13 different lookup tables
 5. **Quality Control**: Handles duplicate lookup entries (primarily 1998-2003)
 6. **Denormalization**: Creates single analysis-ready table
+
+### Data Availability by Year
+- **1998**: September
+- **1999**: September  
+- **2000**: September
+- **2001**: September
+- **2002**: September
+- **2003**: September
+- **2004**: September
+- **2005**: September
+- **2006**: September
+- **2007**: September
+- **2008**: September
+- **2009**: September, December
+- **2010**: March, June, September, December
+- **2011**: March, June, September, December
+- **2012**: March, June, September, December
+- **2013**: March, June, September, December
+- **2014**: March, June, September, December
+- **2015**: March, June, September, December
+- **2016**: March, June, September, December
+- **2017**: March, June, September, December
+- **2018**: March, June, September, December
+- **2019**: March, June, September, December
+- **2020**: March, June, September, December
+- **2021**: March, June, September, December
+- **2022**: March, June, September, December
+- **2023**: March, June, September, December
+- **2024**: March, June, September
 
 #### Who are the source data producers?
 
