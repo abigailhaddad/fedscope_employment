@@ -32,8 +32,11 @@ Cleaned and processed version of OPM's FedScope Employment Cube data (1998-2024)
 ```python
 import pandas as pd
 
-# Load a specific quarter directly
+# Load a specific quarter directly from Hugging Face
 df = pd.read_csv("https://huggingface.co/datasets/abigailhaddad/fedscope/resolve/main/fedscope_employment_September_2022.csv")
+
+# Or download manually from https://huggingface.co/datasets/abigailhaddad/fedscope/tree/main
+df = pd.read_csv("fedscope_employment_September_2022.csv")
 ```
 
 ## Dataset Details
