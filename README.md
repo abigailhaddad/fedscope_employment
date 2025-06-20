@@ -1,156 +1,42 @@
 # FedScope Employment Data Pipeline
 
-This repository contains the **processing pipeline** that creates a cleaned, denormalized version of the FedScope Employment Cube dataset.
+**📊 DATASET AVAILABLE ON HUGGING FACE**: https://huggingface.co/datasets/abigailhaddad/fedscope
 
-**📊 Final Dataset**: https://huggingface.co/datasets/abigailhaddad/fedscope
+This repository contains the **processing pipeline** that creates the cleaned dataset. **The actual data files (72 quarterly CSV files, ~140M records) are hosted on Hugging Face**, not in this repository.
 
 **📚 Documentation**: https://abigailhaddad.github.io/fedscope_employment/
 
-**⚠️ Note**: This repository contains only the processing code, not the raw data files. To recreate the dataset, you'll need to download the original ZIP files from https://www.opm.gov/data/datasets/.
+**⚠️ Note**: This repository contains only the processing code. The final dataset lives on Hugging Face. To recreate the dataset from scratch, you'd need to download the original ZIP files from https://www.opm.gov/data/datasets/.
 
-## About the Data
+## Using the Dataset
 
-I downloaded all available FedScope Employment Cube files from the Office of Personnel Management (OPM). This dataset contains snapshots of federal civilian employment data from 1998 to 2024, totaling approximately 140+ million employee records across 72 datasets.
+The processed dataset on Hugging Face contains 72 quarterly CSV files with ~140M federal employee records (1998-2024). Each file is ready for analysis with all lookup tables already joined.
+
+### Quick Start
+
+Download individual quarterly CSV files from https://huggingface.co/datasets/abigailhaddad/fedscope. The files work with any spreadsheet application (Excel, Google Sheets) or data analysis tool (Python, R, etc.).
+
+### What You Get
+
+- **Ready-to-analyze data**: No need to extract ZIPs or join lookup tables
+- **Consistent schema**: Schema evolution handled (e.g., pay plan field added in 2016) 
+- **Clean data**: Duplicates resolved, salary redactions converted to null
+- **72 quarterly files**: Individual CSV files, 1998-2024 (1.7M-2.2M records each)
 
 ### Data Sources and Alternatives
 
-- **Raw Data**: The original FedScope files are available at https://www.opm.gov/data/datasets/ as individual ZIP archives that require extraction and manual merging of fact and lookup tables for each quarter
-- **Official Web Interface**: OPM also provides an interactive data exploration tool at https://www.fedscope.opm.gov/ for querying the data through a web interface. Note that the Cognos web interface includes additional variables not available in the downloadable cube files.
-- **This Processed Dataset**: For researchers and analysts who prefer working with complete, pre-processed data files, this repository provides quarterly CSV files based on the downloadable cube data
+- **This Dataset (Recommended)**: Pre-processed quarterly CSV files ready for analysis
+- **Raw Data**: Original FedScope ZIP files at https://www.opm.gov/data/datasets/ (requires manual extraction and joining)
+- **Official Web Interface**: https://www.fedscope.opm.gov/ (includes additional variables not in downloadable files)
 
-**Note**: This repository currently processes only the Employment Cube data. The FedScope system also includes Separations and Accessions data cubes, which are not included in this processed dataset.
+**Note**: This covers only Employment Cube data. FedScope also has Separations and Accessions cubes not included here.
 
-## Data Files
+## Data Coverage
 
-The raw data consists of 72 ZIP files, one for each quarter where data is available:
-
-### Files by Year
-- **1998**: September
-- **1999**: September  
-- **2000**: September
-- **2001**: September
-- **2002**: September
-- **2003**: September
-- **2004**: September
-- **2005**: September
-- **2006**: September
-- **2007**: September
-- **2008**: September
-- **2009**: September, December
-- **2010**: March, June, September, December
-- **2011**: March, June, September, December
-- **2012**: March, June, September, December
-- **2013**: March, June, September, December
-- **2014**: March, June, September, December
-- **2015**: March, June, September, December
-- **2016**: March, June, September, December
-- **2017**: March, June, September, December
-- **2018**: March, June, September, December
-- **2019**: March, June, September, December
-- **2020**: March, June, September, December
-- **2021**: March, June, September, December
-- **2022**: March, June, September, December
-- **2023**: March, June, September, December
-- **2024**: March, June, September
-
-## Data Preparation
-
-The FedScope files from OPM  come with UUID-style names (e.g., `9f7eab79-e539-45fe-8e8a-00663e3ec190`) rather than descriptive names. The `fix_and_extract.py` script:
-
-1. Identifies the time period by examining the FACTDATA filename inside each ZIP
-2. Renames files to a standard format: `FedScope_Employment_{Quarter}_{Year}.zip`
-3. Extracts them to matching directory names
-
-## Repository Structure
-
-```
-fedscope_employment/
-├── fedscope_data/
-│   ├── raw/                    # Original ZIP files from OPM
-│   └── extracted/              # Extracted data files
-│       ├── FedScope_Employment_September_1998/
-│       ├── FedScope_Employment_September_1999/
-│       └── ... (60 more directories)
-├── main.py                     # Main orchestration script
-├── fix_and_extract.py          # Identifies, renames, and extracts ZIP files
-├── load_to_duckdb_robust.py    # Loads data into DuckDB with schema handling
-├── export_and_upload_one_by_one.py  # Exports and uploads quarterly CSV files to Hugging Face
-├── collect_pdfs.py             # Collects PDF documentation files
-├── validate_duckdb.py          # Validates loaded data
-├── requirements.txt            # Python dependencies
-└── documentation_pdfs/         # PDF documentation for each quarterly dataset
-```
-
-## Data Structure
-
-Each quarterly dataset contains:
-- **FACTDATA_\*.TXT**: Main fact table with employee records (1.7M - 2.2M records per quarter)
-- **DT\*.txt**: Lookup tables providing descriptions for coded values
-  - DTagelvl.txt - Age levels
-  - DTagy.txt - Agencies  
-  - DTedlvl.txt - Education levels
-  - DTgsegrd.txt - General Schedule grades
-  - DTloc.txt - Locations
-  - DTocc.txt - Occupations
-  - DTpatco.txt - PATCO categories
-  - DTppgrd.txt - Pay plans and grades
-  - DTsallvl.txt - Salary levels
-  - DTstemocc.txt - STEM occupations
-  - DTsuper.txt - Supervisory status
-  - DTtoa.txt - Types of appointment
-  - DTwrksch.txt - Work schedules
-  - DTwkstat.txt - Work status
-
-## Pipeline Overview
-
-The pipeline uses DuckDB as a central data warehouse that:
-1. Loads all 140M+ records into a single database
-2. Handles schema evolution (e.g., 'pp' column added in 2016)
-3. Creates a denormalized table with all lookups joined
-4. Exports and uploads quarterly CSV files directly to Hugging Face
-
-### Data Quality Note
-
-Some lookup tables contain duplicate entries where agencies were renamed but kept the same code. For example, in 1998 the agency code "AMPC" appears twice:
-- U.S. INTERNATIONAL DEVELOPMENT COOPERATION AGENCY
-- U.S. AGENCY FOR INTERNATIONAL DEVELOPMENT
-
-This primarily affects early years (1998-2003). When creating the denormalized table, we use the first occurrence of each duplicate and log all duplicates to `lookup_duplicates_summary.txt`. This ensures each fact record maps to exactly one description.
-
-## Architecture
-
-```
-FedScope ZIP files → Extract → DuckDB → Upload quarterly CSV files to Hugging Face
-```
-
-- **DuckDB**: Local data warehouse containing all historical data (~10GB)
-- **Hugging Face Upload**: Exports and uploads 72 quarterly CSV files directly to Hugging Face dataset repository
-
-## Usage
-
-### Full Pipeline
-```bash
-python main.py --all
-```
-
-### Individual Steps
-
-1. **Extract ZIP files**:
-```bash
-python main.py --extract
-```
-
-2. **Load into DuckDB**:
-```bash
-python main.py --load-duckdb
-```
-
-3. **Export and Upload to Hugging Face**:
-```bash
-python export_and_upload_one_by_one.py <your-repo-name>
-```
-
-This exports each quarterly dataset as a CSV file and uploads it directly to Hugging Face, processing one file at a time to minimize disk usage.
+- **1998-2008**: September only (annual snapshots)
+- **2009**: September, December  
+- **2010-2024**: Full quarterly coverage (March, June, September, December)
+- **2024**: Through September
 
 ## Data Schema
 
@@ -176,21 +62,51 @@ The dataset includes for each employee record:
 
 **For Analysis**: Use the description fields (ending in 't') which provide human-readable values. Code fields are primarily for data processing.
 
-## Setup
+## Data Quality
 
-1. Install dependencies:
+The processing pipeline handles several data quality issues:
+
+- **Duplicate Lookup Entries**: Early years (1998-2003) contain duplicate agency entries with same codes but different names. The pipeline uses the first occurrence and logs all duplicates.
+- **Schema Evolution**: The pay plan field was added in 2016, so earlier years have null values.
+- **Salary Redaction**: Some salary values are masked as '****' in the source data and converted to null.
+
+## Recreating This Dataset
+
+If you want to recreate the dataset from scratch:
+
+### Prerequisites
+1. Download all 72 quarterly **FedScope Employment Cube** ZIP files from https://www.opm.gov/data/datasets/
+2. Place them in `fedscope_data/raw/` directory
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Output
+### Pipeline Steps
+```bash
+# Full pipeline
+python main.py --all
 
-The pipeline produces:
-- `fedscope_employment.duckdb` - Complete database with all fact and lookup tables (~10GB)
-- `lookup_duplicates_summary.txt` - Documentation of data quality issues
-- `lookup_duplicates_log.json` - Machine-readable duplicate records log
-- `documentation_pdfs/` - Original OPM documentation PDFs for each quarterly dataset
-- Hugging Face dataset with 72 quarterly CSV files (uploaded directly, no local storage)
+# Or individual steps:
+python main.py --extract           # Extract ZIP files
+python main.py --load-duckdb       # Load into DuckDB
+python export_and_upload_one_by_one.py <repo-name>  # Upload to HF
+```
+
+### Architecture
+```
+FedScope ZIP files → Extract → DuckDB → Upload quarterly CSV files to Hugging Face
+```
+
+The pipeline uses DuckDB as a local data warehouse (~10GB) to:
+1. Load all 140M+ records with schema handling
+2. Create denormalized tables with lookups joined
+3. Export and upload quarterly CSV files to Hugging Face
+
+### Output Files
+- `fedscope_employment.duckdb` - Complete local database
+- `lookup_duplicates_summary.txt` - Data quality documentation  
+- `documentation_pdfs/` - Original OPM documentation PDFs
 
 ## License
 
