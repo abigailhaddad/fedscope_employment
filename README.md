@@ -22,10 +22,10 @@ Download individual quarterly CSV files from https://huggingface.co/datasets/abi
 ```python
 import pandas as pd
 
-# Load a specific quarter directly
+# Load a specific quarter directly from Hugging Face
 df = pd.read_csv("https://huggingface.co/datasets/abigailhaddad/fedscope/resolve/main/fedscope_employment_September_2022.csv")
 
-# Or download and load locally
+# Or download manually from https://huggingface.co/datasets/abigailhaddad/fedscope/tree/main and load locally
 df = pd.read_csv("fedscope_employment_September_2022.csv")
 ```
 
