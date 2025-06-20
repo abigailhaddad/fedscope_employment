@@ -164,11 +164,7 @@ def compare_counts(raw_total, raw_by_dataset, db_total, db_by_dataset):
             parts = dataset.replace('FedScope_Employment_', '').split('_')
             if len(parts) == 2:
                 month, year = parts
-                quarter_map = {
-                    'March': 'Q1', 'June': 'Q2', 'September': 'Q3', 'December': 'Q4'
-                }
-                quarter = quarter_map.get(month, month)
-                dataset_key = f"{year}_{quarter}"
+                dataset_key = f"{year}_{month}"
                 raw_by_key[dataset_key] = count
     
     # Compare by dataset key
