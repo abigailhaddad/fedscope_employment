@@ -16,7 +16,7 @@ I downloaded all available FedScope Employment Cube files from the Office of Per
 
 - **Raw Data**: The original FedScope files are available at https://www.opm.gov/data/datasets/ as individual ZIP archives that require extraction and manual merging of fact and lookup tables for each quarter
 - **Official Web Interface**: OPM also provides an interactive data exploration tool at https://www.fedscope.opm.gov/ for querying the data through a web interface. Note that the Cognos web interface includes additional variables not available in the downloadable cube files.
-- **This Processed Dataset**: For researchers and analysts who prefer working with complete, pre-processed data files, this repository provides the entire dataset as a single table based on the downloadable cube data
+- **This Processed Dataset**: For researchers and analysts who prefer working with complete, pre-processed data files, this repository provides quarterly CSV files based on the downloadable cube data
 
 **Note**: This repository currently processes only the Employment Cube data. The FedScope system also includes Separations and Accessions data cubes, which are not included in this processed dataset.
 

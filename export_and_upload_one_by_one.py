@@ -109,15 +109,26 @@ def export_and_upload_one_by_one(repo_name, hf_token=None):
         except Exception as e:
             logger.warning(f"Repository creation/verification failed: {e}")
         
-        # Clear existing files in repository (except .gitattributes)
-        logger.info("Clearing existing files from repository...")
+        # Check and clear existing files in repository (except .gitattributes)
+        logger.info("Checking repository contents before upload...")
         try:
             existing_files = api.list_repo_files(repo_id=repo_name, repo_type="dataset")
             files_to_delete = [f for f in existing_files if f != '.gitattributes']
             
             if files_to_delete:
-                logger.info(f"Deleting {len(files_to_delete)} existing files: {files_to_delete}")
+                logger.warning(f"Found {len(files_to_delete)} existing files in repository:")
+                for f in files_to_delete:
+                    logger.warning(f"  - {f}")
+                
+                # Ask for confirmation to proceed
+                response = input(f"\n⚠️  Repository contains {len(files_to_delete)} files. Delete them and proceed? (y/N): ")
+                if response.lower() != 'y':
+                    logger.info("Upload cancelled by user")
+                    return
+                
+                logger.info("Deleting existing files...")
                 for file_path in files_to_delete:
+                    logger.info(f"  Deleting {file_path}...")
                     api.delete_file(
                         path_in_repo=file_path,
                         repo_id=repo_name,
@@ -125,11 +136,26 @@ def export_and_upload_one_by_one(repo_name, hf_token=None):
                         token=hf_token,
                         commit_message=f"Delete {file_path} before fresh upload"
                     )
-                logger.info("✅ Repository cleared")
+                
+                # Verify deletion worked
+                logger.info("Verifying deletion...")
+                remaining_files = api.list_repo_files(repo_id=repo_name, repo_type="dataset")
+                remaining_data_files = [f for f in remaining_files if f != '.gitattributes']
+                
+                if remaining_data_files:
+                    logger.error(f"❌ Deletion failed! {len(remaining_data_files)} files still remain:")
+                    for f in remaining_data_files:
+                        logger.error(f"  - {f}")
+                    logger.error("Stopping upload to prevent conflicts")
+                    return
+                else:
+                    logger.info("✅ Repository successfully cleared")
             else:
-                logger.info("Repository already clean")
+                logger.info("✅ Repository is clean, proceeding with upload")
         except Exception as e:
-            logger.warning(f"Could not clear repository: {e}")
+            logger.error(f"Could not check/clear repository: {e}")
+            logger.error("Stopping upload for safety")
+            return
         
         # Get total count and year range
         total_count = conn.execute("SELECT COUNT(*) FROM employment_denormalized").fetchone()[0]
