@@ -154,15 +154,27 @@ This exports each quarterly dataset as a CSV file and uploads it directly to Hug
 
 ## Data Schema
 
+### Field Format Structure
+
+The processed dataset contains three types of fields:
+
+1. **Code Fields**: Original FedScope codes used for categorization and joining (e.g., `agelvl`, `edlvl`, `occ`)
+2. **Description Fields**: Human-readable labels derived from lookup tables (e.g., `agelvlt`, `edlvlt`, `occt`)
+3. **Data Fields**: Actual analytical values (e.g., `employment`, `salary`, `year`)
+
+**Naming Pattern**: Description fields follow the pattern of adding 't' to the code field name (e.g., `agelvl` → `agelvlt`).
+
 The dataset includes for each employee record:
 
 - **Time**: Year, quarter, dataset key
-- **Demographics**: Age level, education level (with descriptions)
-- **Job Characteristics**: Occupation, PATCO category, pay plan/grade, GS equivalent grade (with descriptions)
-- **Compensation**: Salary (null for redacted values), salary level (with descriptions)
-- **Work Details**: Schedule, status, appointment type, supervisory status (with descriptions)
-- **Organization**: Sub-agency, location (with descriptions)
-- **Other**: STEM occupation indicator, length of service (with descriptions)
+- **Demographics**: Age level code/description, education level code/description
+- **Job Characteristics**: Occupation codes/descriptions, PATCO category codes/descriptions, pay plan/grade codes/descriptions, GS equivalent grade codes/descriptions
+- **Compensation**: Salary (null for redacted values), salary level codes/descriptions
+- **Work Details**: Schedule codes/descriptions, status codes/descriptions, appointment type codes/descriptions, supervisory status codes/descriptions
+- **Organization**: Sub-agency codes/descriptions, agency codes, location codes/descriptions
+- **Other**: STEM occupation indicator codes/descriptions, length of service, employment count
+
+**For Analysis**: Use the description fields (ending in 't') which provide human-readable values. Code fields are primarily for data processing.
 
 ## Setup
 

@@ -42,42 +42,56 @@ Each record represents an anonymized federal employee with demographic, job, and
 
 ## Fields
 
+### Field Format Structure
+
+The dataset contains three types of fields:
+
+1. **Code Fields**: Original FedScope codes used for categorization and joining (e.g., `agelvl`, `edlvl`, `occ`)
+2. **Description Fields**: Human-readable labels derived from lookup tables (e.g., `agelvlt`, `edlvlt`, `occt`)
+3. **Data Fields**: Actual analytical values (e.g., `employment`, `salary`, `year`)
+
+**Naming Pattern**: Description fields follow the pattern of adding 't' to the code field name (e.g., `agelvl` → `agelvlt`).
+
 ### Time Dimensions
+- `dataset_key`: Unique identifier for each quarterly dataset (string)
 - `year`: Calendar year (1998-2024)
-- `quarter`: Quarter (March, June, September, December)
-- `dataset_key`: Unique identifier for each quarterly dataset
+- `quarter`: Quarter name (March, June, September, December)
 
-### Demographics
-- `agelvl`: Age level (with description)
-- `edlvl`: Education level (with description)
+### Demographics (Codes + Descriptions)
+- `agelvl` / `agelvlt`: Age level code / Age level description (5-year bands)
+- `edlvl` / `edlvlt`: Education level code / Education level description
 
-### Job Characteristics  
-- `occ`: Occupation code and series (with description)
-- `patco`: Professional/Administrative/Technical/Clerical/Other category (with description)
-- `pp`: Pay plan (with description)
-- `ppgrd`: Pay plan and grade (with description)
-- `gsegrd`: General Schedule equivalent grade (with description)
+### Job Characteristics (Codes + Descriptions)
+- `occ` / `occt`: Occupation code / Occupation title
+- `occfam` / `occfamt`: Occupation family code / Occupation family description
+- `patco` / `patcot`: PATCO category code / PATCO category description
+- `pp` / `ppt`: Pay plan code / Pay plan description (null before 2016)
+- `ppgrd` / `ppgrdt`: Pay plan and grade code / Pay plan and grade description
+- `gsegrd` / `gsegrdt`: GS equivalent grade code / GS equivalent grade description
+- `supervis` / `supervist`: Supervisory status code / Supervisory status description
 
-### Compensation
-- `salary`: Annual salary (null values indicate redacted/masked salaries)
-- `sallvl`: Salary level range (with description)
+### Compensation (Codes + Descriptions + Data)
+- `salary`: Annual basic pay amount (null when redacted)
+- `sallvl` / `sallvlt`: Salary level code / Salary level description
 
-### Work Details
-- `wrksch`: Work schedule (full-time, part-time, etc.) (with description)
-- `wkstat`: Work status (with description)
-- `toa`: Type of appointment (with description)
-- `super`: Supervisory status (with description)
+### Work Details (Codes + Descriptions)
+- `wrksch` / `wrkscht`: Work schedule code / Work schedule description
+- `wkstat` / `wkstatt`: Work status code / Work status description
+- `toa` / `toat`: Type of appointment code / Type of appointment description
+- `loslvl` / `loslvlt`: Length of service level code / Length of service level description
 
-### Organization
-- `agy`: Agency code (with description)
-- `subagy`: Sub-agency code (with description)  
-- `loc`: Location code (with description)
+### Organization (Codes + Descriptions)
+- `agysub` / `agysubt`: Sub-agency code / Sub-agency description
+- `agy`: Agency code (from lookup join)
+- `loc` / `loct`: Location code / Location description
 
-### Additional Information
-- `stemocc`: STEM occupation indicator (with description)
-- `los`: Length of service (with description)
+### Additional Information (Codes + Descriptions + Data)
+- `stemocc` / `stemocct`: STEM occupation indicator code / STEM occupation description
+- `los`: Length of service (years)
+- `datecode`: Date code
+- `employment`: Employment count
 
-All fields include both codes and descriptions.
+**Note**: Code fields are primarily used for data processing and joins. For analysis, use the description fields (ending in 't') which provide human-readable values.
 
 ## Dataset Creation
 

@@ -129,6 +129,23 @@ def load_lookup_tables(conn, data_dir, dataset_key):
                 
             except Exception as e:
                 logger.error(f"    Error loading {table_name}: {e}")
+        else:
+            logger.warning(f"  Lookup file not found: {file_path}")
+            # Create empty table for missing lookup files (especially payplan for older datasets)
+            if table_name == 'payplan':
+                try:
+                    tables = conn.execute(f"SELECT table_name FROM information_schema.tables WHERE table_name = '{table_name}'").fetchall()
+                    if not tables:
+                        conn.execute(f"""
+                            CREATE TABLE {table_name} (
+                                dataset_key VARCHAR,
+                                pp VARCHAR,
+                                ppt VARCHAR
+                            )
+                        """)
+                        logger.info(f"    Created empty {table_name} table for schema compatibility")
+                except Exception as e:
+                    logger.error(f"    Error creating empty {table_name} table: {e}")
 
 def detect_and_log_duplicates(conn):
     """Detect duplicates in lookup tables and log them to a file."""
@@ -249,6 +266,10 @@ def detect_and_log_duplicates(conn):
 def create_denormalized_records_for_dataset(conn, dataset_key):
     """Create denormalized records for a specific dataset."""
     
+    # Check what columns exist in employment_facts_all for this dataset
+    fact_columns = conn.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'employment_facts_all'").fetchall()
+    fact_column_names = [col[0] for col in fact_columns]
+    
     # Check if denormalized table exists, create if not
     tables = conn.execute("SELECT table_name FROM information_schema.tables WHERE table_name = 'employment_denormalized'").fetchall()
     
@@ -259,41 +280,57 @@ def create_denormalized_records_for_dataset(conn, dataset_key):
             dataset_key VARCHAR,
             quarter VARCHAR,
             year INTEGER,
-            age_level_code VARCHAR,
-            education_level_code VARCHAR,
-            gs_equivalent_grade_code VARCHAR,
-            length_of_service_level_code VARCHAR,
-            occupation_code VARCHAR,
-            patco_code VARCHAR,
-            pay_plan_grade_code VARCHAR,
+            agysub VARCHAR,
+            loc VARCHAR,
+            agelvl VARCHAR,
+            edlvl VARCHAR,
+            gsegrd VARCHAR,
+            loslvl VARCHAR,
+            occ VARCHAR,
+            patco VARCHAR,
+            pp VARCHAR,
+            ppgrd VARCHAR,
+            sallvl VARCHAR,
+            stemocc VARCHAR,
+            supervis VARCHAR,
+            toa VARCHAR,
+            wrksch VARCHAR,
+            wkstat VARCHAR,
+            datecode VARCHAR,
+            employment VARCHAR,
             salary VARCHAR,
-            salary_level_code VARCHAR,
-            stem_occupation_code VARCHAR,
-            supervisory_status_code VARCHAR,
-            type_of_appointment_code VARCHAR,
-            work_schedule_code VARCHAR,
-            work_status_code VARCHAR,
-            date_code VARCHAR,
-            sub_agency_code VARCHAR,
-            location_code VARCHAR,
-            age_level_description VARCHAR,
-            education_level_description VARCHAR,
-            gs_equivalent_grade_description VARCHAR,
-            length_of_service_level_description VARCHAR,
-            occupation_description VARCHAR,
-            occupation_family_description VARCHAR,
-            patco_description VARCHAR,
-            pay_plan_grade_description VARCHAR,
-            salary_level_description VARCHAR,
-            stem_occupation_description VARCHAR,
-            supervisory_status_description VARCHAR,
-            type_of_appointment_description VARCHAR,
-            work_schedule_description VARCHAR,
-            work_status_description VARCHAR,
-            sub_agency_description VARCHAR,
-            location_description VARCHAR
+            los VARCHAR,
+            agelvlt VARCHAR,
+            agy VARCHAR,
+            agysubt VARCHAR,
+            edlvlt VARCHAR,
+            gsegrdt VARCHAR,
+            loct VARCHAR,
+            loslvlt VARCHAR,
+            occfam VARCHAR,
+            occt VARCHAR,
+            occfamt VARCHAR,
+            patcot VARCHAR,
+            ppt VARCHAR,
+            ppgrdt VARCHAR,
+            sallvlt VARCHAR,
+            stemocct VARCHAR,
+            supervist VARCHAR,
+            toat VARCHAR,
+            wrkscht VARCHAR,
+            wkstatt VARCHAR
         )
         """)
+    
+    # Build dynamic SQL based on available columns
+    pp_field = "f.pp" if "pp" in fact_column_names else "NULL as pp"
+    los_field = "f.los" if "los" in fact_column_names else "NULL as los"
+    
+    # Build payplan join conditionally
+    if "pp" in fact_column_names:
+        payplan_join = "LEFT JOIN (SELECT DISTINCT ON (dataset_key, pp) * FROM payplan ORDER BY dataset_key, pp, ROWID) pl ON f.dataset_key = pl.dataset_key AND f.pp = pl.pp"
+    else:
+        payplan_join = f"LEFT JOIN (SELECT dataset_key, NULL as pp, NULL as ppt FROM (SELECT DISTINCT dataset_key FROM employment_facts_all WHERE dataset_key = '{dataset_key}')) pl ON f.dataset_key = pl.dataset_key"
     
     # Insert denormalized records for this dataset
     conn.execute(f"""
@@ -303,42 +340,48 @@ def create_denormalized_records_for_dataset(conn, dataset_key):
         f.quarter,
         f.year,
         
-        -- Original fact columns (cleaned names)
-        f.agelvl as age_level_code,
-        f.edlvl as education_level_code, 
-        f.gsegrd as gs_equivalent_grade_code,
-        f.loslvl as length_of_service_level_code,
-        f.occ as occupation_code,
-        f.patco as patco_code,
-        f.ppgrd as pay_plan_grade_code,
-        f.salary as salary,
-        f.sallvl as salary_level_code,
-        f.stemocc as stem_occupation_code,
-        f.supervis as supervisory_status_code,
-        f.toa as type_of_appointment_code,
-        f.worksch as work_schedule_code,
-        f.workstat as work_status_code,
-        f.datecode as date_code,
-        f.agysub as sub_agency_code,
-        f.loc as location_code,
+        -- Original fact columns in same order as table
+        f.agysub,
+        f.loc,
+        f.agelvl,
+        f.edlvl,
+        f.gsegrd,
+        f.loslvl,
+        f.occ,
+        f.patco,
+        {pp_field},
+        f.ppgrd,
+        f.sallvl,
+        f.stemocc,
+        f.supervis,
+        f.toa,
+        f.worksch as wrksch,
+        f.workstat as wkstat,
+        f.datecode,
+        f.employment,
+        CASE WHEN f.salary = '****' THEN NULL ELSE f.salary END as salary,
+        {los_field},
         
-        -- Lookup descriptions (using actual column names)
-        a.agelvlt as age_level_description,
-        e.edlvlt as education_level_description,
-        g.gsegrd as gs_equivalent_grade_description,
-        los.loslvlt as length_of_service_level_description,
-        o.occt as occupation_description,
-        o.occfamt as occupation_family_description,
-        p.patcot as patco_description,
-        pp.ppgrd as pay_plan_grade_description,
-        sl.sallvlt as salary_level_description,
-        st.stemocct as stem_occupation_description,
-        s.supervist as supervisory_status_description,
-        t.toat as type_of_appointment_description,
-        ws.workscht as work_schedule_description,
-        wst.workstatt as work_status_description,
-        ag.agysubt as sub_agency_description,
-        l.loct as location_description
+        -- Lookup descriptions with original column names
+        a.agelvlt,
+        ag.agy,
+        ag.agysubt,
+        e.edlvlt,
+        g.gsegrd as gsegrdt,
+        l.loct,
+        los.loslvlt,
+        o.occ as occfam,
+        o.occt,
+        o.occfamt,
+        p.patcot,
+        pl.ppt,
+        pp.ppgrd as ppgrdt,
+        sl.sallvlt,
+        st.stemocct,
+        s.supervist,
+        t.toat,
+        ws.workscht as wrkscht,
+        wst.workstatt as wkstatt
         
     FROM employment_facts_all f
     -- Use deduplicated lookup tables (taking first occurrence by ROWID)
@@ -372,6 +415,7 @@ def create_denormalized_records_for_dataset(conn, dataset_key):
         ON f.dataset_key = ag.dataset_key AND f.agysub = ag.agysub
     LEFT JOIN (SELECT DISTINCT ON (dataset_key, loc) * FROM location ORDER BY dataset_key, loc, ROWID) l 
         ON f.dataset_key = l.dataset_key AND f.loc = l.loc
+    {payplan_join}
     WHERE f.dataset_key = '{dataset_key}'
     """)
     
