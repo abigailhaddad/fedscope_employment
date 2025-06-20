@@ -57,13 +57,6 @@ This is a cleaned and processed version of the official FedScope Employment Cube
 
 This dataset can be used to analyze federal government employment patterns over time, including trends in demographics, compensation, job classifications, and agency staffing from 1998-2024.
 
-### Out-of-Scope Use
-
-- **Official Government Use**: This is NOT an official dataset and should not be used for official government decisions or reporting
-- **Individual Identification**: Data has been anonymized and cannot be used to identify specific employees
-
-## Dataset Structure
-
 The dataset contains the following key fields for each employee record:
 
 ### Time Dimensions
