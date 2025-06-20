@@ -1,11 +1,11 @@
 {
   "agency": [
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "AMAG",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -15,7 +15,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -26,11 +26,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "AMPC",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -40,7 +40,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -51,11 +51,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "CG00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "CG",
@@ -65,7 +65,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "CG",
@@ -76,11 +76,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "EQ00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EQ",
@@ -90,7 +90,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EQ",
@@ -101,11 +101,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "EX00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EX",
@@ -115,7 +115,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EX",
@@ -126,11 +126,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "HB00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "HB",
@@ -140,7 +140,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "HB",
@@ -151,11 +151,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "IB00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "IB",
@@ -165,7 +165,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "IB",
@@ -176,11 +176,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "NK00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "NK",
@@ -190,7 +190,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "NK",
@@ -201,11 +201,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "PC00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "PC",
@@ -215,7 +215,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "PC",
@@ -226,11 +226,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "RE00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RE",
@@ -240,7 +240,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RE",
@@ -251,11 +251,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "RS00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RS",
@@ -265,7 +265,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RS",
@@ -276,11 +276,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "TC00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TC",
@@ -290,7 +290,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TC",
@@ -301,11 +301,11 @@
       ]
     },
     {
-      "dataset_key": "1998_Q3",
+      "dataset_key": "1998_September",
       "code": "TN00",
       "count": 2,
       "kept": {
-        "dataset_key": "1998_Q3",
+        "dataset_key": "1998_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TN",
@@ -315,7 +315,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1998_Q3",
+          "dataset_key": "1998_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TN",
@@ -326,11 +326,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "AM00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -340,7 +340,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -351,11 +351,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "AMPC",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -365,7 +365,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -376,11 +376,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "CG00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "CG",
@@ -390,7 +390,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "CG",
@@ -401,11 +401,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "EQ00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EQ",
@@ -415,7 +415,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EQ",
@@ -426,11 +426,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "EX00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EX",
@@ -440,7 +440,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EX",
@@ -451,11 +451,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "HB00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "HB",
@@ -465,7 +465,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "HB",
@@ -476,11 +476,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "IB00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "IB",
@@ -490,7 +490,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "IB",
@@ -501,11 +501,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "NK00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "NK",
@@ -515,7 +515,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "NK",
@@ -526,11 +526,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "PC00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "PC",
@@ -540,7 +540,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "PC",
@@ -551,11 +551,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "RE00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RE",
@@ -565,7 +565,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RE",
@@ -576,11 +576,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "RS00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RS",
@@ -590,7 +590,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RS",
@@ -601,11 +601,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "TC00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TC",
@@ -615,7 +615,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TC",
@@ -626,11 +626,11 @@
       ]
     },
     {
-      "dataset_key": "1999_Q3",
+      "dataset_key": "1999_September",
       "code": "TN00",
       "count": 2,
       "kept": {
-        "dataset_key": "1999_Q3",
+        "dataset_key": "1999_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TN",
@@ -640,7 +640,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "1999_Q3",
+          "dataset_key": "1999_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TN",
@@ -651,11 +651,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "AM00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -665,7 +665,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -676,11 +676,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "CG00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "CG",
@@ -690,7 +690,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "CG",
@@ -701,11 +701,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "EQ00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EQ",
@@ -715,7 +715,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EQ",
@@ -726,11 +726,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "EX00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EX",
@@ -740,7 +740,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EX",
@@ -751,11 +751,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "HB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "HB",
@@ -765,7 +765,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "HB",
@@ -776,11 +776,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "IB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "IB",
@@ -790,7 +790,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "IB",
@@ -801,11 +801,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "NK00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "NK",
@@ -815,7 +815,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "NK",
@@ -826,11 +826,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "PC00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "PC",
@@ -840,7 +840,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "PC",
@@ -851,11 +851,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "RE00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RE",
@@ -865,7 +865,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RE",
@@ -876,11 +876,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "RS00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RS",
@@ -890,7 +890,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RS",
@@ -901,11 +901,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "TC00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TC",
@@ -915,7 +915,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TC",
@@ -926,11 +926,11 @@
       ]
     },
     {
-      "dataset_key": "2000_Q3",
+      "dataset_key": "2000_September",
       "code": "TN00",
       "count": 2,
       "kept": {
-        "dataset_key": "2000_Q3",
+        "dataset_key": "2000_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TN",
@@ -940,7 +940,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2000_Q3",
+          "dataset_key": "2000_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TN",
@@ -951,11 +951,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "AM00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -965,7 +965,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -976,11 +976,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "CG00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "CG",
@@ -990,7 +990,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "CG",
@@ -1001,11 +1001,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "EQ00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EQ",
@@ -1015,7 +1015,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EQ",
@@ -1026,11 +1026,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "EX00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EX",
@@ -1040,7 +1040,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EX",
@@ -1051,11 +1051,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "HB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "HB",
@@ -1065,7 +1065,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "HB",
@@ -1076,11 +1076,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "HD00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "HD",
@@ -1090,7 +1090,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "HD",
@@ -1101,11 +1101,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "IB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "IB",
@@ -1115,7 +1115,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "IB",
@@ -1126,11 +1126,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "NK00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "NK",
@@ -1140,7 +1140,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "NK",
@@ -1151,11 +1151,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "RE00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RE",
@@ -1165,7 +1165,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RE",
@@ -1176,11 +1176,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "RS00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RS",
@@ -1190,7 +1190,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RS",
@@ -1201,11 +1201,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "TC00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TC",
@@ -1215,7 +1215,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TC",
@@ -1226,11 +1226,11 @@
       ]
     },
     {
-      "dataset_key": "2001_Q3",
+      "dataset_key": "2001_September",
       "code": "TN00",
       "count": 2,
       "kept": {
-        "dataset_key": "2001_Q3",
+        "dataset_key": "2001_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TN",
@@ -1240,7 +1240,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2001_Q3",
+          "dataset_key": "2001_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TN",
@@ -1251,11 +1251,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "AM00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -1265,7 +1265,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -1276,11 +1276,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "EQ00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EQ",
@@ -1290,7 +1290,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EQ",
@@ -1301,11 +1301,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "EX00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EX",
@@ -1315,7 +1315,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EX",
@@ -1326,11 +1326,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "HB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "HB",
@@ -1340,7 +1340,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "HB",
@@ -1351,11 +1351,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "HD00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "HD",
@@ -1365,7 +1365,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "HD",
@@ -1376,11 +1376,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "IB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "IB",
@@ -1390,7 +1390,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "IB",
@@ -1401,11 +1401,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "NK00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "NK",
@@ -1415,7 +1415,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "NK",
@@ -1426,11 +1426,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "RE00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RE",
@@ -1440,7 +1440,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RE",
@@ -1451,11 +1451,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "RS00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RS",
@@ -1465,7 +1465,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RS",
@@ -1476,11 +1476,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "TC00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TC",
@@ -1490,7 +1490,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TC",
@@ -1501,11 +1501,11 @@
       ]
     },
     {
-      "dataset_key": "2002_Q3",
+      "dataset_key": "2002_September",
       "code": "TN00",
       "count": 2,
       "kept": {
-        "dataset_key": "2002_Q3",
+        "dataset_key": "2002_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TN",
@@ -1515,7 +1515,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2002_Q3",
+          "dataset_key": "2002_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TN",
@@ -1526,11 +1526,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "AM00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "AM",
@@ -1540,7 +1540,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "AM",
@@ -1551,11 +1551,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "EQ00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EQ",
@@ -1565,7 +1565,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EQ",
@@ -1576,11 +1576,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "EX00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "EX",
@@ -1590,7 +1590,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "EX",
@@ -1601,11 +1601,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "HB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "HB",
@@ -1615,7 +1615,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "HB",
@@ -1626,11 +1626,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "HD00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "HD",
@@ -1640,7 +1640,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "HD",
@@ -1651,11 +1651,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "IB00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "2",
         "agytypt": "Large Independent Agencies (1000 or more employees)",
         "agy": "IB",
@@ -1665,7 +1665,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "2",
           "agytypt": "Large Independent Agencies (1000 or more employees)",
           "agy": "IB",
@@ -1676,11 +1676,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "NK00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "NK",
@@ -1690,7 +1690,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "NK",
@@ -1701,11 +1701,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "RE00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RE",
@@ -1715,7 +1715,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RE",
@@ -1726,11 +1726,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "RS00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "RS",
@@ -1740,7 +1740,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "RS",
@@ -1751,11 +1751,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "TC00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TC",
@@ -1765,7 +1765,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TC",
@@ -1776,11 +1776,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "TN00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "3",
         "agytypt": "Medium Independent Agencies (100-999 employees)",
         "agy": "TN",
@@ -1790,7 +1790,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "3",
           "agytypt": "Medium Independent Agencies (100-999 employees)",
           "agy": "TN",
@@ -1801,11 +1801,11 @@
       ]
     },
     {
-      "dataset_key": "2003_Q3",
+      "dataset_key": "2003_September",
       "code": "ZS00",
       "count": 2,
       "kept": {
-        "dataset_key": "2003_Q3",
+        "dataset_key": "2003_September",
         "agytyp": "4",
         "agytypt": "Small Independent Agencies (less than 100 employees)",
         "agy": "ZS",
@@ -1815,7 +1815,7 @@
       },
       "discarded": [
         {
-          "dataset_key": "2003_Q3",
+          "dataset_key": "2003_September",
           "agytyp": "4",
           "agytypt": "Small Independent Agencies (less than 100 employees)",
           "agy": "ZS",
