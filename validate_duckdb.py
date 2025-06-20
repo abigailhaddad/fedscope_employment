@@ -195,6 +195,133 @@ def compare_counts(raw_total, raw_by_dataset, db_total, db_by_dataset):
         logger.warning(f"\n❌ {mismatches} datasets have mismatched counts, {matches} match correctly")
         return False
 
+def validate_field_completeness(conn):
+    """Validate that all expected fields are present and nulls are expected."""
+    logger.info("\n=== FIELD COMPLETENESS VALIDATION ===")
+    
+    try:
+        # Expected fields based on original FedScope structure - ALL fields from denormalized table
+        expected_fields = {
+            # Core identifiers  
+            'dataset_key', 'quarter', 'year',
+            
+            # Original fact table fields (with original names)
+            'agysub',        # Sub-agency code
+            'loc',           # Location code
+            'agelvl',        # Age level code
+            'edlvl',         # Education level code
+            'gsegrd',        # GS equivalent grade code
+            'loslvl',        # Length of service level code
+            'occ',           # Occupation code
+            'patco',         # PATCO category code
+            'pp',            # Pay plan code (null before 2016)
+            'ppgrd',         # Pay plan and grade code
+            'sallvl',        # Salary level code
+            'stemocc',       # STEM occupation indicator
+            'supervis',      # Supervisory status code
+            'toa',           # Type of appointment code
+            'wrksch',        # Work schedule code
+            'wkstat',        # Work status code
+            'datecode',      # Date code
+            'employment',    # Employment count
+            'salary',        # Annual salary
+            'los',           # Length of service (null before certain years)
+            
+            # Lookup descriptions (with 't' suffix pattern)
+            'agelvlt',       # Age level description
+            'agy',           # Agency code (from agency lookup)
+            'agysubt',       # Sub-agency description
+            'edlvlt',        # Education level description
+            'gsegrdt',       # GS equivalent grade description
+            'loct',          # Location description
+            'loslvlt',       # Length of service level description
+            'occfam',        # Occupation family code
+            'occt',          # Occupation description
+            'occfamt',       # Occupation family description
+            'patcot',        # PATCO category description
+            'ppt',           # Pay plan description (null before 2016)
+            'ppgrdt',        # Pay plan and grade description
+            'sallvlt',       # Salary level description
+            'stemocct',      # STEM occupation description
+            'supervist',     # Supervisory status description
+            'toat',          # Type of appointment description
+            'wrkscht',       # Work schedule description
+            'wkstatt'        # Work status description
+        }
+        
+        # Get actual columns
+        columns = conn.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'employment_denormalized'").fetchall()
+        actual_fields = {col[0] for col in columns}
+        
+        # Check missing fields
+        missing_fields = expected_fields - actual_fields
+        extra_fields = actual_fields - expected_fields
+        
+        if missing_fields:
+            logger.error(f"❌ Missing expected fields: {sorted(missing_fields)}")
+        else:
+            logger.info("✅ All expected fields are present")
+            
+        if extra_fields:
+            logger.warning(f"⚠️ Unexpected extra fields: {sorted(extra_fields)}")
+        
+        # Check expected null patterns
+        logger.info("\nChecking expected null patterns...")
+        
+        # PP field should be null before 2016
+        pp_null_count = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE pp IS NULL AND year < 2016").fetchone()[0]
+        pp_total_pre2016 = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE year < 2016").fetchone()[0]
+        
+        if pp_total_pre2016 > 0:
+            pp_null_percent = (pp_null_count / pp_total_pre2016) * 100
+            logger.info(f"✅ PP field nulls before 2016: {pp_null_count:,}/{pp_total_pre2016:,} ({pp_null_percent:.1f}%)")
+        
+        # Check for unexpected nulls in core fields that should always be present
+        core_fields = ['agelvl', 'edlvl', 'occ', 'patco', 'agysub', 'loc']
+        for field in core_fields:
+            if field in actual_fields:
+                null_count = conn.execute(f"SELECT COUNT(*) FROM employment_denormalized WHERE {field} IS NULL").fetchone()[0]
+                if null_count > 0:
+                    logger.warning(f"⚠️ Unexpected nulls in {field}: {null_count:,} records")
+                else:
+                    logger.info(f"✅ {field}: no unexpected nulls")
+        
+        # Check salary redaction pattern
+        salary_null_count = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE salary IS NULL").fetchone()[0]
+        total_records = conn.execute("SELECT COUNT(*) FROM employment_denormalized").fetchone()[0]
+        salary_null_percent = (salary_null_count / total_records) * 100
+        logger.info(f"✅ Salary nulls (redacted): {salary_null_count:,}/{total_records:,} ({salary_null_percent:.2f}%)")
+        
+        # Check lookup description coverage
+        logger.info("\nChecking lookup description coverage...")
+        
+        # Sample a few key lookup relationships
+        lookup_checks = [
+            ('agelvl', 'agelvlt'),
+            ('edlvl', 'edlvlt'), 
+            ('occ', 'occt'),
+            ('patco', 'patcot'),
+            ('loc', 'loct')
+        ]
+        
+        for code_field, desc_field in lookup_checks:
+            if code_field in actual_fields and desc_field in actual_fields:
+                # Check records where code exists but description is null
+                missing_desc = conn.execute(f"""
+                    SELECT COUNT(*) FROM employment_denormalized 
+                    WHERE {code_field} IS NOT NULL AND {desc_field} IS NULL
+                """).fetchone()[0]
+                
+                if missing_desc > 0:
+                    logger.warning(f"⚠️ {desc_field} missing for {missing_desc:,} records with {code_field}")
+                else:
+                    logger.info(f"✅ {desc_field}: complete coverage")
+        
+        logger.info("\n=== FIELD VALIDATION COMPLETE ===")
+        
+    except Exception as e:
+        logger.error(f"Error during field validation: {e}")
+
 def main():
     """Run full validation."""
     logger.info("Starting validation process...")
@@ -208,7 +335,14 @@ def main():
     # Compare
     if raw_total > 0 and db_total > 0:
         success = compare_counts(raw_total, raw_by_dataset, db_total, db_by_dataset)
+        
+        # If counts match, validate field completeness
         if success:
+            conn = duckdb.connect('fedscope_employment.duckdb', read_only=True)
+            try:
+                validate_field_completeness(conn)
+            finally:
+                conn.close()
             logger.info("\n🎉 Validation PASSED - All data loaded correctly!")
         else:
             logger.warning("\n⚠️ Validation FAILED - Some data may be missing")

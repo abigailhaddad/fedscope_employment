@@ -184,6 +184,17 @@
     <div class="section" id="data-fields">
         <h2>Data Fields Reference</h2>
         
+        <div class="note">
+            <strong>Field Format Structure:</strong> The dataset contains three types of fields:
+            <ul style="margin-top: 0.5rem;">
+                <li><strong>Code Fields</strong>: Original FedScope codes used for categorization and joining (e.g., <code>agelvl</code>, <code>edlvl</code>, <code>occ</code>)</li>
+                <li><strong>Description Fields</strong>: Human-readable labels derived from lookup tables (e.g., <code>agelvlt</code>, <code>edlvlt</code>, <code>occt</code>)</li>
+                <li><strong>Data Fields</strong>: Actual analytical values (e.g., <code>employment</code>, <code>salary</code>, <code>year</code>)</li>
+            </ul>
+            <strong>Naming Pattern:</strong> Description fields follow the pattern of adding 't' to the code field name (e.g., <code>agelvl</code> → <code>agelvlt</code>).<br>
+            <strong>For Analysis:</strong> Use the description fields (ending in 't') which provide human-readable values. Code fields are primarily for data processing and joins.
+        </div>
+        
         <h3>Core Identifiers</h3>
         <table class="field-table">
             <tr>
@@ -211,23 +222,27 @@
         <h3>Demographics</h3>
         <table class="field-table">
             <tr>
-                <th>Field Name</th>
+                <th>Code Field</th>
+                <th>Description Field</th>
                 <th>Description</th>
                 <th>Example Values</th>
             </tr>
             <tr>
                 <td><code>agelvl</code></td>
+                <td><code>agelvlt</code></td>
                 <td>Age level (5-year bands)</td>
                 <td>A: < 20, B: 20-24, C: 25-29, etc.</td>
             </tr>
             <tr>
                 <td><code>edlvl</code></td>
+                <td><code>edlvlt</code></td>
                 <td>Education level</td>
                 <td>00-22 (High school through Doctorate)</td>
             </tr>
             <tr>
                 <td><code>los</code></td>
-                <td>Length of service</td>
+                <td><em>N/A</em></td>
+                <td>Length of service (data field)</td>
                 <td>Years of federal service</td>
             </tr>
         </table>
@@ -235,37 +250,44 @@
         <h3>Job Characteristics</h3>
         <table class="field-table">
             <tr>
-                <th>Field Name</th>
+                <th>Code Field</th>
+                <th>Description Field</th>
                 <th>Description</th>
                 <th>Details</th>
             </tr>
             <tr>
                 <td><code>occ</code></td>
+                <td><code>occt</code></td>
                 <td>Occupation code and series</td>
                 <td>4-digit OPM occupation codes</td>
             </tr>
             <tr>
                 <td><code>patco</code></td>
+                <td><code>patcot</code></td>
                 <td>PATCO category</td>
                 <td>Professional, Administrative, Technical, Clerical, Other</td>
             </tr>
             <tr>
                 <td><code>pp</code></td>
+                <td><code>ppt</code></td>
                 <td>Pay plan</td>
                 <td>GS, ES, SL, ST, etc. (added in 2016)</td>
             </tr>
             <tr>
                 <td><code>ppgrd</code></td>
+                <td><code>ppgrdt</code></td>
                 <td>Pay plan and grade</td>
                 <td>Combined pay plan and grade level</td>
             </tr>
             <tr>
                 <td><code>gsegrd</code></td>
+                <td><code>gsegrdt</code></td>
                 <td>GS equivalent grade</td>
                 <td>01-15, SES, or blank</td>
             </tr>
             <tr>
-                <td><code>super</code></td>
+                <td><code>supervis</code></td>
+                <td><code>supervist</code></td>
                 <td>Supervisory status</td>
                 <td>2: Supervisor, 4: Manager, 6: Leader, 8: Non-supervisor</td>
             </tr>
@@ -274,32 +296,38 @@
         <h3>Compensation & Work Details</h3>
         <table class="field-table">
             <tr>
-                <th>Field Name</th>
+                <th>Code Field</th>
+                <th>Description Field</th>
                 <th>Description</th>
                 <th>Notes</th>
             </tr>
             <tr>
                 <td><code>salary</code></td>
-                <td>Annual salary</td>
+                <td><em>N/A</em></td>
+                <td>Annual salary (data field)</td>
                 <td>Adjusted basic pay (null when redacted)</td>
             </tr>
             <tr>
                 <td><code>sallvl</code></td>
+                <td><code>sallvlt</code></td>
                 <td>Salary level</td>
                 <td>Salary ranges in $10K bands</td>
             </tr>
             <tr>
                 <td><code>wrksch</code></td>
+                <td><code>wrkscht</code></td>
                 <td>Work schedule</td>
                 <td>F: Full-time, P: Part-time, etc.</td>
             </tr>
             <tr>
                 <td><code>toa</code></td>
+                <td><code>toat</code></td>
                 <td>Type of appointment</td>
                 <td>Permanent, temporary, term, etc.</td>
             </tr>
             <tr>
                 <td><code>wkstat</code></td>
+                <td><code>wkstatt</code></td>
                 <td>Work status</td>
                 <td>Active, leave without pay, etc.</td>
             </tr>
@@ -308,27 +336,32 @@
         <h3>Organization & Location</h3>
         <table class="field-table">
             <tr>
-                <th>Field Name</th>
+                <th>Code Field</th>
+                <th>Description Field</th>
                 <th>Description</th>
                 <th>Format</th>
             </tr>
             <tr>
                 <td><code>agy</code></td>
-                <td>Agency code</td>
+                <td><em>N/A</em></td>
+                <td>Agency code (from lookup)</td>
                 <td>4-character agency identifier</td>
             </tr>
             <tr>
-                <td><code>subagy</code></td>
+                <td><code>agysub</code></td>
+                <td><code>agysubt</code></td>
                 <td>Sub-agency code</td>
                 <td>4-character sub-agency identifier</td>
             </tr>
             <tr>
                 <td><code>loc</code></td>
+                <td><code>loct</code></td>
                 <td>Location code</td>
                 <td>State abbreviation or country code</td>
             </tr>
             <tr>
                 <td><code>stemocc</code></td>
+                <td><code>stemocct</code></td>
                 <td>STEM occupation indicator</td>
                 <td>1: STEM, 0: Non-STEM</td>
             </tr>

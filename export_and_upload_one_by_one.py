@@ -84,6 +84,32 @@ def validate_uploaded_data(conn, repo_name, datasets, hf_token):
     except Exception as e:
         logger.error(f"Validation failed with error: {e}")
 
+def upload_dataset_card(repo_name):
+    """Upload dataset_card.md as README.md to Hugging Face."""
+    logger.info("Uploading dataset card as README...")
+    
+    try:
+        # Check if dataset_card.md exists
+        dataset_card_path = "dataset_card.md"
+        if not os.path.exists(dataset_card_path):
+            logger.error(f"Dataset card not found: {dataset_card_path}")
+            return
+        
+        # Upload as README.md
+        api = HfApi()
+        api.upload_file(
+            path_or_fileobj=dataset_card_path,
+            path_in_repo="README.md",
+            repo_id=repo_name,
+            repo_type="dataset",
+            commit_message="Add dataset card as README"
+        )
+        
+        logger.info("✅ Dataset card uploaded successfully as README.md")
+        
+    except Exception as e:
+        logger.error(f"Failed to upload dataset card: {e}")
+
 def export_and_upload_one_by_one(repo_name, hf_token=None):
     """Export CSV files one by one, upload each, then delete."""
     if not repo_name:
@@ -181,60 +207,7 @@ def export_and_upload_one_by_one(repo_name, hf_token=None):
             logger.info(f"  Exporting to {TEMP_CSV}...")
             conn.execute(f"""
                 COPY (
-                    SELECT 
-                        dataset_key,
-                        quarter,
-                        year,
-                        agelvl,
-                        edlvl,
-                        gsegrd,
-                        loc,
-                        loct,
-                        los,
-                        loslvl,
-                        occ,
-                        occfam,
-                        occt,
-                        patco,
-                        patcot,
-                        pp,
-                        ppgrd,
-                        ppgrdt,
-                        ppt,
-                        CASE WHEN salary = '****' THEN NULL ELSE salary END as salary,
-                        sallvl,
-                        sallvlt,
-                        stemocc,
-                        stemocct,
-                        subagy,
-                        subagyt,
-                        super,
-                        supert,
-                        toa,
-                        toat,
-                        wkstat,
-                        wkstatt,
-                        wrksch,
-                        wrkscht,
-                        agelvl_description,
-                        agy,
-                        agy_description,
-                        edlvl_description,
-                        gsegrd_description,
-                        loc_description,
-                        loslvl_description,
-                        occ_description,
-                        patco_description,
-                        pp_description,
-                        ppgrd_description,
-                        sallvl_description,
-                        stemocc_description,
-                        subagy_description,
-                        super_description,
-                        toa_description,
-                        wkstat_description,
-                        wrksch_description
-                    FROM employment_denormalized
+                    SELECT * FROM employment_denormalized
                     WHERE dataset_key = '{dataset_key}'
                     ORDER BY dataset_key
                 ) TO '{TEMP_CSV}' (HEADER, DELIMITER ',')
@@ -267,10 +240,15 @@ def export_and_upload_one_by_one(repo_name, hf_token=None):
             logger.info(f"  Progress: {total_processed:,}/{total_count:,} records ({total_processed/total_count*100:.1f}%)")
         
         logger.info(f"\n🎉 Upload complete! Processed {total_processed:,} records across {len(datasets)} quarterly files")
-        logger.info(f"Dataset available at: https://huggingface.co/datasets/{repo_name}")
+        
+        # Upload dataset card as README
+        logger.info(f"\n=== UPLOADING DATASET CARD ===")
+        upload_dataset_card(repo_name)
+        
+        logger.info(f"\nDataset available at: https://huggingface.co/datasets/{repo_name}")
         
         # Validate uploaded data
-        logger.info("\n=== VALIDATION ===")
+        logger.info(f"\n=== VALIDATION ===")
         validate_uploaded_data(conn, repo_name, datasets, hf_token)
             
     except Exception as e:
