@@ -25,6 +25,17 @@ Cleaned and processed version of OPM's FedScope Employment Cube data (1998-2024)
 
 **⚠️ UNOFFICIAL processed copy. NOT an official government dataset.**
 
+## Quick Usage
+
+**Note**: Each file contains 1.7-2.3 million records, exceeding Excel's limit (1,048,576 rows). Use Python/R for analysis.
+
+```python
+import pandas as pd
+
+# Load a specific quarter directly
+df = pd.read_csv("https://huggingface.co/datasets/abigailhaddad/fedscope/resolve/main/fedscope_employment_September_2022.csv")
+```
+
 ## Dataset Details
 
 Each record represents an anonymized federal employee with demographic, job, and organizational information. 
@@ -71,7 +82,7 @@ The dataset contains three types of fields:
 - `supervis` / `supervist`: Supervisory status code / Supervisory status description
 
 ### Compensation (Codes + Descriptions + Data)
-- `salary`: Annual basic pay amount (null when redacted)
+- `salary`: Annual basic pay amount (null when redacted with asterisks)
 - `sallvl` / `sallvlt`: Salary level code / Salary level description
 
 ### Work Details (Codes + Descriptions)
@@ -129,7 +140,7 @@ No personally identifiable information. All records are anonymous with only aggr
 
 - **Lookup Duplicates:** 1998-2003 contain duplicate agency entries (same code, different names)
 - **Schema Changes:** Pay plan field added in 2016 (null in earlier years)
-- **Redacted Salaries:** Some salary values are masked in source data (replaced with null)
+- **Redacted Values:** Some values are masked with asterisks in source data (replaced with null)
 - **Snapshots:** Quarterly point-in-time data, not continuous employment histories
 - **Aggregated:** Demographics/geography grouped into ranges
 

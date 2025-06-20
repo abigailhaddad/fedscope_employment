@@ -323,8 +323,12 @@ def create_denormalized_records_for_dataset(conn, dataset_key):
         """)
     
     # Build dynamic SQL based on available columns
-    pp_field = "f.pp" if "pp" in fact_column_names else "NULL as pp"
-    los_field = "f.los" if "los" in fact_column_names else "NULL as los"
+    if "pp" in fact_column_names:
+        pp_field = "CASE WHEN f.pp LIKE '*%' THEN NULL ELSE f.pp END"
+    else:
+        pp_field = "NULL"
+    
+    los_field = "f.los" if "los" in fact_column_names else "NULL"
     
     # Build payplan join conditionally
     if "pp" in fact_column_names:
@@ -340,27 +344,27 @@ def create_denormalized_records_for_dataset(conn, dataset_key):
         f.quarter,
         f.year,
         
-        -- Original fact columns in same order as table
+        -- Original fact columns in same order as table (clean asterisks)
         f.agysub,
         f.loc,
-        f.agelvl,
-        f.edlvl,
-        f.gsegrd,
+        CASE WHEN f.agelvl LIKE '*%' THEN NULL ELSE f.agelvl END as agelvl,
+        CASE WHEN f.edlvl LIKE '*%' THEN NULL ELSE f.edlvl END as edlvl,
+        CASE WHEN f.gsegrd LIKE '*%' THEN NULL ELSE f.gsegrd END as gsegrd,
         f.loslvl,
-        f.occ,
+        CASE WHEN f.occ LIKE '*%' THEN NULL ELSE f.occ END as occ,
         f.patco,
-        {pp_field},
-        f.ppgrd,
+        {pp_field} as pp,
+        CASE WHEN f.ppgrd LIKE '*%' THEN NULL ELSE f.ppgrd END as ppgrd,
         f.sallvl,
-        f.stemocc,
-        f.supervis,
-        f.toa,
-        f.worksch as wrksch,
+        CASE WHEN f.stemocc LIKE '*%' THEN NULL ELSE f.stemocc END as stemocc,
+        CASE WHEN f.supervis LIKE '*%' THEN NULL ELSE f.supervis END as supervis,
+        CASE WHEN f.toa LIKE '*%' THEN NULL ELSE f.toa END as toa,
+        CASE WHEN f.worksch LIKE '*%' THEN NULL ELSE f.worksch END as wrksch,
         f.workstat as wkstat,
         f.datecode,
         f.employment,
-        CASE WHEN f.salary = '****' THEN NULL ELSE f.salary END as salary,
-        {los_field},
+        CASE WHEN f.salary LIKE '*%' THEN NULL ELSE f.salary END as salary,
+        {los_field} as los,
         
         -- Lookup descriptions with original column names
         a.agelvlt,

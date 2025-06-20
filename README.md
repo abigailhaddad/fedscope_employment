@@ -14,7 +14,20 @@ The processed dataset on Hugging Face contains 72 quarterly CSV files with ~140M
 
 ### Quick Start
 
-Download individual quarterly CSV files from https://huggingface.co/datasets/abigailhaddad/fedscope. The files work with any spreadsheet application (Excel, Google Sheets) or data analysis tool (Python, R, etc.).
+Download individual quarterly CSV files from https://huggingface.co/datasets/abigailhaddad/fedscope. 
+
+**Note**: Each file contains 1.7-2.3 million records and may exceed spreadsheet software limits (Excel: 1,048,576 rows). Use Python, R, or other data analysis tools for full files.
+
+**Python Example:**
+```python
+import pandas as pd
+
+# Load a specific quarter directly
+df = pd.read_csv("https://huggingface.co/datasets/abigailhaddad/fedscope/resolve/main/fedscope_employment_September_2022.csv")
+
+# Or download and load locally
+df = pd.read_csv("fedscope_employment_September_2022.csv")
+```
 
 ### What You Get
 
@@ -68,7 +81,7 @@ The processing pipeline handles several data quality issues:
 
 - **Duplicate Lookup Entries**: Early years (1998-2003) contain duplicate agency entries with same codes but different names. The pipeline uses the first occurrence and logs all duplicates.
 - **Schema Evolution**: The pay plan field was added in 2016, so earlier years have null values.
-- **Salary Redaction**: Some salary values are masked as '****' in the source data and converted to null.
+- **Redacted Values**: Some values are masked with asterisks (*, **, ***, ****) in the source data and converted to null for clean analysis.
 
 ## Recreating This Dataset
 
