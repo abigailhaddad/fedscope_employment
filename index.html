@@ -281,7 +281,7 @@
             <tr>
                 <td><code>salary</code></td>
                 <td>Annual salary</td>
-                <td>Adjusted basic pay</td>
+                <td>Adjusted basic pay (null when redacted)</td>
             </tr>
             <tr>
                 <td><code>sallvl</code></td>
@@ -399,6 +399,9 @@
         <h3>Known Issues</h3>
         <div class="note">
             <strong>Within-Dataset Duplicate Agencies (1998-2003):</strong> Within individual quarterly datasets, some agencies appear with multiple names but the same code due to reorganizations. The processing pipeline uses the first occurrence of each code within each dataset. See the complete list of duplicates in <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/lookup_duplicates_summary.txt">lookup_duplicates_summary.txt</a>.
+        </div>
+        <div class="note">
+            <strong>Redacted Salary Values:</strong> Some salary values in the original data are masked as '****' for privacy reasons. These are replaced with null values in the processed dataset.
         </div>
 
         <h3>Data Coverage</h3>
