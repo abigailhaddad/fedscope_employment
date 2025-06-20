@@ -1,126 +1,121 @@
-# FedScope Employment Data Pipeline
+---
+license: cc0-1.0
+task_categories:
+- tabular-classification
+- tabular-regression
+language:
+- en
+tags:
+- government
+- employment
+- federal
+- economics
+- demographics
+- time-series
+- public-sector
+- hr
+- workforce-analysis
+size_categories:
+- 100M<n<1B
+---
 
-**📊 DATASET AVAILABLE ON HUGGING FACE**: https://huggingface.co/datasets/abigailhaddad/fedscope
+# Federal Employment Data (1998-2024)
 
-This repository contains the **processing pipeline** that creates the cleaned dataset. **The actual data files (72 quarterly CSV files, ~140M records) are hosted on Hugging Face**, not in this repository.
+Ready-to-analyze federal civilian employment data: **72 quarterly snapshots** with **140+ million employee records** from 1998 to 2024.
 
-**📚 Documentation**: https://abigailhaddad.github.io/fedscope_employment/
+**⚠️ This is unofficial processed data.** Official data is at [fedscope.opm.gov](https://www.fedscope.opm.gov/).
 
-**⚠️ Note**: This repository contains only the processing code. The final dataset lives on Hugging Face. To recreate the dataset from scratch, you'd need to download the original ZIP files from https://www.opm.gov/data/datasets/.
+## Quick Start
 
-## Using the Dataset
+Download CSV files from [this Hugging Face dataset](https://huggingface.co/datasets/abigailhaddad/fedscope/tree/main) and load with Python, R, or your preferred tool.
 
-The processed dataset on Hugging Face contains 72 quarterly CSV files with ~140M federal employee records (1998-2024). Each file is ready for analysis with all lookup tables already joined.
+**Note**: Files are large (1.7-2.3M rows each) and exceed Excel's limits. The Hugging Face dataset preview may show errors, but data loads correctly.
 
-### Quick Start
-
-Download individual quarterly CSV files from https://huggingface.co/datasets/abigailhaddad/fedscope. 
-
-**Note**: Each file contains 1.7-2.3 million records and may exceed spreadsheet software limits (Excel: 1,048,576 rows). Use Python, R, or other data analysis tools for full files.
-
-**Python Example:**
 ```python
 import pandas as pd
 
-# Load a specific quarter directly from Hugging Face
-df = pd.read_csv("https://huggingface.co/datasets/abigailhaddad/fedscope/resolve/main/fedscope_employment_September_2022.csv")
+# Load September 2024 data
+df = pd.read_csv("https://huggingface.co/datasets/abigailhaddad/fedscope/resolve/main/fedscope_employment_September_2024.csv")
 
-# Or download manually from https://huggingface.co/datasets/abigailhaddad/fedscope/tree/main and load locally
-df = pd.read_csv("fedscope_employment_September_2022.csv")
+# Or download manually and load locally
+df = pd.read_csv("fedscope_employment_September_2024.csv")
 ```
 
-### What You Get
+## What You Can Analyze
 
-- **Ready-to-analyze data**: No need to extract ZIPs or join lookup tables
-- **Consistent schema**: Schema evolution handled (e.g., pay plan field added in 2016) 
-- **Clean data**: Duplicates resolved, salary redactions converted to null
-- **72 quarterly files**: Individual CSV files, 1998-2024 (1.7M-2.2M records each)
+Each row is an anonymized federal employee with their:
+- **Demographics**: Age group, education level
+- **Job**: Occupation, grade level, pay plan, supervisory status  
+- **Organization**: Agency, sub-agency, location
+- **Compensation**: Salary level (some redacted for privacy)
+- **Work details**: Schedule (full/part-time), appointment type
 
-### Data Sources and Alternatives
+Useful for analyzing federal workforce trends, compensation patterns, geographic distribution, and demographic changes over time.
 
-- **This Dataset (Recommended)**: Pre-processed quarterly CSV files ready for analysis
-- **Raw Data**: Original FedScope ZIP files at https://www.opm.gov/data/datasets/ (requires manual extraction and joining)
-- **Official Web Interface**: https://www.fedscope.opm.gov/ (includes additional variables not in downloadable files)
+## Key Fields for Analysis
 
-**Note**: This covers only Employment Cube data. FedScope also has Separations and Accessions cubes not included here.
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| `year`, `quarter` | When the data was collected | 2024, "September" |
+| `agy`, `agysubt` | Agency and sub-agency names | "Department of Defense", "Army" |
+| `loct` | Work location | "DISTRICT OF COLUMBIA", "CALIFORNIA" |
+| `occt` | Job title/occupation | "Accountant", "Computer Scientist" |
+| `patcot` | Job category | "Professional", "Administrative" |
+| `edlvlt` | Education level | "Bachelor's Degree", "Master's Degree" |
+| `agelvlt` | Age group | "25-29 YEARS", "45-49 YEARS" |
+| `salary` | Annual salary | 65000, null (when redacted) |
+| `sallvlt` | Salary range | "$60,000 - $69,999" |
+| `employment` | Employee count | 1 (each row = 1 person) |
+
+**[→ See all 42 fields](https://abigailhaddad.github.io/fedscope_employment/)** with detailed descriptions and coding schemes.
 
 ## Data Coverage
 
 - **1998-2008**: September only (annual snapshots)
 - **2009**: September, December  
-- **2010-2024**: Full quarterly coverage (March, June, September, December)
+- **2010-2024**: Quarterly (March, June, September, December)
 - **2024**: Through September
 
-## Data Schema
+Each file contains all federal civilian employees for that quarter (~1.7-2.3 million people).
 
-### Field Format Structure
+## Important Notes
 
-The processed dataset contains three types of fields:
+**Field Types**: Each concept has two fields - a code (for joining/filtering) and description (for analysis). Use the description fields ending in 't' for most analysis (e.g., `occt` not `occ`, `loct` not `loc`).
 
-1. **Code Fields**: Original FedScope codes used for categorization and joining (e.g., `agelvl`, `edlvl`, `occ`)
-2. **Description Fields**: Human-readable labels derived from lookup tables (e.g., `agelvlt`, `edlvlt`, `occt`)
-3. **Data Fields**: Actual analytical values (e.g., `employment`, `salary`, `year`)
+**Missing Data**: Some values are null when:
+- Data was redacted for privacy (especially salaries)
+- Field didn't exist in earlier years (pay plan added 2016)
+- Information was legitimately missing
 
-**Naming Pattern**: Description fields follow the pattern of adding 't' to the code field name (e.g., `agelvl` → `agelvlt`).
+**Agency Changes**: Government reorganizations over 26 years mean agency names and codes change. Early years (1998-2003) have some duplicate agency entries.
 
-The dataset includes for each employee record:
+## Example Uses
 
-- **Time**: Year, quarter, dataset key
-- **Demographics**: Age level code/description, education level code/description
-- **Job Characteristics**: Occupation codes/descriptions, PATCO category codes/descriptions, pay plan/grade codes/descriptions, GS equivalent grade codes/descriptions
-- **Compensation**: Salary (null for redacted values), salary level codes/descriptions
-- **Work Details**: Schedule codes/descriptions, status codes/descriptions, appointment type codes/descriptions, supervisory status codes/descriptions
-- **Organization**: Sub-agency codes/descriptions, agency codes, location codes/descriptions
-- **Other**: STEM occupation indicator codes/descriptions, length of service, employment count
+- Track federal workforce size changes over time
+- Analyze compensation patterns by occupation or agency
+- Map federal employment by state/region
+- Study workforce demographics and tenure
+- Compare agencies by size and composition
+- Examine seasonal employment patterns
 
-**For Analysis**: Use the description fields (ending in 't') which provide human-readable values. Code fields are primarily for data processing.
+## Links
 
-## Data Quality
+- **📊 This Dataset**: [Hugging Face repository](https://huggingface.co/datasets/abigailhaddad/fedscope)
+- **📚 Full Documentation**: [Field guide and background](https://abigailhaddad.github.io/fedscope_employment/)
+- **🔧 Processing Pipeline**: [Development README](https://github.com/abigailhaddad/fedscope_employment/blob/main/README-DEVELOPMENT.md)
+- **🏛️ Official Source**: [OPM FedScope](https://www.fedscope.opm.gov/)
 
-The processing pipeline handles several data quality issues:
+## Why Use This vs. Official Data?
 
-- **Duplicate Lookup Entries**: Early years (1998-2003) contain duplicate agency entries with same codes but different names. The pipeline uses the first occurrence and logs all duplicates.
-- **Schema Evolution**: The pay plan field was added in 2016, so earlier years have null values.
-- **Redacted Values**: Some values are masked with asterisks (*, **, ***, ****) in the source data and converted to null for clean analysis.
+The [official FedScope data](https://www.opm.gov/data/datasets/) requires downloading 72 separate ZIP files, extracting them, and joining fact tables with 13+ lookup tables per quarter. This processed version gives you analysis-ready CSV files with all the joins already done.
 
-## Recreating This Dataset
+## Citation
 
-If you want to recreate the dataset from scratch:
-
-### Prerequisites
-1. Download all 72 quarterly **FedScope Employment Cube** ZIP files from https://www.opm.gov/data/datasets/
-2. Place them in `fedscope_data/raw/` directory
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
 ```
-
-### Pipeline Steps
-```bash
-# Full pipeline
-python main.py --all
-
-# Or individual steps:
-python main.py --extract           # Extract ZIP files
-python main.py --load-duckdb       # Load into DuckDB
-python export_and_upload_one_by_one.py <repo-name>  # Upload to HF
+Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. 
+Hugging Face. https://huggingface.co/datasets/abigailhaddad/fedscope
 ```
-
-### Architecture
-```
-FedScope ZIP files → Extract → DuckDB → Upload quarterly CSV files to Hugging Face
-```
-
-The pipeline uses DuckDB as a local data warehouse (~10GB) to:
-1. Load all 140M+ records with schema handling
-2. Create denormalized tables with lookups joined
-3. Export and upload quarterly CSV files to Hugging Face
-
-### Output Files
-- `fedscope_employment.duckdb` - Complete local database
-- `lookup_duplicates_summary.txt` - Data quality documentation  
-- `documentation_pdfs/` - Original OPM documentation PDFs
 
 ## License
 
-The underlying FedScope data is in the public domain as a work of the U.S. Government.
+Public domain (CC0) - U.S. Government data.
