@@ -195,6 +195,60 @@ def compare_counts(raw_total, raw_by_dataset, db_total, db_by_dataset):
         logger.warning(f"\n❌ {mismatches} datasets have mismatched counts, {matches} match correctly")
         return False
 
+def check_for_asterisks(conn):
+    """Check for any remaining asterisk values that could break Hugging Face parsing."""
+    logger.info("\n=== ASTERISK VALUE CHECK ===")
+    logger.info("Checking for asterisk values that could cause parsing errors...")
+    
+    try:
+        # Get all columns from denormalized table
+        columns = conn.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'employment_denormalized'").fetchall()
+        column_names = [col[0] for col in columns]
+        
+        total_asterisks = 0
+        problematic_fields = []
+        
+        for col in column_names:
+            # Skip known safe fields
+            if col in ['dataset_key', 'quarter', 'year', 'employment']:
+                continue
+                
+            # Check for any asterisk patterns
+            query = f"""
+            SELECT COUNT(*) as count, 
+                   {col} as value
+            FROM employment_denormalized 
+            WHERE {col} LIKE '%*%'
+            GROUP BY {col}
+            ORDER BY count DESC
+            """
+            
+            try:
+                results = conn.execute(query).fetchall()
+                if results:
+                    for count, value in results:
+                        logger.warning(f"  ❌ {col}: {count:,} records with value '{value}'")
+                        total_asterisks += count
+                        problematic_fields.append((col, value, count))
+            except Exception as e:
+                # Skip if column can't be queried this way
+                pass
+        
+        if total_asterisks == 0:
+            logger.info("  ✅ No asterisk values found - data is clean!")
+        else:
+            logger.error(f"\n❌ CRITICAL: Found {total_asterisks:,} asterisk values across {len(set(f[0] for f in problematic_fields))} fields")
+            logger.error("These MUST be cleaned before uploading to Hugging Face!")
+            logger.error("\nProblematic fields:")
+            for field, value, count in sorted(problematic_fields, key=lambda x: x[2], reverse=True)[:10]:
+                logger.error(f"  - {field}: '{value}' ({count:,} records)")
+                
+        return total_asterisks == 0
+        
+    except Exception as e:
+        logger.error(f"Error checking for asterisks: {e}")
+        return False
+
 def validate_field_completeness(conn):
     """Validate that all expected fields are present and nulls are expected."""
     logger.info("\n=== FIELD COMPLETENESS VALIDATION ===")
@@ -341,9 +395,16 @@ def main():
             conn = duckdb.connect('fedscope_employment.duckdb', read_only=True)
             try:
                 validate_field_completeness(conn)
+                
+                # Check for asterisks that could break Hugging Face
+                asterisk_check = check_for_asterisks(conn)
+                if asterisk_check:
+                    logger.info("\n🎉 Validation PASSED - All data loaded correctly and ready for upload!")
+                else:
+                    logger.error("\n❌ Validation FAILED - Asterisk values found that will break Hugging Face!")
+                    success = False
             finally:
                 conn.close()
-            logger.info("\n🎉 Validation PASSED - All data loaded correctly!")
         else:
             logger.warning("\n⚠️ Validation FAILED - Some data may be missing")
     else:

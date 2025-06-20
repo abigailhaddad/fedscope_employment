@@ -1,0 +1,49 @@
+# Hugging Face dataset configuration
+# Specify column types to prevent automatic type inference issues
+
+configs:
+- config_name: default
+  data_files: "*.csv"
+  column_types:
+    dataset_key: string
+    quarter: string
+    year: string
+    agysub: string
+    loc: string
+    agelvl: string
+    edlvl: string
+    gsegrd: string
+    loslvl: string
+    occ: string
+    patco: string
+    pp: string
+    ppgrd: string
+    sallvl: string
+    stemocc: string
+    supervis: string
+    toa: string
+    wrksch: string
+    wkstat: string
+    datecode: string
+    employment: string
+    salary: string
+    los: string
+    agelvlt: string
+    agy: string
+    agysubt: string
+    edlvlt: string
+    gsegrdt: string
+    loct: string
+    loslvlt: string
+    occfam: string
+    occt: string
+    occfamt: string
+    patcot: string
+    ppt: string
+    ppgrdt: string
+    sallvlt: string
+    stemocct: string
+    supervist: string
+    toat: string
+    wrkscht: string
+    wkstatt: string
