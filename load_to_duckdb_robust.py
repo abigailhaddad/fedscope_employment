@@ -21,28 +21,24 @@ logger = logging.getLogger(__name__)
 DUCKDB_PATH = "fedscope_employment.duckdb"
 
 def get_quarter_year_from_filename(filename):
-    """Extract quarter and year from FedScope filename patterns."""
+    """Extract month and year from FedScope filename patterns."""
     # Handle patterns like FACTDATA_DEC2018.TXT or directory names like FedScope_Employment_December_2018
     
     # First try the file pattern
     match = re.search(r'([A-Z]{3})(\d{4})', filename.upper())
     if match:
         month_abbr, year = match.groups()
-        month_to_quarter = {
-            'MAR': 'Q1', 'JUN': 'Q2', 'SEP': 'Q3', 'DEC': 'Q4'
+        month_mapping = {
+            'MAR': 'March', 'JUN': 'June', 'SEP': 'September', 'DEC': 'December'
         }
-        quarter = month_to_quarter.get(month_abbr, 'UNKNOWN')
-        return quarter, int(year)
+        month = month_mapping.get(month_abbr, 'UNKNOWN')
+        return month, int(year)
     
     # Then try the directory pattern
     match = re.search(r'(March|June|September|December)_(\d{4})', filename)
     if match:
         month_name, year = match.groups()
-        month_to_quarter = {
-            'March': 'Q1', 'June': 'Q2', 'September': 'Q3', 'December': 'Q4'
-        }
-        quarter = month_to_quarter.get(month_name, 'UNKNOWN')
-        return quarter, int(year)
+        return month_name, int(year)
     
     return None, None
 
@@ -383,7 +379,7 @@ def create_denormalized_records_for_dataset(conn, dataset_key):
     result = conn.execute(f"SELECT COUNT(*) FROM employment_denormalized WHERE dataset_key = '{dataset_key}'").fetchone()
     logger.info(f"    ✅ Created {result[0]:,} denormalized records for {dataset_key}")
 
-def load_single_dataset_robust(conn, dataset_path, dataset_key, quarter, year):
+def load_single_dataset_robust(conn, dataset_path, dataset_key, month, year):
     """Load a single dataset into DuckDB, handling schema variations."""
     logger.info(f"Loading {dataset_key} from {os.path.basename(dataset_path)}...")
     
@@ -419,7 +415,7 @@ def load_single_dataset_robust(conn, dataset_path, dataset_key, quarter, year):
         
         # Add metadata columns
         df.insert(0, 'dataset_key', dataset_key)
-        df.insert(1, 'quarter', quarter)
+        df.insert(1, 'quarter', month)
         df.insert(2, 'year', year)
         
         # Clean column names
@@ -522,12 +518,12 @@ def load_all_data_robust():
     
     # Process each dataset
     for i, dataset_dir in enumerate(dataset_dirs, 1):
-        quarter, year = get_quarter_year_from_filename(dataset_dir)
-        if not quarter or not year:
+        month, year = get_quarter_year_from_filename(dataset_dir)
+        if not month or not year:
             logger.warning(f"Could not determine period for {dataset_dir}, skipping")
             continue
         
-        dataset_key = f"{year}_{quarter}"
+        dataset_key = f"{year}_{month}"
         dataset_path = os.path.join(extracted_dir, dataset_dir)
         
         logger.info(f"\n[{i}/{len(dataset_dirs)}] Processing {dataset_key}...")
@@ -541,7 +537,7 @@ def load_all_data_robust():
         if data_dirs:
             load_lookup_tables(conn, data_dirs[0], dataset_key)
         
-        records = load_single_dataset_robust(conn, dataset_path, dataset_key, quarter, year)
+        records = load_single_dataset_robust(conn, dataset_path, dataset_key, month, year)
         if records > 0:
             total_records += records
             loaded_datasets += 1
