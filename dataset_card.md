@@ -21,43 +21,26 @@ size_categories:
 
 # FedScope Employment Cube Dataset
 
-This dataset is a cleaned and processed version of the official U.S. Office of Personnel Management (OPM) FedScope Employment Cube data from 1998-2024, comprising approximately 140+ million employee records across 72 quarterly datasets.
+Cleaned and processed version of OPM's FedScope Employment Cube data (1998-2024), containing ~140M federal employee records across 72 quarterly snapshots.
 
-**⚠️ DISCLAIMER: This is an UNOFFICIAL processed copy of federal data. This is NOT an official government dataset.**
+**⚠️ UNOFFICIAL processed copy. NOT an official government dataset.**
 
 ## Dataset Details
 
-### Dataset Description
+Each record represents an anonymized federal employee with demographic, job, and organizational information. 
 
-This is a cleaned and processed version of the official FedScope Employment Cube data collected quarterly by the U.S. Office of Personnel Management. Each record represents an anonymized federal employee with demographic, occupational, compensation, and organizational information. 
-
-**Data Source**: The original data comes from OPM's official FedScope Employment Cube files available at https://www.opm.gov/data/datasets/. This processed dataset has been denormalized from the original format to provide a single, analysis-ready table.
-
-**Note**: OPM also provides a Cognos-based web interface at https://www.fedscope.opm.gov/ that includes additional variables not available in the downloadable cube files. This dataset is based on the downloadable cube data only.
-
-- **Original Data Curated by:** U.S. Office of Personnel Management (OPM)
-- **Original Data Source:** https://www.opm.gov/data/datasets/
-- **Data Processing by:** Abigail Haddad
-- **Funded by:** U.S. Government (original data collection)
-- **Language(s):** English (field names and categorical descriptions)
+- **Source:** OPM's FedScope Employment Cube files (https://www.opm.gov/data/datasets/)
+- **Processing:** Denormalized fact/lookup tables into analysis-ready CSVs
+- **Note:** OPM's web interface (https://www.fedscope.opm.gov/) includes additional variables not in downloadable files
 - **License:** CC0 1.0 (Public Domain)
 
-### Dataset Sources
+### Links
 
-- **Processing Code Repository:** https://github.com/abigailhaddad/fedscope_employment
-- **Field Documentation:** https://abigailhaddad.github.io/fedscope_employment/ (unofficial guide)
-- **Original Authoritative Data Source:** https://www.opm.gov/data/datasets/
-- **Official OPM Web Interface:** https://www.fedscope.opm.gov/ (includes additional variables not in downloadable files)
-- **Original Data Format:** 72 separate quarterly ZIP files with fact and lookup tables
-- **Documentation PDFs:** Original OPM documentation for each quarterly dataset available at https://github.com/abigailhaddad/fedscope_employment/tree/main/documentation_pdfs
+- **Code & Docs:** https://github.com/abigailhaddad/fedscope_employment
+- **Field Guide:** https://abigailhaddad.github.io/fedscope_employment/
+- **Original Data:** https://www.opm.gov/data/datasets/
 
-## Uses
-
-### Direct Use
-
-This dataset can be used to analyze federal government employment patterns over time, including trends in demographics, compensation, job classifications, and agency staffing from 1998-2024.
-
-The dataset contains the following key fields for each employee record:
+## Fields
 
 ### Time Dimensions
 - `year`: Calendar year (1998-2024)
@@ -76,7 +59,7 @@ The dataset contains the following key fields for each employee record:
 - `gsegrd`: General Schedule equivalent grade (with description)
 
 ### Compensation
-- `salary`: Annual salary
+- `salary`: Annual salary (null values indicate redacted/masked salaries)
 - `sallvl`: Salary level range (with description)
 
 ### Work Details
@@ -94,13 +77,13 @@ The dataset contains the following key fields for each employee record:
 - `stemocc`: STEM occupation indicator (with description)
 - `los`: Length of service (with description)
 
-All coded fields include both the original code and human-readable description for ease of analysis.
+All fields include both codes and descriptions.
 
 ## Dataset Creation
 
 ### Curation Rationale
 
-The original FedScope data is published as separate quarterly ZIP files with complex fact and lookup table structures that require significant technical expertise to merge and analyze. This processed dataset addresses several key challenges:
+The original FedScope data is published as separate quarterly ZIP files with fact and lookup tables that need to be extracted and merged. Working with multiple datasets requires downloading, unzipping, and joining tables repeatedly. This processed dataset addresses several practical challenges:
 
 1. **Accessibility**: Processes 72 separate quarterly datasets into individual CSV files ready for analysis
 2. **Usability**: Joins all lookup tables to provide human-readable descriptions
@@ -111,65 +94,30 @@ The original FedScope data is published as separate quarterly ZIP files with com
 
 #### Data Collection and Processing
 
-**Original Data Collection**: The source data comes from the U.S. Office of Personnel Management's Enterprise Human Resources Integration (EHRI) system, which maintains records for all federal civilian employees. OPM publishes this data quarterly as individual ZIP files at https://www.opm.gov/data/datasets/.
+Processing pipeline:
+1. Downloads and extracts 72 quarterly ZIP files
+2. Identifies time periods from FACTDATA filenames  
+3. Handles schema evolution across 26+ years
+4. Joins fact tables with 13 lookup tables
+5. Resolves duplicate lookup entries
+6. Exports as individual CSV files
 
-**This Dataset's Processing Pipeline**:
+### Data Availability
+- **1998-2008:** September only
+- **2009:** September, December
+- **2010-2024:** March, June, September, December (2024 through September)
 
-1. **Extraction**: Downloads and extracts 72 quarterly ZIP files from OPM
-2. **Identification**: Identifies time periods from FACTDATA filenames  
-3. **Schema Handling**: Manages evolving schema across 26+ years
-4. **Lookup Resolution**: Joins fact tables with 13 different lookup tables
-5. **Quality Control**: Handles duplicate lookup entries (primarily 1998-2003)
-6. **Denormalization**: Creates single analysis-ready table
+### Privacy
 
-### Data Availability by Year
-- **1998**: September
-- **1999**: September  
-- **2000**: September
-- **2001**: September
-- **2002**: September
-- **2003**: September
-- **2004**: September
-- **2005**: September
-- **2006**: September
-- **2007**: September
-- **2008**: September
-- **2009**: September, December
-- **2010**: March, June, September, December
-- **2011**: March, June, September, December
-- **2012**: March, June, September, December
-- **2013**: March, June, September, December
-- **2014**: March, June, September, December
-- **2015**: March, June, September, December
-- **2016**: March, June, September, December
-- **2017**: March, June, September, December
-- **2018**: March, June, September, December
-- **2019**: March, June, September, December
-- **2020**: March, June, September, December
-- **2021**: March, June, September, December
-- **2022**: March, June, September, December
-- **2023**: March, June, September, December
-- **2024**: March, June, September
-
-#### Who are the source data producers?
-
-The data is produced by the U.S. Office of Personnel Management (OPM) as part of their statutory responsibility to maintain federal workforce statistics. OPM collects this data from federal agencies' human resources systems on a quarterly basis.
-
-### Personal and Sensitive Information
-
-The dataset contains no personally identifiable information. All employee records are anonymous and contain only aggregate demographic categories, job classifications, and salary ranges. The original data collection follows federal privacy guidelines and OPM disclosure policies.
+No personally identifiable information. All records are anonymous with only aggregate categories.
 
 ## Bias, Risks, and Limitations
 
-### Data Quality Issues
-- **Lookup Duplicates**: Some early years (1998-2003) contain duplicate agency entries where agencies were renamed but retained the same code
-- **Schema Changes**: The pay plan field was added in 2016, resulting in null values for earlier years
-- **Reporting Variations**: Different agencies may have varying data quality and reporting practices
-
-
-### Technical Limitations
-- **Quarterly Snapshots**: Data represents point-in-time snapshots, not continuous employment histories
-- **Aggregated Categories**: Some demographic and geographic information is grouped into ranges rather than precise values
+- **Lookup Duplicates:** 1998-2003 contain duplicate agency entries (same code, different names)
+- **Schema Changes:** Pay plan field added in 2016 (null in earlier years)
+- **Redacted Salaries:** Some salary values are masked in source data (replaced with null)
+- **Snapshots:** Quarterly point-in-time data, not continuous employment histories
+- **Aggregated:** Demographics/geography grouped into ranges
 
 
 ## Citation
@@ -198,20 +146,9 @@ Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. Hugging Face. ht
 - **OPM**: Office of Personnel Management - federal HR agency
 - **STEM**: Science, Technology, Engineering, Mathematics occupations
 
-## More Information
+## Contact
 
-For technical details about data processing, schema handling, and quality issues, see the source repository: https://github.com/abigailhaddad/fedscope_employment
+- **This dataset:** https://github.com/abigailhaddad/fedscope_employment/issues
+- **Official data:** https://www.opm.gov/data/
 
-The original OPM documentation PDFs for each quarterly dataset are available at: https://github.com/abigailhaddad/fedscope_employment/tree/main/documentation_pdfs
-
-For questions about the original data collection methodology, contact the U.S. Office of Personnel Management at https://www.opm.gov/data/
-
-## Dataset Card Authors
-
-Abigail Haddad
-
-## Dataset Card Contact
-
-For questions about this processed dataset, please open an issue at: https://github.com/abigailhaddad/fedscope_employment/issues
-
-For official data inquiries, contact the U.S. Office of Personnel Management directly.
+Processed by Abigail Haddad

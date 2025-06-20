@@ -159,7 +159,7 @@ The dataset includes for each employee record:
 - **Time**: Year, quarter, dataset key
 - **Demographics**: Age level, education level (with descriptions)
 - **Job Characteristics**: Occupation, PATCO category, pay plan/grade, GS equivalent grade (with descriptions)
-- **Compensation**: Salary, salary level (with descriptions)
+- **Compensation**: Salary (null for redacted values), salary level (with descriptions)
 - **Work Details**: Schedule, status, appointment type, supervisory status (with descriptions)
 - **Organization**: Sub-agency, location (with descriptions)
 - **Other**: STEM occupation indicator, length of service (with descriptions)
