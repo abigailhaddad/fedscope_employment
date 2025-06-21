@@ -2,6 +2,14 @@
 
 This repository contains the **processing pipeline** that creates the cleaned dataset. **The actual data files (72 quarterly CSV files, ~140M records) are hosted on [Hugging Face](https://huggingface.co/datasets/abigailhaddad/fedscope)**.
 
+## What's in This Repository
+
+- **Original ZIP files**: All 72 quarterly FedScope Employment Cube ZIP files are included in the `fedscope_data/raw/` directory for easy replication
+- **Processing pipeline**: Scripts to extract, clean, and transform the data
+- **Documentation**: Original OPM documentation PDFs for each quarterly dataset
+
+If you want the raw ZIP files in one location rather than downloading from multiple OPM pages, or if you want to replicate the processing, you can use this repository.
+
 ## Data Quality
 
 The processing pipeline handles several data quality issues:
@@ -46,46 +54,86 @@ The dataset includes for each employee record:
 If you want to recreate the dataset from scratch:
 
 ### Prerequisites
-1. Download all 72 quarterly **FedScope Employment Cube** ZIP files from https://www.opm.gov/data/datasets/
-2. Place them in `fedscope_data/raw/` directory
-3. Install dependencies:
+1. The 72 quarterly ZIP files are already included in this repository in the `fedscope_data/raw/` directory. No need to download them separately!
+   
+   *(Alternative: If you prefer to download fresh copies, get all 72 quarterly **FedScope Employment Cube** ZIP files from https://www.opm.gov/data/datasets/ and place them in `fedscope_data/raw/`)*
+
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
 ### Pipeline Steps
 ```bash
-# Full pipeline
-python main.py --all
+# Default: Extract and load into DuckDB
+python main.py
 
 # Or individual steps:
-python main.py --extract           # Extract ZIP files
-python main.py --load-duckdb       # Load into DuckDB
-python export_and_upload_one_by_one.py <repo-name>  # Upload to HF
+python main.py --extract           # Extract ZIP files only
+python main.py --load-duckdb       # Load into DuckDB only
+python main.py --all              # Same as no arguments
+
+# To upload to Hugging Face (optional):
+python export_and_upload_one_by_one.py <repo-name>
 ```
+
+### What the Pipeline Does
+
+Running `python main.py` will:
+
+1. **Extract** all 72 ZIP files from `fedscope_data/raw/`
+2. **Parse** the fact data files (FACTDATA_*.TXT) and lookup tables (DT*.txt) from each quarter
+3. **Merge** the lookup tables with the fact data, replacing codes with human-readable descriptions
+4. **Concatenate** all 72 quarters of data into a single database
+5. **Produce** a DuckDB database file (`fedscope_employment.duckdb`) containing:
+   - All 140+ million employee records from 1998-2024
+   - Fully denormalized data with all lookups joined
+   - Ready for analysis with SQL queries
+
+The resulting DuckDB file (~10GB) serves as a local data warehouse that can be queried directly or exported to other formats.
 
 ### Architecture
 ```
-FedScope ZIP files → Extract → DuckDB → Upload quarterly CSV files to Hugging Face
+72 ZIP files → Extract → Parse fact & lookup tables → Join lookups → Load into DuckDB → Single queryable database
 ```
 
-The pipeline uses DuckDB as a local data warehouse (~10GB) to:
-1. Load all 140M+ records with schema handling
-2. Create denormalized tables with lookups joined
-3. Export and upload quarterly CSV files to Hugging Face
-
 ### Output Files
-- `fedscope_employment.duckdb` - Complete local database
+- `fedscope_employment.duckdb` - Complete local database with all 140M+ records
 - `lookup_duplicates_summary.txt` - Data quality documentation  
 - `documentation_pdfs/` - Original OPM documentation PDFs
+
+### Using the DuckDB Database
+
+Once created, you can query the database directly:
+
+```python
+import duckdb
+
+# Connect to the database
+conn = duckdb.connect('fedscope_employment.duckdb')
+
+# Example query: Count employees by year
+result = conn.execute("""
+    SELECT year, COUNT(*) as employee_count 
+    FROM fact_data_denormalized 
+    GROUP BY year 
+    ORDER BY year
+""").fetchall()
+
+# Or export specific quarters to CSV
+conn.execute("""
+    COPY (SELECT * FROM fact_data_denormalized WHERE year = 2024 AND quarter = 'September') 
+    TO 'fedscope_2024_september.csv' (HEADER, DELIMITER ',')
+""")
+```
 
 ## Repository Structure
 
 ```
 fedscope_employment/
 ├── fedscope_data/
-│   ├── raw/                    # Original ZIP files from OPM
-│   └── extracted/              # Extracted data files
+│   ├── raw/                    # Contains all 72 quarterly ZIP files
+│   └── extracted/              # Extracted data files (created by pipeline)
 ├── main.py                     # Main orchestration script
 ├── fix_and_extract.py          # Identifies, renames, and extracts ZIP files
 ├── load_to_duckdb_robust.py    # Loads data into DuckDB with schema handling

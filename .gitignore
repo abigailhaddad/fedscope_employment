@@ -19,8 +19,8 @@ venv.bak/
 # Data files
 data/
 fedscope_data/
+!fedscope_data/raw/
 fedscope_employment_dataset/
-*.zip
 *.txt
 !lookup_duplicates_summary.txt
 *.csv

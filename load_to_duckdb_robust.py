@@ -69,7 +69,7 @@ def load_lookup_tables(conn, data_dir, dataset_key):
         'loslvl': 'DTloslvl.txt',
         'occupation': 'DTocc.txt',
         'patco': 'DTpatco.txt',
-        'payplan': 'DTpayplan.txt',
+        'payplan': 'DTpp.txt',
         'ppgrd': 'DTppgrd.txt',
         'salary_level': 'DTsallvl.txt',
         'stemocc': 'DTstemocc.txt',
