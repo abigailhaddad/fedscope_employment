@@ -19,7 +19,7 @@ size_categories:
 - 100M<n<1B
 ---
 
-# Federal Employment Data (1998-2024)
+# FedScope Employment Cube data (1998-2024)
 
 Ready-to-analyze federal civilian employment data: **72 quarterly snapshots** with **140+ million employee records** from 1998 to 2024.
 
