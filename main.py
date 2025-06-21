@@ -3,8 +3,9 @@
 Main orchestration script for FedScope employment data pipeline.
 
 Usage:
-    python main.py --extract          # Extract zip files
-    python main.py --load-duckdb      # Load data into DuckDB
+    python main.py                    # Run extract and load steps (default)
+    python main.py --extract          # Extract zip files only
+    python main.py --load-duckdb      # Load data into DuckDB only
     python main.py --all              # Run extract and load steps
 """
 
@@ -24,10 +25,10 @@ def main():
     
     args = parser.parse_args()
     
-    # If no arguments, show help
+    # If no arguments, run extract and load-duckdb (but not HF upload)
     if len(sys.argv) == 1:
-        parser.print_help()
-        return
+        args.extract = True
+        args.load_duckdb = True
     
     try:
         if args.all or args.extract:
@@ -39,12 +40,12 @@ def main():
             logger.info("\n=== STEP 2: Loading data into DuckDB ===")
             from load_to_duckdb_robust import load_all_data_robust
             load_all_data_robust()
+            
+            logger.info("\n=== STEP 3: Validating DuckDB database ===")
+            from validate_duckdb import main as validate_main
+            validate_main()
         
         logger.info("\n✅ Pipeline completed successfully!")
-        
-        if args.all:
-            logger.info("\nTo upload to Hugging Face, run:")
-            logger.info("python export_and_upload_one_by_one.py <your-repo-name>")
         
     except Exception as e:
         logger.error(f"\n❌ Pipeline failed: {e}")

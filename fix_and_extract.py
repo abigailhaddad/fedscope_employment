@@ -67,9 +67,11 @@ def identify_fedscope_file(zip_path):
 def rename_and_extract_files():
     """Rename UUID files to proper FedScope names and extract them."""
     fedscope_dir = "fedscope_data"
+    raw_dir = os.path.join(fedscope_dir, "raw")
     extracted_dir = os.path.join(fedscope_dir, "extracted")
     
-    # Create extracted directory if it doesn't exist
+    # Create directories if they don't exist
+    os.makedirs(raw_dir, exist_ok=True)
     os.makedirs(extracted_dir, exist_ok=True)
     
     # Find all zip files
@@ -77,7 +79,7 @@ def rename_and_extract_files():
     uuid_files = []
     fedscope_files = []
     
-    for file in os.listdir(fedscope_dir):
+    for file in os.listdir(raw_dir):
         if file.endswith('.zip'):
             all_zip_files.append(file)
             if file.startswith('FedScope_'):
@@ -90,7 +92,7 @@ def rename_and_extract_files():
     logger.info(f"  - {len(fedscope_files)} properly named FedScope files to extract")
     
     for uuid_file in uuid_files:
-        zip_path = os.path.join(fedscope_dir, uuid_file)
+        zip_path = os.path.join(raw_dir, uuid_file)
         logger.info(f"Processing {uuid_file}...")
         
         # Identify the time period
@@ -99,7 +101,7 @@ def rename_and_extract_files():
         if quarter and year:
             # Create proper filename
             proper_name = f"FedScope_Employment_{quarter}_{year}.zip"
-            proper_path = os.path.join(fedscope_dir, proper_name)
+            proper_path = os.path.join(raw_dir, proper_name)
             
             # Rename the file
             if not os.path.exists(proper_path):
@@ -122,7 +124,7 @@ def rename_and_extract_files():
     
     # Now process properly named FedScope files
     for fedscope_file in fedscope_files:
-        zip_path = os.path.join(fedscope_dir, fedscope_file)
+        zip_path = os.path.join(raw_dir, fedscope_file)
         logger.info(f"Processing {fedscope_file}...")
         
         # Extract quarter and year from filename

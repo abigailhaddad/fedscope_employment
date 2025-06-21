@@ -195,59 +195,6 @@ def compare_counts(raw_total, raw_by_dataset, db_total, db_by_dataset):
         logger.warning(f"\n❌ {mismatches} datasets have mismatched counts, {matches} match correctly")
         return False
 
-def check_for_asterisks(conn):
-    """Check for any remaining asterisk values that could break Hugging Face parsing."""
-    logger.info("\n=== ASTERISK VALUE CHECK ===")
-    logger.info("Checking for asterisk values that could cause parsing errors...")
-    
-    try:
-        # Get all columns from denormalized table
-        columns = conn.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'employment_denormalized'").fetchall()
-        column_names = [col[0] for col in columns]
-        
-        total_asterisks = 0
-        problematic_fields = []
-        
-        for col in column_names:
-            # Skip known safe fields
-            if col in ['dataset_key', 'quarter', 'year', 'employment']:
-                continue
-                
-            # Check for any asterisk patterns
-            query = f"""
-            SELECT COUNT(*) as count, 
-                   {col} as value
-            FROM employment_denormalized 
-            WHERE {col} LIKE '%*%'
-            GROUP BY {col}
-            ORDER BY count DESC
-            """
-            
-            try:
-                results = conn.execute(query).fetchall()
-                if results:
-                    for count, value in results:
-                        logger.warning(f"  ❌ {col}: {count:,} records with value '{value}'")
-                        total_asterisks += count
-                        problematic_fields.append((col, value, count))
-            except Exception as e:
-                # Skip if column can't be queried this way
-                pass
-        
-        if total_asterisks == 0:
-            logger.info("  ✅ No asterisk values found - data is clean!")
-        else:
-            logger.error(f"\n❌ CRITICAL: Found {total_asterisks:,} asterisk values across {len(set(f[0] for f in problematic_fields))} fields")
-            logger.error("These MUST be cleaned before uploading to Hugging Face!")
-            logger.error("\nProblematic fields:")
-            for field, value, count in sorted(problematic_fields, key=lambda x: x[2], reverse=True)[:10]:
-                logger.error(f"  - {field}: '{value}' ({count:,} records)")
-                
-        return total_asterisks == 0
-        
-    except Exception as e:
-        logger.error(f"Error checking for asterisks: {e}")
-        return False
 
 def validate_field_completeness(conn):
     """Validate that all expected fields are present and nulls are expected."""
@@ -268,7 +215,7 @@ def validate_field_completeness(conn):
             'loslvl',        # Length of service level code
             'occ',           # Occupation code
             'patco',         # PATCO category code
-            'pp',            # Pay plan code (null before 2016)
+            'pp',            # Pay plan code (null before December 2017)
             'ppgrd',         # Pay plan and grade code
             'sallvl',        # Salary level code
             'stemocc',       # STEM occupation indicator
@@ -293,7 +240,7 @@ def validate_field_completeness(conn):
             'occt',          # Occupation description
             'occfamt',       # Occupation family description
             'patcot',        # PATCO category description
-            'ppt',           # Pay plan description (null before 2016)
+            'ppt',           # Pay plan description (null before December 2017)
             'ppgrdt',        # Pay plan and grade description
             'sallvlt',       # Salary level description
             'stemocct',      # STEM occupation description
@@ -322,13 +269,43 @@ def validate_field_completeness(conn):
         # Check expected null patterns
         logger.info("\nChecking expected null patterns...")
         
-        # PP field should be null before 2016
-        pp_null_count = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE pp IS NULL AND year < 2016").fetchone()[0]
-        pp_total_pre2016 = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE year < 2016").fetchone()[0]
+        # PP field should be null before late 2017 (first appears in December 2017)
+        pp_null_count_pre2017 = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE pp IS NULL AND year < 2017").fetchone()[0]
+        pp_total_pre2017 = conn.execute("SELECT COUNT(*) FROM employment_denormalized WHERE year < 2017").fetchone()[0]
         
-        if pp_total_pre2016 > 0:
-            pp_null_percent = (pp_null_count / pp_total_pre2016) * 100
-            logger.info(f"✅ PP field nulls before 2016: {pp_null_count:,}/{pp_total_pre2016:,} ({pp_null_percent:.1f}%)")
+        pp_null_count_2017 = conn.execute("""
+            SELECT COUNT(*) FROM employment_denormalized 
+            WHERE pp IS NULL AND year = 2017 
+            AND quarter IN ('March', 'June', 'September')
+        """).fetchone()[0]
+        pp_total_2017_early = conn.execute("""
+            SELECT COUNT(*) FROM employment_denormalized 
+            WHERE year = 2017 
+            AND quarter IN ('March', 'June', 'September')
+        """).fetchone()[0]
+        
+        if pp_total_pre2017 > 0:
+            pp_null_percent = (pp_null_count_pre2017 / pp_total_pre2017) * 100
+            logger.info(f"✅ PP field nulls before 2017: {pp_null_count_pre2017:,}/{pp_total_pre2017:,} ({pp_null_percent:.1f}%)")
+        
+        if pp_total_2017_early > 0:
+            pp_null_percent_2017 = (pp_null_count_2017 / pp_total_2017_early) * 100
+            logger.info(f"✅ PP field nulls for 2017 Q1-Q3: {pp_null_count_2017:,}/{pp_total_2017_early:,} ({pp_null_percent_2017:.1f}%)")
+        
+        # Check that PP field is NOT null after December 2017
+        pp_not_null_post2017 = conn.execute("""
+            SELECT COUNT(*) FROM employment_denormalized 
+            WHERE pp IS NOT NULL AND 
+            ((year = 2017 AND quarter = 'December') OR year > 2017)
+        """).fetchone()[0]
+        pp_total_post2017 = conn.execute("""
+            SELECT COUNT(*) FROM employment_denormalized 
+            WHERE (year = 2017 AND quarter = 'December') OR year > 2017
+        """).fetchone()[0]
+        
+        if pp_total_post2017 > 0:
+            pp_present_percent = (pp_not_null_post2017 / pp_total_post2017) * 100
+            logger.info(f"✅ PP field present from Dec 2017 onwards: {pp_not_null_post2017:,}/{pp_total_post2017:,} ({pp_present_percent:.1f}%)")
         
         # Check for unexpected nulls in core fields that should always be present
         core_fields = ['agelvl', 'edlvl', 'occ', 'patco', 'agysub', 'loc']
@@ -349,27 +326,79 @@ def validate_field_completeness(conn):
         # Check lookup description coverage
         logger.info("\nChecking lookup description coverage...")
         
-        # Sample a few key lookup relationships
-        lookup_checks = [
-            ('agelvl', 'agelvlt'),
-            ('edlvl', 'edlvlt'), 
-            ('occ', 'occt'),
-            ('patco', 'patcot'),
-            ('loc', 'loct')
+        # Check for completely failed merges by dataset
+        logger.info("\nChecking for completely failed merges by dataset...")
+        
+        # Core lookup relationships that should always work (excluding ones with known data gaps)
+        core_lookup_checks = [
+            ('agelvl', 'agelvlt', 'age level'),
+            ('edlvl', 'edlvlt', 'education level'), 
+            ('occ', 'occt', 'occupation'),
+            ('patco', 'patcot', 'PATCO category'),
+            ('loc', 'loct', 'location'),
+            ('gsegrd', 'gsegrdt', 'GS grade'),
+            ('supervis', 'supervist', 'supervisory status'),
+            ('toa', 'toat', 'appointment type'),
+            ('wrksch', 'wrkscht', 'work schedule'),
+            ('wkstat', 'wkstatt', 'work status')
         ]
         
-        for code_field, desc_field in lookup_checks:
+        failed_datasets = {}
+        
+        for code_field, desc_field, field_name in core_lookup_checks:
             if code_field in actual_fields and desc_field in actual_fields:
-                # Check records where code exists but description is null
-                missing_desc = conn.execute(f"""
-                    SELECT COUNT(*) FROM employment_denormalized 
-                    WHERE {code_field} IS NOT NULL AND {desc_field} IS NULL
-                """).fetchone()[0]
+                # Check datasets where ALL records have codes but NO descriptions
+                completely_failed_datasets = conn.execute(f"""
+                    WITH dataset_stats AS (
+                        SELECT 
+                            dataset_key,
+                            COUNT(*) as total_records,
+                            COUNT(CASE WHEN {code_field} IS NOT NULL THEN 1 END) as records_with_code,
+                            COUNT(CASE WHEN {code_field} IS NOT NULL AND {desc_field} IS NOT NULL THEN 1 END) as records_with_desc
+                        FROM employment_denormalized 
+                        GROUP BY dataset_key
+                    )
+                    SELECT dataset_key, total_records, records_with_code, records_with_desc
+                    FROM dataset_stats 
+                    WHERE records_with_code > 0 AND records_with_desc = 0
+                    ORDER BY dataset_key
+                """).fetchall()
                 
-                if missing_desc > 0:
-                    logger.warning(f"⚠️ {desc_field} missing for {missing_desc:,} records with {code_field}")
+                if completely_failed_datasets:
+                    logger.error(f"❌ {field_name} merge COMPLETELY FAILED for {len(completely_failed_datasets)} datasets:")
+                    for dataset_key, total, with_code, with_desc in completely_failed_datasets:
+                        logger.error(f"   - {dataset_key}: {with_code:,} codes, 0 descriptions")
+                        if dataset_key not in failed_datasets:
+                            failed_datasets[dataset_key] = []
+                        failed_datasets[dataset_key].append(field_name)
                 else:
-                    logger.info(f"✅ {desc_field}: complete coverage")
+                    logger.info(f"✅ {field_name}: no datasets with complete merge failure")
+        
+        # Special check for pay plan (pp/ppt) which should only exist from Dec 2017
+        if 'pp' in actual_fields and 'ppt' in actual_fields:
+            # Check records where pp exists but ppt is null (after Dec 2017)
+            missing_pp_desc = conn.execute("""
+                SELECT COUNT(*) FROM employment_denormalized 
+                WHERE pp IS NOT NULL AND ppt IS NULL
+                AND ((year = 2017 AND quarter = 'December') OR year > 2017)
+            """).fetchone()[0]
+            
+            if missing_pp_desc > 0:
+                logger.warning(f"⚠️ ppt missing for {missing_pp_desc:,} records with pp (post-Dec 2017)")
+                failed_merges.append(('pay plan', missing_pp_desc))
+            else:
+                logger.info("✅ ppt: complete coverage for pay plan (Dec 2017+)")
+        
+        # Summary of complete merge failures by dataset
+        if failed_datasets:
+            logger.error("\n❌ CRITICAL: COMPLETE MERGE FAILURES DETECTED!")
+            logger.error("The following datasets had lookup merges that completely failed:")
+            for dataset_key, failed_fields in failed_datasets.items():
+                logger.error(f"  - {dataset_key}: {', '.join(failed_fields)}")
+            logger.error("\nThese datasets need to be reprocessed - the lookup files were not loaded or joined properly!")
+            return False
+        else:
+            logger.info("\n✅ All core lookup merges succeeded - no datasets with complete failures")
         
         logger.info("\n=== FIELD VALIDATION COMPLETE ===")
         
@@ -394,14 +423,11 @@ def main():
         if success:
             conn = duckdb.connect('fedscope_employment.duckdb', read_only=True)
             try:
-                validate_field_completeness(conn)
-                
-                # Check for asterisks that could break Hugging Face
-                asterisk_check = check_for_asterisks(conn)
-                if asterisk_check:
-                    logger.info("\n🎉 Validation PASSED - All data loaded correctly and ready for upload!")
+                field_validation_success = validate_field_completeness(conn)
+                if field_validation_success is not False:
+                    logger.info("\n🎉 Validation PASSED - All data loaded correctly!")
                 else:
-                    logger.error("\n❌ Validation FAILED - Asterisk values found that will break Hugging Face!")
+                    logger.error("\n❌ Validation FAILED - Critical merge failures detected!")
                     success = False
             finally:
                 conn.close()

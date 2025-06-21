@@ -109,6 +109,8 @@ Each file contains all federal civilian employees for that quarter (~1.7-2.3 mil
 
 The [official FedScope data](https://www.opm.gov/data/datasets/) requires downloading, extracting, and joining 13+ lookup tables for each quarter you want to analyze. For the full historical dataset, that's downloading 72 ZIP files, extracting them, and performing nearly 1,000 table joins. This processed version gives you analysis-ready CSV files with all the joins already done.
 
+If you need the raw ZIP files in one convenient location (rather than downloading from multiple OPM pages), they're available in the [GitHub repository](https://github.com/abigailhaddad/fedscope_employment) under `fedscope_data/raw/`.
+
 ## Citation
 
 ```
