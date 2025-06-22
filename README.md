@@ -21,7 +21,7 @@ Browse available files: [fedscope_data/parquet/](https://github.com/abigailhadda
 
 ### Option 2: Clone Repository
 
-⚠️ **Large Repository Warning**: This repo is ~2.6GB due to the included data files. 
+⚠️ **Large Repository Warning**: This repo is ~3.7GB due to the included data files. 
 
 ```bash
 git clone https://github.com/abigailhaddad/fedscope_employment.git
