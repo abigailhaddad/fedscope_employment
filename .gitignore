@@ -20,6 +20,7 @@ venv.bak/
 data/
 fedscope_data/
 !fedscope_data/raw/
+!fedscope_data/parquet/
 fedscope_employment_dataset/
 *.txt
 !lookup_duplicates_summary.txt
