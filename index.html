@@ -141,15 +141,16 @@
         <p>This dataset contains <strong>140+ million records</strong> of federal civilian employees from 1998 to 2024. Each record represents one employee in a specific quarter with their job details, demographics, and compensation.</p>
         
         <div class="note">
-            <strong>📊 Get the Data:</strong> Download CSV files from <a href="https://huggingface.co/datasets/abigailhaddad/fedscope">Hugging Face</a> or read our <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for examples.
+            <strong>📊 Get the Data:</strong> Download Parquet files directly from <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/fedscope_data/parquet">this repository</a> or read our <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for examples.
         </div>
 
         <h3>What's Included</h3>
         <ul>
-            <li><strong>72 quarterly files</strong> from March 1998 to September 2024</li>
+            <li><strong>72 quarterly Parquet files</strong> from March 1998 to September 2024</li>
             <li><strong>~1.7-2.3 million employees</strong> per quarterly snapshot</li>
             <li><strong>All federal civilian agencies</strong> (excludes military, postal service, intelligence)</li>
             <li><strong>42 fields per employee</strong> including demographics, job details, and pay</li>
+            <li><strong>~2.3 GB total</strong> with efficient Parquet compression</li>
         </ul>
 
         <h3>Useful For</h3>
@@ -540,11 +541,11 @@
         
         <h3>Get the Data</h3>
         <div class="links">
-            <a href="https://huggingface.co/datasets/abigailhaddad/fedscope">📊 Download CSV Files</a>
+            <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/fedscope_data/parquet">📊 Download Parquet Files</a>
             <a href="https://github.com/abigailhaddad/fedscope_employment">📖 Usage Examples & Code</a>
         </div>
         
-        <p style="margin-top: 1rem;">Need the raw ZIP files? They're available in the <a href="https://github.com/abigailhaddad/fedscope_employment">GitHub repository</a> under <code>fedscope_data/raw/</code> for easy download and replication.</p>
+        <p style="margin-top: 1rem;">All files are hosted directly in this GitHub repository: <strong>72 quarterly Parquet files</strong> in <code>fedscope_data/parquet/</code> and <strong>original ZIP files</strong> in <code>fedscope_data/raw/</code> for easy download and replication.</p>
 
         <h3>Official Government Sources</h3>
         <div class="links">
@@ -562,7 +563,7 @@
         <h3>Citation</h3>
         <p>If you use this dataset, please cite:</p>
         <div style="background-color: #f7fafc; padding: 1rem; border-radius: 4px; font-family: monospace;">
-Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. Hugging Face. https://huggingface.co/datasets/abigailhaddad/fedscope
+Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. GitHub. https://github.com/abigailhaddad/fedscope_employment
         </div>
     </div>
 
