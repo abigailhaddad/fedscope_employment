@@ -32,14 +32,9 @@ Then load files locally:
 
 ```python
 import pandas as pd
-import glob
 
-# Load one quarter
+# Load one quarter (recommended - see examples.py for comprehensive usage)
 df = pd.read_parquet('fedscope_data/parquet/fedscope_employment_September_2024.parquet')
-
-# Load all data
-all_files = glob.glob('fedscope_data/parquet/*.parquet')
-all_data = pd.concat([pd.read_parquet(f) for f in all_files])
 ```
 
 ## What's Included
