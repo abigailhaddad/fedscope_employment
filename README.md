@@ -46,21 +46,26 @@ all_data = pd.concat([pd.read_parquet(f) for f in all_files])
 
 - **72 quarterly snapshots** from March 1998 through September 2024
 - **1.7-2.3 million employees** per quarter 
-- **42 fields** including demographics, job details, and compensation
+- **52 fields** including demographics, job details, and compensation
 - **Lookup tables joined** for easier usage
 
 ## Example Usage
 
-```python
-# Count employees by agency
-df.groupby('agysubt')['employment'].sum().sort_values(ascending=False).head(10)
+**🚀 Quick Start: Run [examples.py](examples.py)** for comprehensive usage examples!
 
-# Average salary by education level
-df[df['salary'].notna()].groupby('edlvlt')['salary'].mean()
+```python
+# Count employees by agency (employment is stored as strings)
+agency_counts = df.groupby('agysubt')['employment'].apply(lambda x: sum(int(i) for i in x)).sort_values(ascending=False).head(10)
+
+# Average salary by education level (filter out redacted salaries)
+df_with_salary = df[df['salary'].notna() & (df['salary'] != '*****')]
+salary_by_edu = df_with_salary.groupby('edlvlt')['salary'].apply(lambda x: sum(int(i) for i in x) / len(x)).sort_values(ascending=False)
 
 # Track workforce over time
-quarterly = df.groupby(['year', 'quarter'])['employment'].sum()
+quarterly = df.groupby(['year', 'quarter'])['employment'].apply(lambda x: sum(int(i) for i in x))
 ```
+
+> **💡 Note:** The dataset uses string types for numeric fields like `employment` and `salary`. See [examples.py](examples.py) for proper handling.
 
 ## Repository Structure
 
