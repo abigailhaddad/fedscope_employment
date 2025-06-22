@@ -122,7 +122,8 @@ Each quarterly dataset contains:
   - DTloc.txt - Locations
   - DTocc.txt - Occupations
   - DTpatco.txt - PATCO categories
-  - DTppgrd.txt - Pay plans and grades (from 2017 onward)
+  - DTpp.txt - Pay plans (from 2017 onward)
+  - DTppgrd.txt - Pay plans and grades
   - DTsallvl.txt - Salary levels
   - DTstemocc.txt - STEM occupations
   - DTsuper.txt - Supervisory status
