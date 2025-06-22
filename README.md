@@ -67,13 +67,13 @@ quarterly = df.groupby(['year', 'quarter'])['employment'].sum()
 - `fedscope_data/parquet/` - 72 quarterly Parquet files (2.3GB total)
 - `fedscope_data/raw/` - Original ZIP files from OPM
 - `main.py` - Processing pipeline to recreate Parquet files
-- [Documentation](https://abigailhaddad.github.io/fedscope_employment/) - Interactive field guide
+- [Additional Data Documentation](https://abigailhaddad.github.io/fedscope_employment/)
 
 ## Data Coverage
 
 - **1998-2008**: September only (annual snapshots)
 - **2009**: September, December  
-- **2010-2024**: Full quarterly coverage (March, June, September, December)
+- **2010-2024**: Full quarterly coverage (March, June, September, December, ending in September 2024)
 
 ## Field Types
 
@@ -122,7 +122,7 @@ Each quarterly dataset contains:
   - DTloc.txt - Locations
   - DTocc.txt - Occupations
   - DTpatco.txt - PATCO categories
-  - DTppgrd.txt - Pay plans and grades
+  - DTppgrd.txt - Pay plans and grades (from 2016 onward)
   - DTsallvl.txt - Salary levels
   - DTstemocc.txt - STEM occupations
   - DTsuper.txt - Supervisory status
