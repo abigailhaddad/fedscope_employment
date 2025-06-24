@@ -52,9 +52,10 @@ df = pd.read_parquet('fedscope_data/parquet/fedscope_employment_September_2024.p
 # Count employees by agency (employment is stored as strings)
 agency_counts = df.groupby('agysubt')['employment'].apply(lambda x: sum(int(i) for i in x)).sort_values(ascending=False).head(10)
 
-# Average salary by education level (filter out redacted salaries)
-df_with_salary = df[df['salary'].notna() & (df['salary'] != '*****')]
-salary_by_edu = df_with_salary.groupby('edlvlt')['salary'].apply(lambda x: sum(int(i) for i in x) / len(x)).sort_values(ascending=False)
+# Average salary by education level (convert salary to numeric, handling edge cases)
+df['salary_numeric'] = df['salary'].apply(lambda x: int(float(x)) if x not in [None, 'nan', '*****', ''] and pd.notna(x) else None)
+df_with_salary = df[df['salary_numeric'].notna()]
+salary_by_edu = df_with_salary.groupby('edlvlt')['salary_numeric'].mean().sort_values(ascending=False)
 
 # Track workforce over time
 quarterly = df.groupby(['year', 'quarter'])['employment'].apply(lambda x: sum(int(i) for i in x))

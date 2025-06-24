@@ -1,6 +1,6 @@
 """
-FedScope Employment Data Examples
-=================================
+FedScope Employment Data Examples - Fixed Version
+=================================================
 
 This script demonstrates how to work with the FedScope Employment data using both:
 1. Local files (if you've cloned the repository)
@@ -13,8 +13,6 @@ The examples show common analysis patterns including:
 - Tracking workforce over time
 - Exploring various demographic fields
 
-Note: The data uses string types for numeric fields like 'employment' and 'salary'.
-This script handles the conversions appropriately.
 """
 
 import pandas as pd
@@ -26,6 +24,15 @@ def ensure_directory_exists(path):
     if not os.path.exists(path):
         os.makedirs(path)
         print(f"Created directory: {path}")
+
+def safe_int_conversion(value):
+    """Safely convert a value to integer, handling various edge cases"""
+    if pd.isna(value) or value == 'nan' or value == '*****' or value == '':
+        return None
+    try:
+        return int(float(value))  # float() first handles cases like '123.0'
+    except (ValueError, TypeError):
+        return None
 
 def run_local_examples():
     """Run examples using local parquet files"""
@@ -97,7 +104,9 @@ def analyze_data(df, source_type):
     print("-" * 40)
     try:
         # Employment is stored as string '1' for each record
-        agency_counts = df.groupby('agysubt')['employment'].apply(lambda x: sum(int(i) for i in x)).sort_values(ascending=False).head(10)
+        agency_counts = df.groupby('agysubt')['employment'].apply(
+            lambda x: sum(int(i) for i in x if i not in ['nan', '*****', ''])
+        ).sort_values(ascending=False).head(10)
         for i, (agency, count) in enumerate(agency_counts.items(), 1):
             print(f"{i:2d}. {agency}: {count:,} employees")
     except Exception as e:
@@ -106,14 +115,15 @@ def analyze_data(df, source_type):
     print("\n2. AVERAGE SALARY BY EDUCATION LEVEL (TOP 5)")
     print("-" * 40)
     try:
-        # Filter out null salaries and asterisks (redacted values)
-        df_with_salary = df[df['salary'].notna() & (df['salary'] != '*****')]
+        # Convert salary to numeric, handling all edge cases
+        df['salary_numeric'] = df['salary'].apply(safe_int_conversion)
+        
+        # Filter to records with valid salary data
+        df_with_salary = df[df['salary_numeric'].notna()]
         print(f"   Records with valid salary data: {len(df_with_salary):,} ({len(df_with_salary)/len(df)*100:.1f}%)")
         
         # Calculate average salary by education level
-        salary_by_edu = df_with_salary.groupby('edlvlt')['salary'].apply(
-            lambda x: sum(int(i) for i in x) / len(x)
-        ).sort_values(ascending=False)
+        salary_by_edu = df_with_salary.groupby('edlvlt')['salary_numeric'].mean().sort_values(ascending=False)
         
         for edu, salary in salary_by_edu.head(5).items():
             print(f"   {edu}: ${salary:,.2f}")
@@ -123,7 +133,9 @@ def analyze_data(df, source_type):
     print("\n3. WORKFORCE BY TIME PERIOD")
     print("-" * 40)
     try:
-        quarterly = df.groupby(['year', 'quarter'])['employment'].apply(lambda x: sum(int(i) for i in x))
+        quarterly = df.groupby(['year', 'quarter'])['employment'].apply(
+            lambda x: sum(int(i) for i in x if i not in ['nan', '*****', ''])
+        )
         for (year, quarter), count in quarterly.items():
             print(f"   {year} {quarter}: {count:,} employees")
     except Exception as e:
@@ -171,6 +183,20 @@ def analyze_data(df, source_type):
         work_schedule = df['wrkscht'].value_counts()
         for schedule, count in work_schedule.items():
             print(f"   {schedule}: {count:,} employees ({count/len(df)*100:.1f}%)")
+    except Exception as e:
+        print(f"Error: {e}")
+    
+    print("\n9. SALARY STATISTICS")
+    print("-" * 40)
+    try:
+        if 'salary_numeric' in df.columns:
+            valid_salaries = df['salary_numeric'].dropna()
+            print(f"   Valid salary records: {len(valid_salaries):,}")
+            print(f"   Mean salary: ${valid_salaries.mean():,.2f}")
+            print(f"   Median salary: ${valid_salaries.median():,.2f}")
+            print(f"   Min salary: ${valid_salaries.min():,.2f}")
+            print(f"   Max salary: ${valid_salaries.max():,.2f}")
+            print(f"   Std deviation: ${valid_salaries.std():,.2f}")
     except Exception as e:
         print(f"Error: {e}")
 
