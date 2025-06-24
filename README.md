@@ -46,7 +46,9 @@ df = pd.read_parquet('fedscope_data/parquet/fedscope_employment_September_2024.p
 
 ## Example Usage
 
-**🚀 Quick Start: Run [examples.py](examples.py)** for comprehensive usage examples!
+**🚀 Quick Start: Run [examples.py](examples.py)** for comprehensive usage examples! 
+- Output is saved to [examples_output.txt](examples_output.txt)
+- Includes DuckDB examples for querying multiple years at once
 
 ```python
 # Count employees by agency (employment is stored as strings)
@@ -61,13 +63,37 @@ salary_by_edu = df_with_salary.groupby('edlvlt')['salary_numeric'].mean().sort_v
 quarterly = df.groupby(['year', 'quarter'])['employment'].apply(lambda x: sum(int(i) for i in x))
 ```
 
+### Using DuckDB for Multi-Year Analysis
+
+```python
+import duckdb
+
+# Create a view from multiple Parquet files
+con = duckdb.connect('fedscope.duckdb')
+con.execute("""
+    CREATE VIEW employment AS 
+    SELECT * FROM read_parquet('fedscope_employment_September_2024.parquet')
+    UNION ALL
+    SELECT * FROM read_parquet('fedscope_employment_September_2023.parquet')
+""")
+
+# Query across years
+result = con.execute("""
+    SELECT year, agysubt, SUM(CAST(employment AS INTEGER)) as employees
+    FROM employment
+    GROUP BY year, agysubt
+    ORDER BY year, employees DESC
+""").fetchdf()
+```
+
 > **💡 Note:** The dataset uses string types for numeric fields like `employment` and `salary`. See [examples.py](examples.py) for proper handling.
 
 ## Repository Structure
 
 - `fedscope_data/parquet/` - 72 quarterly Parquet files (2.3GB total)
-- `fedscope_data/raw/` - Original ZIP files from OPM
+- `fedscope_data/raw/` - Original ZIP files from OPM (1.5GB total)
 - `main.py` - Processing pipeline to recreate Parquet files
+- `examples.py` - Comprehensive usage examples (output saved to `examples_output.txt`)
 - [Additional Data Documentation](https://abigailhaddad.github.io/fedscope_employment/)
 
 ## Data Coverage

@@ -276,6 +276,10 @@
         
         <div class="note">
             <strong>🚀 Complete Examples:</strong> Run <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for comprehensive usage examples with both local and download methods!
+            <ul style="margin-top: 0.5rem;">
+                <li>Output is saved to <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples_output.txt">examples_output.txt</a></li>
+                <li>Includes DuckDB examples for querying multiple years efficiently</li>
+            </ul>
         </div>
 
         <h3>Basic Usage Patterns</h3>
@@ -311,6 +315,38 @@ quarterly = df.groupby(['year', 'quarter'])['employment'].apply(
                 <li>Numeric fields are stored as <strong>strings</strong> - convert with <code>int(i)</code></li>
                 <li>Filter salary data: <code>df['salary'] != '*****'</code> removes redacted values</li>
                 <li>Each record represents one employee (<code>employment</code> is always '1')</li>
+            </ul>
+        </div>
+
+        <h3>Using DuckDB for Multi-Year Analysis</h3>
+        <p>Query multiple years efficiently using DuckDB:</p>
+        
+        <pre><code>import duckdb
+
+# Create a view from multiple Parquet files
+con = duckdb.connect('fedscope.duckdb')
+con.execute("""
+    CREATE VIEW employment AS 
+    SELECT * FROM read_parquet('fedscope_employment_September_2024.parquet')
+    UNION ALL
+    SELECT * FROM read_parquet('fedscope_employment_September_2023.parquet')
+""")
+
+# Query across years
+result = con.execute("""
+    SELECT year, agysubt, SUM(CAST(employment AS INTEGER)) as employees
+    FROM employment
+    GROUP BY year, agysubt
+    ORDER BY year, employees DESC
+""").fetchdf()</code></pre>
+
+        <div class="note">
+            <strong>📊 DuckDB Benefits:</strong>
+            <ul style="margin-top: 0.5rem;">
+                <li>Query multiple years without loading all data into memory</li>
+                <li>SQL interface for complex aggregations</li>
+                <li>Efficient columnar processing of Parquet files</li>
+                <li>See <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for complete DuckDB usage</li>
             </ul>
         </div>
     </div>
