@@ -13,11 +13,18 @@ The examples show common analysis patterns including:
 - Tracking workforce over time
 - Exploring various demographic fields
 
+It also demonstrates how to register multiple Parquet files as external tables in a DuckDB database and query them.
+You might want to do this if you want to download multiple data files and query them together.
+
+If you run this, it will ask you if you want to delete the files this downloads. 
+
 """
 
 import pandas as pd
 import os
 import shutil
+import duckdb
+from io import StringIO
 
 def ensure_directory_exists(path):
     """Create directory if it doesn't exist"""
@@ -200,13 +207,131 @@ def analyze_data(df, source_type):
     except Exception as e:
         print(f"Error: {e}")
 
+
+
+def run_duckdb_examples(filenames=None):
+    """
+    Download FedScope Parquet files, load them into DuckDB, 
+    and run an agency head-count query broken out by year.
+    
+    Args:
+        filenames (list): List of parquet filenames to download and analyze.
+                         Defaults to September 2024 and 2023 files.
+    """
+    if filenames is None:
+        filenames = [
+            "fedscope_employment_September_2024.parquet",
+            "fedscope_employment_September_2023.parquet"
+        ]
+    print("\n" + "="*80)
+    print("RUNNING DUCKDB COMBINED-YEAR EXAMPLE")
+    print(f"Files to process: {len(filenames)}")
+    print("="*80 + "\n")
+
+    # ---------- 1. Make sure download folder exists ----------
+    download_dir = "download"
+    ensure_directory_exists(download_dir)
+
+    # ---------- 2. Download all requested files ----------
+    base_url = ("https://github.com/abigailhaddad/fedscope_employment/"
+                "raw/main/fedscope_data/parquet/")
+
+    # Helper to fetch a parquet only if we don’t have it yet
+    def fetch_parquet(filename):
+        local_path = os.path.join(download_dir, filename)
+        if not os.path.exists(local_path):
+            print(f"Downloading: {filename}")
+            df_tmp = pd.read_parquet(base_url + filename)
+            df_tmp.to_parquet(local_path)
+            print(f"✓ Saved → {local_path}")
+        else:
+            print(f"✓ Found cached file → {local_path}")
+        return local_path
+
+    # Download all files
+    local_files = []
+    for filename in filenames:
+        local_path = fetch_parquet(filename)
+        local_files.append(local_path)
+
+    # ---------- 3. Create / connect to DuckDB and load files ----------
+    db_path = os.path.join(download_dir, "fedscope.duckdb")
+    con = duckdb.connect(db_path)
+    print(f"\n✓ Connected to DuckDB database: {db_path}")
+    
+    # Create a unified view from all files
+    con.execute("DROP VIEW IF EXISTS employment")
+    
+    # Build UNION ALL query for all files
+    union_parts = []
+    for local_path in local_files:
+        union_parts.append(f"SELECT * FROM read_parquet('{local_path}')")
+    
+    union_query = " UNION ALL ".join(union_parts)
+    view_query = f"CREATE VIEW employment AS {union_query}"
+    
+    print(f"Creating unified view from {len(local_files)} files...")
+    con.execute(view_query)
+    print("✓ Created unified employment view")
+
+    # ---------- 4. Run a sample query and pivot wide ----------
+    query = """
+        SELECT
+            year,
+            agysubt AS agency_sub,
+            SUM(CAST(employment AS INTEGER)) AS employees
+        FROM employment
+        GROUP BY year, agency_sub
+    """
+
+    df_wide = con.execute(query).fetchdf()
+
+    # Pivot to wide format: one row per agency, columns for each year
+    df_pivot = df_wide.pivot(index='agency_sub', columns='year', values='employees')
+
+    # Optional: sort by latest year, e.g., 2024
+    if 2024 in df_pivot.columns:
+        df_pivot = df_pivot.sort_values(by=2024, ascending=False)
+
+    # Display top 10 agencies with highest 2024 headcount (or 2023 if 2024 is missing)
+    print("\nTOP AGENCIES BY EMPLOYEES (wide format: one row per agency)\n")
+    print(df_pivot.head(10).to_string(index=True, na_rep='–'))
+
+
+    # ---------- 6. Finish up ----------
+    con.close()
+    print("\n✓ DuckDB connection closed.")
+
 def cleanup_download_folder():
-    """Remove the download folder if it exists"""
+    """Show download folder contents and ask before removal"""
     download_dir = 'download'
     if os.path.exists(download_dir):
-        print(f"\nCleaning up: Removing {download_dir} folder...")
-        shutil.rmtree(download_dir)
-        print("✓ Cleanup complete")
+        print(f"\nDownload folder contents:")
+        print("-" * 40)
+        
+        # Show folder contents and sizes
+        total_size = 0
+        for item in os.listdir(download_dir):
+            item_path = os.path.join(download_dir, item)
+            if os.path.isfile(item_path):
+                size = os.path.getsize(item_path)
+                total_size += size
+                print(f"  {item} ({size / 1024 / 1024:.1f} MB)")
+            else:
+                print(f"  {item} (directory)")
+        
+        print(f"\nTotal size: {total_size / 1024 / 1024:.1f} MB")
+        
+        # Ask for confirmation
+        response = input(f"\nDelete the '{download_dir}' folder and all its contents? (y/N): ").strip().lower()
+        if response in ['y', 'yes']:
+            print(f"Removing {download_dir} folder...")
+            shutil.rmtree(download_dir)
+            print("✓ Cleanup complete")
+        else:
+            print(f"✓ Keeping {download_dir} folder")
+    else:
+        print(f"\nNo {download_dir} folder found to clean up")
 
 def main():
     """Main function to run all examples"""
@@ -230,6 +355,13 @@ def main():
     df_download = run_download_examples()
     if df_download is not None:
         analyze_data(df_download, "DOWNLOADED FILES")
+
+    # And run DuckDB with local downloads - using default files
+    run_duckdb_examples()
+    
+    # custom_files = ["fedscope_employment_September_2024.parquet", "fedscope_employment_September_2023.parquet"]
+    # print(f"\n\nRunning DuckDB example with custom file list: {custom_files}")
+    # run_duckdb_examples(custom_files)   
     
     # Cleanup
     cleanup_download_folder()
@@ -242,5 +374,51 @@ def main():
     print("- Documentation: https://abigailhaddad.github.io/fedscope_employment/")
     print("- Official FedScope: https://www.fedscope.opm.gov/")
 
+def main_with_output_capture():
+    """Run main function and capture output to file"""
+    output_file = "examples_output.txt"
+    
+    # Create a custom print function that writes to both console and file
+    original_print = print
+    original_input = input
+    output_buffer = StringIO()
+    
+    def dual_print(*args, **kwargs):
+        # Print to console
+        original_print(*args, **kwargs)
+        # Also print to buffer (but not file= kwargs)
+        if 'file' not in kwargs:
+            original_print(*args, **kwargs, file=output_buffer)
+    
+    def input_with_logging(prompt=""):
+        # Print prompt to both console and buffer
+        dual_print(prompt, end="")
+        # Get actual input from user
+        response = original_input()
+        # Log the response to buffer
+        output_buffer.write(response + "\n")
+        return response
+    
+    # Temporarily replace print and input functions
+    import builtins
+    builtins.print = dual_print
+    builtins.input = input_with_logging
+    
+    try:
+        # Run the main function
+        main()
+        
+        # Write buffer contents to file
+        with open(output_file, 'w') as f:
+            f.write(output_buffer.getvalue())
+        
+        original_print(f"\n✓ Output saved to: {output_file}")
+        
+    finally:
+        # Restore original functions
+        builtins.print = original_print
+        builtins.input = original_input
+        output_buffer.close()
+
 if __name__ == "__main__":
-    main()
+    main_with_output_capture()
