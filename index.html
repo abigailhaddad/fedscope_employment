@@ -294,11 +294,10 @@ agency_counts = df.groupby('agysubt')['employment'].apply(
 ).sort_values(ascending=False).head(10)</code></pre>
 
         <h4>Analyze Salaries by Education</h4>
-        <pre><code># Filter out null and redacted salaries first
-df_with_salary = df[df['salary'].notna() & (df['salary'] != '*****')]
-salary_by_edu = df_with_salary.groupby('edlvlt')['salary'].apply(
-    lambda x: sum(int(i) for i in x) / len(x)
-).sort_values(ascending=False)</code></pre>
+        <pre><code># Convert salary to numeric, handling edge cases
+df['salary_numeric'] = df['salary'].apply(lambda x: int(float(x)) if x not in [None, 'nan', '*****', ''] and pd.notna(x) else None)
+df_with_salary = df[df['salary_numeric'].notna()]
+salary_by_edu = df_with_salary.groupby('edlvlt')['salary_numeric'].mean().sort_values(ascending=False)</code></pre>
 
         <h4>Track Workforce Over Time</h4>
         <pre><code># Group by time periods
