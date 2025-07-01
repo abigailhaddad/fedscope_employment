@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federal Workforce Changes: March 2025 vs September 2024 - Aggregated Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .code-links {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #3182ce;
+        }
+
+        .code-links a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+
+
+        .caveat-box {
+            background: white;
+            border-left: 4px solid #3182ce;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 15px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #718096;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #3182ce;
+            border-bottom-color: #3182ce;
+            background: #f7fafc;
+        }
+
+        .tab:hover {
+            background: #f7fafc;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3182ce;
+        }
+
+        .expand-button {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .expand-button:hover {
+            background: #cbd5e0;
+        }
+
+        .expand-button.expanded {
+            background: #3182ce;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 70vh;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: #2d3748;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+        }
+
+        th:hover {
+            background: #edf2f7;
+        }
+
+        .sort-arrow {
+            margin-left: 8px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .sort-arrow.asc::after {
+            content: '▲';
+        }
+
+        .sort-arrow.desc::after {
+            content: '▼';
+        }
+
+        .sort-arrow.none::after {
+            content: '▲▼';
+            opacity: 0.3;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .number-cell {
+            text-align: right;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        }
+
+        .positive { color: #38a169; }
+        .negative { color: #e53e3e; }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Federal Workforce Aggregated Data</h1>
+            <p>March 2025 vs September 2024 Aggregated Data</p>
+            
+            <div class="code-links">
+                <strong>Code:</strong>
+                <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/web_dashboard/raw_tables_dashboard.html" target="_blank">Dashboard Code</a> |
+                <a href="https://github.com/abigailhaddad/fedscope_employment" target="_blank">Full Repository</a>
+            </div>
+        </div>
+
+        <div class="caveat-box">
+            <h3>⚠️ PRELIMINARY DATA NOTICE</h3>
+            <p style="background: #fef7ec; padding: 15px; border-radius: 6px; border-left: 4px solid #f59e0b; margin-bottom: 20px; font-weight: 600;">
+                <strong>The March 2025 snapshot should be considered preliminary while OPM works with agencies to ensure data is submitted on time and meets quality standards.</strong>
+            </p>
+            
+            <h3>📊 Data Sources & Important Caveats</h3>
+            <p><strong>Data Source:</strong> <a href="https://www.fedscope.opm.gov/" target="_blank">Official FedScope Employment Data</a> from the U.S. Office of Personnel Management</p>
+            
+            <h4>Important Caveats:</h4>
+            <ul>
+                <li><strong>Aggregated Data:</strong> This uses pre-aggregated tables from OPM, not individual-level records</li>
+                <li><strong>Deferred Resignation Program (DRP):</strong> Employees in the Deferred Resignation Program appear as employed but are not actively working</li>
+                <li><strong>Exclusions:</strong> See <a href="https://www.fedscope.opm.gov/" target="_blank">official FedScope documentation</a> for complete methodology and data exclusions</li>
+            </ul>
+        </div>
+
+        <div id="loading" class="loading">
+            <h3>Loading data...</h3>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('age-level')">Age Level</button>
+                <button class="tab" onclick="showTab('agency-location')">Agency & Location</button>
+                <button class="tab" onclick="showTab('agency-subagency')">Agency & SubAgency</button>
+                <button class="tab" onclick="showTab('agency-detail')">Agency Detail</button>
+                <button class="tab" onclick="showTab('appointment-type')">Appointment Type</button>
+                <button class="tab" onclick="showTab('duty-location')">Duty Location</button>
+                <button class="tab" onclick="showTab('education-level')">Education Level</button>
+                <button class="tab" onclick="showTab('occupation')">Occupation</button>
+                <button class="tab" onclick="showTab('pay-grade')">Pay Plan & Grade</button>
+            </div>
+
+            <!-- Age Level -->
+            <div id="age-level-tab" class="tab-content active">
+                <h2>Status Employment by Age Level</h2>
+                <div class="search-container">
+                    <input type="text" id="search-age-level" class="search-input" placeholder="Search..." oninput="filterTable('age-level')">
+                    <button class="expand-button" id="expand-age-level" onclick="toggleExpand('age-level')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="age-level-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Agency & Location -->
+            <div id="agency-location-tab" class="tab-content">
+                <h2>Status Employment by Agency and Duty Location</h2>
+                <div class="search-container">
+                    <input type="text" id="search-agency-location" class="search-input" placeholder="Search..." oninput="filterTable('agency-location')">
+                    <button class="expand-button" id="expand-agency-location" onclick="toggleExpand('agency-location')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="agency-location-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Agency & SubAgency -->
+            <div id="agency-subagency-tab" class="tab-content">
+                <h2>Status Employment by Agency and SubAgency</h2>
+                <div class="search-container">
+                    <input type="text" id="search-agency-subagency" class="search-input" placeholder="Search..." oninput="filterTable('agency-subagency')">
+                    <button class="expand-button" id="expand-agency-subagency" onclick="toggleExpand('agency-subagency')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="agency-subagency-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Agency Detail -->
+            <div id="agency-detail-tab" class="tab-content">
+                <h2>Status Employment by Agency_PayPlan_Grade_Series</h2>
+                <div class="search-container">
+                    <input type="text" id="search-agency-detail" class="search-input" placeholder="Search..." oninput="filterTable('agency-detail')">
+                    <button class="expand-button" id="expand-agency-detail" onclick="toggleExpand('agency-detail')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="agency-detail-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Appointment Type -->
+            <div id="appointment-type-tab" class="tab-content">
+                <h2>Status Employment by Appointment Type</h2>
+                <div class="search-container">
+                    <input type="text" id="search-appointment-type" class="search-input" placeholder="Search..." oninput="filterTable('appointment-type')">
+                    <button class="expand-button" id="expand-appointment-type" onclick="toggleExpand('appointment-type')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="appointment-type-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Duty Location -->
+            <div id="duty-location-tab" class="tab-content">
+                <h2>Status Employment by Duty Location</h2>
+                <div class="search-container">
+                    <input type="text" id="search-duty-location" class="search-input" placeholder="Search..." oninput="filterTable('duty-location')">
+                    <button class="expand-button" id="expand-duty-location" onclick="toggleExpand('duty-location')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="duty-location-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Education Level -->
+            <div id="education-level-tab" class="tab-content">
+                <h2>Status Employment by Education Level</h2>
+                <div class="search-container">
+                    <input type="text" id="search-education-level" class="search-input" placeholder="Search..." oninput="filterTable('education-level')">
+                    <button class="expand-button" id="expand-education-level" onclick="toggleExpand('education-level')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="education-level-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Occupation -->
+            <div id="occupation-tab" class="tab-content">
+                <h2>Status Employment by Occupation</h2>
+                <div class="search-container">
+                    <input type="text" id="search-occupation" class="search-input" placeholder="Search..." oninput="filterTable('occupation')">
+                    <button class="expand-button" id="expand-occupation" onclick="toggleExpand('occupation')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="occupation-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pay Plan & Grade -->
+            <div id="pay-grade-tab" class="tab-content">
+                <h2>Status Employment by Pay Plan and Grade</h2>
+                <div class="search-container">
+                    <input type="text" id="search-pay-grade" class="search-input" placeholder="Search..." oninput="filterTable('pay-grade')">
+                    <button class="expand-button" id="expand-pay-grade" onclick="toggleExpand('pay-grade')">📈 Show All (Top 10 shown)</button>
+                </div>
+                <div class="table-container">
+                    <table id="pay-grade-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dataFiles = {
+            'age-level': 'Status Employment by Age Level_202503_and_202409.txt',
+            'agency-location': 'Status Employment by Agency and Duty Location_202503_and_202409.txt',
+            'agency-subagency': 'Status Employment by Agency and SubAgency_202503_and_202409.txt',
+            'agency-detail': 'Status Employment by Agency_PayPlan_Grade_Series_202503_and_202409.txt',
+            'appointment-type': 'Status Employment by Appointment Type_202503_and_202409.txt',
+            'duty-location': 'Status Employment by Duty Location_202503_and_202409.txt',
+            'education-level': 'Status Employment by Education Level_202503_and_202409.txt',
+            'occupation': 'Status Employment by Occupation_202503_and_202409.txt',
+            'pay-grade': 'Status Employment by Pay Plan and Grade_202503_and_202409.txt'
+        };
+
+        let tableData = {};
+        let currentSort = {};
+        let expandedTables = {};
+
+        // Columns to drop for each table type
+        const columnsToDrop = {
+            'age-level': ['EMPCOUNT', 'AVGSAL', 'AVGLOS'],
+            'agency-location': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'AGY', 'AGYSUB', 'LOC', 'STATE'], // Keep AGYT, AGYSUBT, STATET
+            'agency-subagency': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'AGY', 'AGYSUB'], // Keep AGYT, AGYSUBT
+            'agency-detail': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'AGY', 'AGYSUB', 'OCC'], // Keep AGYT, AGYSUBT, OCCT
+            'appointment-type': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'TOA'], // Keep TOAT
+            'duty-location': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'LOC', 'STATE'], // Keep STATET
+            'education-level': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'EDLVL'], // Keep EDLVLT
+            'occupation': ['EMPCOUNT', 'AVGSAL', 'AVGLOS', 'OCC', 'OCCFAM'], // Keep OCCT, OCCFAMT
+            'pay-grade': ['EMPCOUNT', 'AVGSAL', 'AVGLOS']
+        };
+
+        // Column name mappings to user-friendly names
+        const columnDisplayNames = {
+            'AGYT': 'Agency',
+            'AGYSUBT': 'Sub Agency',
+            'STATET': 'State',
+            'AGELVLT': 'Age Bracket',
+            'EDLVLT': 'Education Level',
+            'TOAT': 'Appointment Type',
+            'OCCT': 'Occupation',
+            'OCCFAMT': 'Occupation Group',
+            'PAYPLAN': 'Pay Plan',
+            'GRD': 'Grade',
+            'SEPT_COUNT': 'Sep 2024',
+            'MARCH_COUNT': 'Mar 2025',
+            'CHANGE': 'Change',
+            'PCT_CHANGE': '% Change'
+        };
+
+        // Tab functionality
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        function formatPercent(num) {
+            return (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
+        }
+
+        // Parse TSV data
+        function parseTSV(text) {
+            const lines = text.trim().split(/\r?\n/);
+            const headers = lines[0].split('\t').map(h => h.trim());
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split('\t');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = (values[index] || '').trim();
+                });
+                data.push(row);
+            }
+            
+            return { headers, data };
+        }
+
+        // Calculate changes for each row
+        function calculateChanges(data) {
+            const march2025 = data.filter(row => row.DATECODE === '202503');
+            const sept2024 = data.filter(row => row.DATECODE === '202409');
+            
+            // Since the data is in the same order, we can pair them by index
+            const result = [];
+            for (let i = 0; i < march2025.length; i++) {
+                const marchRow = march2025[i];
+                const septRow = sept2024[i]; // Corresponding September row
+                
+                const marchCount = parseInt(marchRow.EMPCOUNT) || 0;
+                const septCount = septRow ? (parseInt(septRow.EMPCOUNT) || 0) : 0;
+                const change = marchCount - septCount;
+                const pctChange = septCount > 0 ? (change / septCount) * 100 : (marchCount > 0 ? 100 : 0);
+                
+                const resultRow = {...marchRow};
+                resultRow.SEPT_COUNT = septCount;
+                resultRow.MARCH_COUNT = marchCount;
+                resultRow.CHANGE = change;
+                resultRow.PCT_CHANGE = pctChange;
+                
+                result.push(resultRow);
+            }
+            
+            // Sort by March count (descending)
+            result.sort((a, b) => b.MARCH_COUNT - a.MARCH_COUNT);
+            
+            return result;
+        }
+
+        // Create table headers with sort functionality
+        function createTableHeaders(tableId, headers) {
+            const thead = document.querySelector(`#${tableId} thead`);
+            const tr = document.createElement('tr');
+            
+            headers.forEach((header, index) => {
+                const th = document.createElement('th');
+                // Use display name if available, otherwise use original header
+                th.textContent = columnDisplayNames[header] || header;
+                th.onclick = () => sortTable(tableId, index);
+                
+                const arrow = document.createElement('span');
+                arrow.className = 'sort-arrow none';
+                th.appendChild(arrow);
+                
+                tr.appendChild(th);
+            });
+            
+            thead.appendChild(tr);
+        }
+
+        // Toggle expand/collapse for table
+        function toggleExpand(tableName) {
+            const button = document.getElementById(`expand-${tableName}`);
+            const isExpanded = expandedTables[tableName];
+            
+            expandedTables[tableName] = !isExpanded;
+            
+            if (expandedTables[tableName]) {
+                button.textContent = '📉 Show Top 10';
+                button.classList.add('expanded');
+                populateTable(`${tableName}-table`, tableData[tableName].data, tableData[tableName].headers, false);
+            } else {
+                button.textContent = '📈 Show All (Top 10 shown)';
+                button.classList.remove('expanded');
+                populateTable(`${tableName}-table`, tableData[tableName].data, tableData[tableName].headers, true);
+            }
+        }
+
+        // Populate table with data
+        function populateTable(tableId, data, headers, limitToTop10 = true) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+            
+            const displayData = limitToTop10 ? data.slice(0, 10) : data;
+            
+            displayData.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    const value = row[header];
+                    
+                    if (header === 'CHANGE') {
+                        td.textContent = formatNumber(value);
+                        td.className = 'number-cell ' + (value >= 0 ? 'positive' : 'negative');
+                    } else if (header === 'PCT_CHANGE') {
+                        td.textContent = formatPercent(value);
+                        td.className = 'number-cell ' + (value >= 0 ? 'positive' : 'negative');
+                    } else if (header.includes('COUNT')) {
+                        td.textContent = formatNumber(value);
+                        td.className = 'number-cell';
+                    } else {
+                        td.textContent = value;
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Sorting functionality
+        function sortTable(tableId, columnIndex) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            const currentSortKey = `${tableId}-${columnIndex}`;
+            const currentDirection = currentSort[currentSortKey] || 'none';
+            let newDirection = 'asc';
+            
+            if (currentDirection === 'asc') {
+                newDirection = 'desc';
+            } else if (currentDirection === 'desc') {
+                newDirection = 'asc';
+            }
+            
+            currentSort[currentSortKey] = newDirection;
+            
+            // Update arrow indicators
+            table.querySelectorAll('.sort-arrow').forEach(arrow => {
+                arrow.className = 'sort-arrow none';
+            });
+            table.querySelectorAll('th')[columnIndex].querySelector('.sort-arrow').className = `sort-arrow ${newDirection}`;
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                const aVal = a.cells[columnIndex].textContent.trim();
+                const bVal = b.cells[columnIndex].textContent.trim();
+                
+                const aNum = parseFloat(aVal.replace(/[,+%]/g, ''));
+                const bNum = parseFloat(bVal.replace(/[,+%]/g, ''));
+                
+                let comparison = 0;
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    comparison = aNum - bNum;
+                } else {
+                    comparison = aVal.localeCompare(bVal);
+                }
+                
+                return newDirection === 'asc' ? comparison : -comparison;
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Search/filter functionality
+        function filterTable(tableId) {
+            const searchInput = document.getElementById(`search-${tableId}`);
+            const searchTerm = searchInput.value.toLowerCase();
+            const table = document.getElementById(`${tableId}-table`);
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Load data for a specific table
+        async function loadTableData(tableName) {
+            if (tableData[tableName]) return;
+            
+            try {
+                const response = await fetch(dataFiles[tableName]);
+                const text = await response.text();
+                const parsed = parseTSV(text);
+                
+                const processedData = calculateChanges(parsed.data);
+                
+                // Create headers with calculated fields, filtering out unwanted columns
+                const columnsToRemove = ['DATECODE', 'EMPCOUNT', 'AVGSAL', 'AVGLOS', ...(columnsToDrop[tableName] || [])];
+                console.log(`Table: ${tableName}, Original headers:`, parsed.headers);
+                console.log(`Columns to remove:`, columnsToRemove);
+                const filteredHeaders = parsed.headers.filter(h => !columnsToRemove.includes(h));
+                console.log(`Filtered headers:`, filteredHeaders);
+                const displayHeaders = [...filteredHeaders, 'SEPT_COUNT', 'MARCH_COUNT', 'CHANGE', 'PCT_CHANGE'];
+                
+                tableData[tableName] = {
+                    headers: displayHeaders,
+                    data: processedData
+                };
+                
+                createTableHeaders(`${tableName}-table`, displayHeaders);
+                populateTable(`${tableName}-table`, processedData, displayHeaders, true);
+                
+            } catch (error) {
+                console.error(`Error loading ${tableName}:`, error);
+            }
+        }
+
+
+        // Load initial data
+        async function initialize() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            
+            // Load first tab data
+            await loadTableData('age-level');
+            
+            // Load other tabs on demand
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', async () => {
+                    // Get the tab name from the onclick attribute instead
+                    const onclick = tab.getAttribute('onclick');
+                    const tabName = onclick.match(/showTab\('([^']+)'\)/)[1];
+                    await loadTableData(tabName);
+                });
+            });
+        }
+
+        window.addEventListener('load', initialize);
+    </script>
+</body>
+</html>
