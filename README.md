@@ -4,6 +4,8 @@ This repository contains **140+ million federal employee records** from 1998-202
 
 **🔍 Want to see quick comparisons between September 2024 and March 2025?** See: https://fluffy-narwhal-e5f260.netlify.app/
 
+**💻 Want to get started coding with March 2025 person-level data?** See: [September 2024 vs March 2025.ipynb](September%202024%20vs%20March%202025.ipynb)
+
 ## Quick Start
 
 You can use this data in two ways:
