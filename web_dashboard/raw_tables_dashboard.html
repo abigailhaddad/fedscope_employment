@@ -523,11 +523,24 @@
             const march2025 = data.filter(row => row.DATECODE === '202503');
             const sept2024 = data.filter(row => row.DATECODE === '202409');
             
-            // Since the data is in the same order, we can pair them by index
+            // Create lookup for September data using key fields (exclude metrics and datecode)
+            const septLookup = {};
+            sept2024.forEach(row => {
+                const keyFields = Object.keys(row).filter(k => 
+                    k !== 'DATECODE' && k !== 'EMPCOUNT' && k !== 'AVGSAL' && k !== 'AVGLOS'
+                );
+                const key = keyFields.map(field => row[field]).join('|');
+                septLookup[key] = row;
+            });
+            
+            // Match March data with September data by key fields
             const result = [];
-            for (let i = 0; i < march2025.length; i++) {
-                const marchRow = march2025[i];
-                const septRow = sept2024[i]; // Corresponding September row
+            march2025.forEach(marchRow => {
+                const keyFields = Object.keys(marchRow).filter(k => 
+                    k !== 'DATECODE' && k !== 'EMPCOUNT' && k !== 'AVGSAL' && k !== 'AVGLOS'
+                );
+                const key = keyFields.map(field => marchRow[field]).join('|');
+                const septRow = septLookup[key];
                 
                 const marchCount = parseInt(marchRow.EMPCOUNT) || 0;
                 const septCount = septRow ? (parseInt(septRow.EMPCOUNT) || 0) : 0;
@@ -541,7 +554,7 @@
                 resultRow.PCT_CHANGE = pctChange;
                 
                 result.push(resultRow);
-            }
+            });
             
             // Sort by March count (descending)
             result.sort((a, b) => b.MARCH_COUNT - a.MARCH_COUNT);
@@ -690,10 +703,7 @@
                 
                 // Create headers with calculated fields, filtering out unwanted columns
                 const columnsToRemove = ['DATECODE', 'EMPCOUNT', 'AVGSAL', 'AVGLOS', ...(columnsToDrop[tableName] || [])];
-                console.log(`Table: ${tableName}, Original headers:`, parsed.headers);
-                console.log(`Columns to remove:`, columnsToRemove);
                 const filteredHeaders = parsed.headers.filter(h => !columnsToRemove.includes(h));
-                console.log(`Filtered headers:`, filteredHeaders);
                 const displayHeaders = [...filteredHeaders, 'SEPT_COUNT', 'MARCH_COUNT', 'CHANGE', 'PCT_CHANGE'];
                 
                 tableData[tableName] = {
