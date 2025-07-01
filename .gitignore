@@ -18,12 +18,11 @@ venv.bak/
 .DS_Store
 # Data files
 data/
-fedscope_data/
-!fedscope_data/raw/
+fedscope_data/extracted/
+fedscope_data/march_2025_data/
 *.txt
 !lookup_duplicates_summary.txt
 *.csv
-!fedscope_data/parquet/*.parquet
 
 # IDE
 .vscode/
