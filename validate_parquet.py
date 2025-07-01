@@ -112,7 +112,7 @@ def validate_all_parquet_files():
     if failed_validations:
         logger.error(f"Failed files: {failed_validations}")
     
-    # Check expected file count (72 quarters from 1998-2024)
+    # Check expected file count (73 quarters from 1998-2025)
     expected_files = calculate_expected_files()
     logger.info(f"Expected files: {expected_files}")
     
@@ -177,14 +177,16 @@ def calculate_expected_files():
     # 1998-2008: September only (11 files)
     # 2009: September and December (2 files)  
     # 2010-2023: March, June, September, December (14 * 4 = 56 files)
-    # 2024: March, June, September so far (3 files)
+    # 2024: March, June, September (3 files - December not available)
+    # 2025: March only so far (1 file)
     
     files_1998_2008 = 11  # Sept only
     files_2009 = 2       # Sept, Dec
     files_2010_2023 = 14 * 4  # 4 quarters * 14 years
     files_2024 = 3       # Mar, Jun, Sept
+    files_2025 = 1       # Mar only
     
-    return files_1998_2008 + files_2009 + files_2010_2023 + files_2024
+    return files_1998_2008 + files_2009 + files_2010_2023 + files_2024 + files_2025
 
 if __name__ == "__main__":
     validate_all_parquet_files()

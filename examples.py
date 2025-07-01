@@ -49,6 +49,7 @@ def run_local_examples():
     
     # Check if local files exist
     local_file = 'fedscope_data/parquet/fedscope_employment_September_2024.parquet'
+    march_file = 'fedscope_data/parquet/fedscope_employment_March_2025.parquet'
     
     if not os.path.exists(local_file):
         print(f"ERROR: Local file not found: {local_file}")
@@ -57,7 +58,7 @@ def run_local_examples():
         print("\nTo use local files:")
         print("1. Clone the repository: git clone https://github.com/abigailhaddad/fedscope_employment.git")
         print("2. Run this script from the repository root directory")
-        return None
+        return None, None
     
     print(f"Loading local file: {local_file}")
     df = pd.read_parquet(local_file)
@@ -65,7 +66,18 @@ def run_local_examples():
     print(f"  Columns: {df.shape[1]}")
     print(f"  Memory usage: {df.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
     
-    return df
+    # Load March 2025 if available
+    df_march = None
+    if os.path.exists(march_file):
+        print(f"\nLoading March 2025 file: {march_file}")
+        df_march = pd.read_parquet(march_file)
+        print(f"✓ Successfully loaded {len(df_march):,} records from March 2025")
+        print(f"  Columns: {df_march.shape[1]}")
+        print(f"  Memory usage: {df_march.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
+    else:
+        print(f"\nNote: March 2025 file not found: {march_file}")
+    
+    return df, df_march
 
 def run_download_examples():
     """Run examples by downloading files from GitHub"""
@@ -77,7 +89,7 @@ def run_download_examples():
     download_dir = 'download'
     ensure_directory_exists(download_dir)
     
-    # Download URL
+    # Download URL - only September 2024 for now (March 2025 not yet on GitHub)
     url = 'https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_September_2024.parquet'
     local_download_path = os.path.join(download_dir, 'fedscope_employment_September_2024.parquet')
     
@@ -91,14 +103,17 @@ def run_download_examples():
         df.to_parquet(local_download_path)
         print(f"✓ Successfully downloaded and loaded {len(df):,} records")
         print(f"  Also saved locally to: {local_download_path}")
-        return df
+        
+        print(f"\nNote: March 2025 data is only available locally (not yet on GitHub)")
+        return df, None
+        
     except Exception as e:
         print(f"ERROR downloading file: {e}")
         print("\nPossible causes:")
         print("- No internet connection")
         print("- GitHub rate limiting")
         print("- File URL has changed")
-        return None
+        return None, None
 
 def analyze_data(df, source_type):
     """Run analysis examples on the dataframe"""
@@ -207,6 +222,50 @@ def analyze_data(df, source_type):
     except Exception as e:
         print(f"Error: {e}")
 
+def analyze_redaction_patterns(df_sept, df_march):
+    """Analyze redaction patterns between September 2024 and March 2025"""
+    print(f"\n{'='*80}")
+    print("REDACTION PATTERN ANALYSIS")
+    print(f"{'='*80}\n")
+    
+    if df_sept is None or df_march is None:
+        print("⚠️  Cannot perform redaction analysis - missing data files")
+        return
+    
+    print("Comparing redaction patterns between September 2024 and March 2025")
+    print("(REDACTED values indicate data suppression per OPM's Data Release Policy)")
+    print("\n" + "-"*60)
+    
+    # Calculate redaction by column for both datasets
+    sept_redaction = (df_sept == 'REDACTED').sum()
+    march_redaction = (df_march == 'REDACTED').sum()
+    
+    sept_total = len(df_sept)
+    march_total = len(df_march)
+    
+    # Get all columns that have redaction in either dataset, sorted by March redaction
+    all_redacted_cols = set(sept_redaction[sept_redaction > 0].index) | set(march_redaction[march_redaction > 0].index)
+    
+    if not all_redacted_cols:
+        print("No redacted columns found in either dataset")
+        return
+    
+    # Sort by March 2025 redaction count (descending)
+    sorted_cols = sorted(all_redacted_cols, key=lambda x: march_redaction.get(x, 0), reverse=True)
+    
+    print(f"\nREDACTION BY COLUMN (September 2024 vs March 2025):")
+    print(f"{'Column':<20} {'Sep 2024 Count':<15} {'Sep 2024 %':<12} {'Mar 2025 Count':<15} {'Mar 2025 %':<12}")
+    print("-" * 75)
+    
+    for col in sorted_cols:
+        sept_count = sept_redaction.get(col, 0)
+        march_count = march_redaction.get(col, 0)
+        
+        sept_pct = (sept_count / sept_total) * 100
+        march_pct = (march_count / march_total) * 100
+        
+        print(f"{col:<20} {sept_count:<15,} {sept_pct:<11.1f}% {march_count:<15,} {march_pct:<11.1f}%")
+
 
 
 def run_duckdb_examples(filenames=None):
@@ -289,11 +348,13 @@ def run_duckdb_examples(filenames=None):
     # Pivot to wide format: one row per agency, columns for each year
     df_pivot = df_wide.pivot(index='agency_sub', columns='year', values='employees')
 
-    # Optional: sort by latest year, e.g., 2024
-    if 2024 in df_pivot.columns:
+    # Optional: sort by latest year, e.g., 2025
+    if 2025 in df_pivot.columns:
+        df_pivot = df_pivot.sort_values(by=2025, ascending=False)
+    elif 2024 in df_pivot.columns:
         df_pivot = df_pivot.sort_values(by=2024, ascending=False)
 
-    # Display top 10 agencies with highest 2024 headcount (or 2023 if 2024 is missing)
+    # Display top 10 agencies with highest headcount (2025 > 2024 > 2023)
     print("\nTOP AGENCIES BY EMPLOYEES (wide format: one row per agency)\n")
     print(df_pivot.head(10).to_string(index=True, na_rep='–'))
 
@@ -340,21 +401,29 @@ def main():
 ║           FedScope Employment Data - Usage Examples              ║
 ║                                                                  ║
 ║  This script demonstrates working with 140+ million federal     ║
-║  employee records from 1998-2024.                               ║
+║  employee records from 1998-2025.                               ║
 ║                                                                  ║
 ║  Data source: https://github.com/abigailhaddad/fedscope_employment
 ╚══════════════════════════════════════════════════════════════════╝
     """)
     
     # Try local files first
-    df_local = run_local_examples()
-    if df_local is not None:
-        analyze_data(df_local, "LOCAL FILES")
+    df_local_sept, df_local_march = run_local_examples()
+    if df_local_sept is not None:
+        analyze_data(df_local_sept, "LOCAL FILES - SEPTEMBER 2024")
+    if df_local_march is not None:
+        analyze_data(df_local_march, "LOCAL FILES - MARCH 2025")
+    
+    # Redaction analysis if both files available
+    if df_local_sept is not None and df_local_march is not None:
+        analyze_redaction_patterns(df_local_sept, df_local_march)
     
     # Then demonstrate download method
-    df_download = run_download_examples()
-    if df_download is not None:
-        analyze_data(df_download, "DOWNLOADED FILES")
+    df_download_sept, df_download_march = run_download_examples()
+    if df_download_sept is not None:
+        analyze_data(df_download_sept, "DOWNLOADED FILES - SEPTEMBER 2024")
+    
+    # Note: March 2025 redaction analysis only available with local files
 
     # And run DuckDB with local downloads - using default files
     run_duckdb_examples()
