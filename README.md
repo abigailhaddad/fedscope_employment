@@ -1,5 +1,7 @@
 # FedScope Employment Data (NOT OFFICIAL)
 
+**⚠️ PROCESSING UPDATED MARCH 2025 DATA IN PROGRESS**
+
 This repository contains **140+ million federal employee records** from 1998-2024, processed from the official FedScope Employment Cube datasets. 
 
 ## Quick Start
