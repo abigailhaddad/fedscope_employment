@@ -157,19 +157,24 @@ This script combines the 3 employment files and standardizes the column structur
 ```
 fedscope_employment/
 ├── fedscope_data/
-│   ├── raw/                    # Contains quarterly ZIP files
+│   ├── raw/                    # Contains quarterly ZIP files (1998-2024)
+│   ├── march_2025_data/        # March 2025 ZIP files (different format)
 │   ├── extracted/              # Extracted data files (created by pipeline)
 │   └── parquet/                # 73 quarterly Parquet files (final output)
-├── main.py                     # Main orchestration script
+├── web_dashboard/              # Interactive comparison dashboard
+│   └── index.html              # Sept 2024 vs March 2025 comparison
+├── main.py                     # Main orchestration script (1998-2024 data)
+├── process_march_2025.py       # March 2025 processing script
 ├── rename_and_extract.py       # Identifies, renames, and extracts ZIP files
 ├── text_to_parquet.py          # Converts TXT files to Parquet with lookups
 ├── validate_parquet.py         # Validates Parquet files
+├── examples.py                 # Usage examples and redaction analysis
 └── documentation_pdfs/         # PDF documentation for each quarterly dataset
 ```
 
 ## Data Structure
 
-Each quarterly dataset contains:
+Each quarterly dataset contains:*
 - **FACTDATA_\*.TXT**: Main fact table with employee records (1.7M - 2.2M records per quarter)
 - **DT\*.txt**: Lookup tables providing descriptions for coded values
   - DTagelvl.txt - Age levels
@@ -187,6 +192,8 @@ Each quarterly dataset contains:
   - DTtoa.txt - Types of appointment
   - DTwrksch.txt - Work schedules
   - DTwkstat.txt - Work status
+
+*Note: March 2025 data has a different structure with 3 separate employment files and different field names. The `process_march_2025.py` script standardizes this to match the historical format.
 
 ## Data Sources
 
