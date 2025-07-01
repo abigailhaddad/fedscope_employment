@@ -1,8 +1,8 @@
 # FedScope Employment Data (NOT OFFICIAL)
 
-**⚠️ PROCESSING UPDATED MARCH 2025 DATA IN PROGRESS**
+This repository contains **140+ million federal employee records** from 1998-2025, processed from the official FedScope Employment Cube datasets. 
 
-This repository contains **140+ million federal employee records** from 1998-2024, processed from the official FedScope Employment Cube datasets. 
+**🔍 Want to see quick comparisons between September 2024 and March 2025?** See: https://fluffy-narwhal-e5f260.netlify.app/
 
 ## Quick Start
 
@@ -17,13 +17,16 @@ import pandas as pd
 
 # Load a single quarter directly from GitHub
 df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_September_2024.parquet')
+
+# For instance, load the latest March 2025 data (see warnings below)
+df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_March_2025.parquet')
 ```
 
 Browse available files: [fedscope_data/parquet/](https://github.com/abigailhaddad/fedscope_employment/tree/main/fedscope_data/parquet)
 
 ### Option 2: Clone Repository
 
-⚠️ **Large Repository Warning**: This repo is ~3.7GB due to the included data files. 
+⚠️ **Large Repository Warning**: This repo is ~3.8GB due to the included data files. 
 
 ```bash
 git clone https://github.com/abigailhaddad/fedscope_employment.git
@@ -41,10 +44,20 @@ df = pd.read_parquet('fedscope_data/parquet/fedscope_employment_September_2024.p
 
 ## What's Included
 
-- **72 quarterly snapshots** from March 1998 through September 2024
+- **73 quarterly snapshots** from March 1998 through March 2025
 - **1.7-2.3 million employees** per quarter 
 - **52 fields** including demographics, job details, and compensation
 - **Lookup tables joined** for easier usage
+
+## ⚠️ March 2025 Data Warnings
+
+The March 2025 dataset has several important differences from historical data:
+
+- **Preliminary data**: This is preliminary and subject to revision
+- **Includes employees on leave**: Data includes federal employees on various types of leave who may not be currently working
+- **Format differences**: Raw data structure and field names differ from historical formats (processed to match historical schema)
+
+**Increased redaction: data suppression policy**: REDACTED values occur in fields where data suppression is required due to OPM's Data Release Policy (https://www.fedscope.opm.gov/download_Data%20Release%20Policy.pdf). This includes categorizing some Federal employees with duty locations in Maryland, Virginia, and West Virginia under the District of Columbia state category.
 
 ## Example Usage
 
@@ -92,7 +105,7 @@ result = con.execute("""
 
 ## Repository Structure
 
-- `fedscope_data/parquet/` - 72 quarterly Parquet files (2.3GB total)
+- `fedscope_data/parquet/` - 73 quarterly Parquet files (2.4GB total)
 - `fedscope_data/raw/` - Original ZIP files from OPM (1.5GB total)
 - `main.py` - Processing pipeline to recreate Parquet files
 - `examples.py` - Comprehensive usage examples (output saved to `examples_output.txt`)
@@ -102,7 +115,9 @@ result = con.execute("""
 
 - **1998-2008**: September only (annual snapshots)
 - **2009**: September, December  
-- **2010-2024**: Full quarterly coverage (March, June, September, December, ending in September 2024)
+- **2010-2023**: Full quarterly coverage (March, June, September, December)
+- **2024**: March, June, September (December not available)
+- **2025**: March only (preliminary data - see warnings above)
 
 ## Field Types
 
@@ -110,7 +125,8 @@ The dataset contains both code fields (e.g., `agelvl`) and description fields (e
 
 ## Recreating the Dataset
 
-The 72 quarterly ZIP files are included in `fedscope_data/raw/`. To recreate the Parquet files:
+### Historical Data (1998-2024)
+The quarterly ZIP files are included in `fedscope_data/raw/`. To recreate the Parquet files:
 
 ```bash
 pip install pandas pyarrow
@@ -124,14 +140,26 @@ python main.py --parquet     # Create Parquet files only
 python main.py --validate    # Validate Parquet files only
 ```
 
+### March 2025 Data
+March 2025 uses a different process due to format changes. To recreate the March 2025 Parquet file:
+
+1. Download the 3 ZIP files from OPM and place in `fedscope_data/march_2025_data/`
+2. Run the specialized processing script:
+
+```bash
+python process_march_2025.py
+```
+
+This script combines the 3 employment files and standardizes the column structure to match historical data format. Alternatively, the provided Parquet file has already been processed to ensure consistency with historical datasets.
+
 ## Repository Structure
 
 ```
 fedscope_employment/
 ├── fedscope_data/
-│   ├── raw/                    # Contains all 72 quarterly ZIP files
+│   ├── raw/                    # Contains quarterly ZIP files
 │   ├── extracted/              # Extracted data files (created by pipeline)
-│   └── parquet/                # 72 quarterly Parquet files (final output)
+│   └── parquet/                # 73 quarterly Parquet files (final output)
 ├── main.py                     # Main orchestration script
 ├── rename_and_extract.py       # Identifies, renames, and extracts ZIP files
 ├── text_to_parquet.py          # Converts TXT files to Parquet with lookups

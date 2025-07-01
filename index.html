@@ -117,7 +117,11 @@
 <body>
     <div class="header">
         <h1>FedScope Employment Cube</h1>
-        <p>Understanding the 140+ million federal employee records (1998-2024)</p>
+        <p>Understanding the 140+ million federal employee records (1998-2025)</p>
+        <p style="background-color: #3182ce; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+            <strong>🔍 Want to see quick comparisons between September 2024 and March 2025?</strong><br>
+            <a href="https://fluffy-narwhal-e5f260.netlify.app/" style="color: white; text-decoration: underline;">View the interactive dashboard →</a>
+        </p>
         <p style="background-color: #e53e3e; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
             <strong>⚠️ This is unofficial processed data. For official information, visit <a href="https://www.fedscope.opm.gov/" style="color: white;">fedscope.opm.gov</a></strong>
         </p>
@@ -139,25 +143,37 @@
     <div class="section" id="getting-started">
         <h2>Getting Started</h2>
         
-        <p>This dataset contains <strong>140+ million records</strong> of federal civilian employees from 1998 to 2024. Each record represents one employee in a specific quarter with their job details, demographics, and compensation.</p>
+        <p>This dataset contains <strong>140+ million records</strong> of federal civilian employees from 1998 to 2025. Each record represents one employee in a specific quarter with their job details, demographics, and compensation.</p>
         
         <div class="note">
             <strong>📊 Get the Data:</strong> You can either:
             <ul style="margin-top: 0.5rem;">
                 <li><strong>Download individual files</strong> directly from <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/fedscope_data/parquet">GitHub</a> without cloning</li>
-                <li><strong>Clone the full repository</strong> (3.7GB) - see the <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for instructions</li>
+                <li><strong>Clone the full repository</strong> (3.8GB) - see the <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for instructions</li>
             </ul>
             <strong>🚀 Quick Start:</strong> Run <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for comprehensive usage examples!
         </div>
 
         <h3>What's Included</h3>
         <ul>
-            <li><strong>72 quarterly Parquet files</strong> from March 1998 to September 2024</li>
+            <li><strong>73 quarterly Parquet files</strong> from March 1998 to March 2025</li>
             <li><strong>~1.7-2.3 million employees</strong> per quarterly snapshot</li>
             <li><strong>Most federal agencies</strong> (excludes uniformed military, postal service, intelligence)</li>
             <li><strong>52 fields per employee</strong> including demographics, job details, and pay</li>
-            <li><strong>~2.3GB Parquet files</strong> (3.7GB total repository)</li>
+            <li><strong>~2.4GB Parquet files</strong> (3.8GB total repository)</li>
         </ul>
+        
+        <div class="note">
+            <strong>⚠️ March 2025 Data Warnings:</strong>
+            <ul style="margin-top: 0.5rem;">
+                <li><strong>Preliminary data</strong> subject to revision</li>
+                <li><strong>Increased redaction:</strong> 13% of cells contain "REDACTED" values</li>
+                <li><strong>Location suppression:</strong> 46.7% of location data is redacted per OPM policy</li>
+                <li><strong>Includes employees on leave</strong> who may not be currently working</li>
+                <li><strong>Format differences:</strong> Raw data structure differs (processed to match historical schema)</li>
+            </ul>
+            <strong>Data suppression policy:</strong> REDACTED values occur where required by OPM's Data Release Policy, including categorizing some employees with duty locations in MD, VA, and WV under DC.
+        </div>
 
         <h3>Useful For</h3>
         <ul>
@@ -287,6 +303,9 @@
         <h4>Load Data</h4>
         <pre><code># Load from GitHub (without cloning)
 df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_September_2024.parquet')
+
+# Or load the latest March 2025 data (see warnings above)
+df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_March_2025.parquet')
 
 # Load locally (if you've cloned the repo)
 df = pd.read_parquet('fedscope_data/parquet/fedscope_employment_September_2024.parquet')</code></pre>
@@ -610,8 +629,9 @@ result = con.execute("""
         <ul>
             <li><strong>1998-2008:</strong> September only (1 file per year)</li>
             <li><strong>2009:</strong> September and December (2 files)</li>
-            <li><strong>2010-2024:</strong> March, June, September, December (4 files per year)</li>
-            <li><strong>2024:</strong> Through September (3 files so far)</li>
+            <li><strong>2010-2023:</strong> March, June, September, December (4 files per year)</li>
+            <li><strong>2024:</strong> March, June, September (December not available)</li>
+            <li><strong>2025:</strong> March only (preliminary data - see warnings above)</li>
         </ul>
 
         <h3>What's NOT Included</h3>
@@ -638,7 +658,7 @@ result = con.execute("""
             <a href="https://github.com/abigailhaddad/fedscope_employment">📖 Full Repository</a>
         </div>
         
-        <p style="margin-top: 1rem;">All files are hosted directly in this GitHub repository: <strong>72 quarterly Parquet files</strong> in <code>fedscope_data/parquet/</code> and <strong>original ZIP files</strong> in <code>fedscope_data/raw/</code> for easy download and replication.</p>
+        <p style="margin-top: 1rem;">All files are hosted directly in this GitHub repository: <strong>73 quarterly Parquet files</strong> in <code>fedscope_data/parquet/</code> and <strong>original ZIP files</strong> in <code>fedscope_data/raw/</code> for easy download and replication.</p>
 
         <h3>Official Government Sources</h3>
         <div class="links">
@@ -656,14 +676,14 @@ result = con.execute("""
         <h3>Citation</h3>
         <p>If you use this dataset, please cite:</p>
         <div style="background-color: #f7fafc; padding: 1rem; border-radius: 4px; font-family: monospace;">
-Haddad, A. (2024). FedScope Employment Cube Dataset [Data set]. GitHub. https://github.com/abigailhaddad/fedscope_employment
+Haddad, A. (2025). FedScope Employment Cube Dataset [Data set]. GitHub. https://github.com/abigailhaddad/fedscope_employment
         </div>
     </div>
 
     <div style="text-align: center; padding: 2rem; color: #718096;">
         <p><strong>This is UNOFFICIAL documentation</strong> created as part of an independent data processing project</p>
         <p>For official information, visit <a href="https://www.fedscope.opm.gov/">fedscope.opm.gov</a></p>
-        <p>Last updated: 2024</p>
+        <p>Last updated: 2025</p>
     </div>
 </body>
 </html>
