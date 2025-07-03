@@ -1,0 +1,693 @@
+---
+title: "Federal Workforce Changes Around Presidential Inaugurations"
+author: "Abigail Haddad"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: cosmo
+    highlight-style: github
+    df-print: paged
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+#| code-fold: false
+
+# Import required libraries
+import pandas as pd
+import numpy as np
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional
+
+# Configuration
+GITHUB_BASE_URL = "https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/"
+
+# Define inauguration periods to analyze (chronological order)
+INAUGURATION_PERIODS = [
+    {"before": (2012, "September"), "after": (2013, "March"), "name": "Obama 2013"},
+    {"before": (2016, "September"), "after": (2017, "March"), "name": "Trump 2017"},
+    {"before": (2020, "September"), "after": (2021, "March"), "name": "Biden 2021"},
+    {"before": (2024, "September"), "after": (2025, "March"), "name": "Trump 2025"},
+]
+
+# Define chronological order for column display
+CHRONOLOGICAL_ORDER = ["Obama 2013", "Trump 2017", "Biden 2021", "Trump 2025"]
+```
+
+## Analysis Overview
+
+This analysis compares federal workforce changes during presidential transitions by examining employment data from September (before inauguration) to March (after inauguration) across three dimensions:
+
+1. **Age Groups**
+2. **Pay Grades/Plans** 
+3. **Appointment Types**
+
+## Data Sources and Methodology
+
+- **March 2025 & September 2024**: Summary tables from OPM
+- **Historical data (2013, 2017, 2021)**: Parquet files from the FedScope repository
+
+```{python}
+#| label: data-loading-functions
+
+def load_march_2025_data(data_type: str) -> pd.DataFrame:
+    """
+    Load March 2025 data from summary table format.
+    
+    Args:
+        data_type: Type of data to load ('age', 'grade', or 'appointment')
+        
+    Returns:
+        DataFrame with standardized columns
+    """
+    file_mapping = {
+        'age': 'Status Employment by Age Level_202503_and_202409.txt',
+        'grade': 'Status Employment by Pay Plan and Grade_202503_and_202409.txt',
+        'appointment': 'Status Employment by Appointment Type_202503_and_202409.txt'
+    }
+    
+    # Adjust path since we're in a subdirectory
+    file_path = Path(f"../web_dashboard/{file_mapping[data_type]}")
+    
+    # Read the TSV file
+    df = pd.read_csv(file_path, sep='\t')
+    
+    # Filter for March 2025 data
+    march_2025 = df[df['DATECODE'] == 202503].copy()
+    
+    # Standardize columns
+    march_2025['year'] = 2025
+    march_2025['quarter'] = 'March'
+    march_2025['employment'] = march_2025['EMPCOUNT'].astype(str)
+    
+    # Map the category column based on data type
+    if data_type == 'age':
+        march_2025['category'] = march_2025['AGELVLT']
+    elif data_type == 'grade':
+        # Combine pay plan and grade with consistent formatting (zero-pad grades)
+        march_2025['category'] = march_2025['PAYPLAN'] + '-' + march_2025['GRD'].astype(str).str.zfill(2)
+    elif data_type == 'appointment':
+        # Use TOA (code) for matching, but keep TOAT (description) for display
+        march_2025['category'] = march_2025['TOA']
+        march_2025['description'] = march_2025['TOAT']
+    
+    if data_type == 'appointment':
+        return march_2025[['year', 'quarter', 'category', 'description', 'employment']]
+    else:
+        return march_2025[['year', 'quarter', 'category', 'employment']]
+
+def load_september_2024_data(data_type: str) -> pd.DataFrame:
+    """Load September 2024 data from summary table format."""
+    file_mapping = {
+        'age': 'Status Employment by Age Level_202503_and_202409.txt',
+        'grade': 'Status Employment by Pay Plan and Grade_202503_and_202409.txt',
+        'appointment': 'Status Employment by Appointment Type_202503_and_202409.txt'
+    }
+    
+    file_path = Path(f"../web_dashboard/{file_mapping[data_type]}")
+    
+    # Read the TSV file
+    df = pd.read_csv(file_path, sep='\t')
+    
+    # Filter for September 2024 data
+    sept_2024 = df[df['DATECODE'] == 202409].copy()
+    
+    # Standardize columns
+    sept_2024['year'] = 2024
+    sept_2024['quarter'] = 'September'
+    sept_2024['employment'] = sept_2024['EMPCOUNT'].astype(str)
+    
+    # Map the category column
+    if data_type == 'age':
+        sept_2024['category'] = sept_2024['AGELVLT']
+    elif data_type == 'grade':
+        # Combine pay plan and grade with consistent formatting (zero-pad grades)
+        sept_2024['category'] = sept_2024['PAYPLAN'] + '-' + sept_2024['GRD'].astype(str).str.zfill(2)
+    elif data_type == 'appointment':
+        # Use TOA (code) for matching, but keep TOAT (description) for display
+        sept_2024['category'] = sept_2024['TOA']
+        sept_2024['description'] = sept_2024['TOAT']
+    
+    if data_type == 'appointment':
+        return sept_2024[['year', 'quarter', 'category', 'description', 'employment']]
+    else:
+        return sept_2024[['year', 'quarter', 'category', 'employment']]
+
+def load_historical_parquet_data(year: int, quarter: str, data_type: str) -> Optional[pd.DataFrame]:
+    """Load historical data from parquet files and aggregate by category."""
+    filename = f"fedscope_employment_{quarter}_{year}.parquet"
+    url = f"{GITHUB_BASE_URL}{filename}"
+    
+    try:
+        df = pd.read_parquet(url)
+        
+        # Map the grouping column
+        if data_type == 'age':
+            group_col = 'agelvlt'
+        elif data_type == 'grade':
+            # Clean and standardize pay plan and grade formatting
+            # ppgrd might be like "GS4" or "GS-4", we need to standardize to "GS-04"
+            df['grade_clean'] = df['ppgrd'].astype(str).str.replace('-', '')
+            # Extract pay plan (letters) and grade (numbers)
+            df['payplan'] = df['grade_clean'].str.extract('([A-Z]+)')
+            df['grade'] = df['grade_clean'].str.extract('([0-9]+)')
+            # Create standardized category with zero-padded grade
+            df['category'] = df['payplan'] + '-' + df['grade'].str.zfill(2)
+            group_col = 'category'
+        elif data_type == 'appointment':
+            # Use toa (code) for matching, but keep toat (description) for display
+            group_col = 'toa'
+            df['description'] = df['toat']
+        
+        # Handle missing columns
+        if data_type != 'grade' and group_col not in df.columns:
+            return None
+            
+        # Group and sum employment
+        if data_type == 'appointment':
+            # For appointments, also get the description (prefer first non-empty description)
+            summary = df.groupby(group_col).agg({
+                'employment': lambda x: sum(int(emp) for emp in x if emp not in ['REDACTED', '', 'nan', '*****'] and pd.notna(emp)),
+                'description': 'first'
+            }).reset_index()
+        else:
+            summary = df.groupby(group_col if data_type != 'grade' else 'category')['employment'].apply(
+                lambda x: sum(int(emp) for emp in x if emp not in ['REDACTED', '', 'nan', '*****'] and pd.notna(emp))
+            ).reset_index()
+        
+        summary['year'] = year
+        summary['quarter'] = quarter
+        summary['employment'] = summary['employment'].astype(str)
+        
+        # Rename column
+        if data_type not in ['grade', 'appointment']:
+            summary.rename(columns={group_col: 'category'}, inplace=True)
+        elif data_type == 'appointment':
+            summary.rename(columns={group_col: 'category'}, inplace=True)
+        
+        if data_type == 'appointment':
+            return summary[['year', 'quarter', 'category', 'description', 'employment']]
+        else:
+            return summary[['year', 'quarter', 'category', 'employment']]
+        
+    except Exception as e:
+        print(f"Error loading {filename}: {e}")
+        return None
+
+def calculate_changes(df_before: pd.DataFrame, df_after: pd.DataFrame, 
+                     period_name: str) -> pd.DataFrame:
+    """Calculate changes between two periods."""
+    # Convert employment to numeric
+    df_before['emp_num'] = pd.to_numeric(df_before['employment'], errors='coerce').fillna(0)
+    df_after['emp_num'] = pd.to_numeric(df_after['employment'], errors='coerce').fillna(0)
+    
+    # Merge on category - use 'outer' to preserve ALL categories from both periods
+    merged = pd.merge(
+        df_before[['category', 'emp_num']], 
+        df_after[['category', 'emp_num']], 
+        on='category', 
+        suffixes=('_before', '_after'),
+        how='outer'  # This ensures we keep ALL categories
+    ).fillna(0)
+    
+    
+    # Calculate changes
+    merged['change'] = merged['emp_num_after'] - merged['emp_num_before']
+    merged['pct_change'] = np.where(
+        merged['emp_num_before'] > 0,
+        (merged['change'] / merged['emp_num_before']) * 100,
+        np.where(merged['emp_num_after'] > 0, 100, 0)
+    )
+    merged['period'] = period_name
+    
+    return merged[['period', 'category', 'emp_num_before', 'emp_num_after', 'change', 'pct_change']]
+
+def analyze_category_changes(data_type: str) -> pd.DataFrame:
+    """Analyze changes for a specific category type across all periods."""
+    all_changes = []
+    
+    for period in INAUGURATION_PERIODS:
+        # Load before data
+        if period['before'] == (2024, "September"):
+            df_before = load_september_2024_data(data_type)
+        else:
+            df_before = load_historical_parquet_data(
+                period['before'][0], period['before'][1], data_type
+            )
+        
+        # Load after data  
+        if period['after'] == (2025, "March"):
+            df_after = load_march_2025_data(data_type)
+        else:
+            df_after = load_historical_parquet_data(
+                period['after'][0], period['after'][1], data_type
+            )
+        
+        if df_before is None or df_after is None:
+            continue
+            
+        # Calculate changes
+        changes = calculate_changes(df_before, df_after, period['name'])
+        all_changes.append(changes)
+    
+    if not all_changes:
+        return pd.DataFrame()
+    
+    return pd.concat(all_changes, ignore_index=True)
+```
+
+## Age Group Analysis
+
+```{python}
+#| label: age-analysis
+
+# Analyze age group changes
+age_changes = analyze_category_changes('age')
+
+if not age_changes.empty:
+    # Create summary table by period
+    age_summary = age_changes.pivot_table(
+        index='category',
+        columns='period',
+        values=['pct_change', 'change'],
+        fill_value=0
+    )
+    
+    # Reorder columns chronologically
+    available_periods = [p for p in CHRONOLOGICAL_ORDER if p in age_summary.columns.get_level_values(1)]
+    age_summary = age_summary.reindex(columns=available_periods, level=1)
+    
+    # Order age groups logically, but INCLUDE ALL categories
+    age_order = ['Less than 20', '20-24', '25-29', '30-34', '35-39', '40-44', 
+                 '45-49', '50-54', '55-59', '60-64', '65 or more']
+    
+    # Get ALL age groups in the data - never drop any
+    all_ages_in_data = list(age_summary.index)
+    
+    # Create ordered list: predefined order first, then any others alphabetically
+    age_order_in_data = [age for age in age_order if age in all_ages_in_data]
+    other_ages = [age for age in all_ages_in_data if age not in age_order]
+    final_age_order = age_order_in_data + sorted(other_ages)
+    
+    # Reindex to show in logical age order (keep this order, don't sort by change size)
+    age_summary = age_summary.reindex(final_age_order)
+    
+    # Combine counts and percentages in one table (keep numeric for styling)
+    combined_age_numeric = pd.concat([
+        age_summary['change'].round(0).astype(int),
+        age_summary['pct_change'].round(1)
+    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
+    
+    # Create styled version with heatmap colors and formatting
+    def style_age_table(df):
+        # Apply styling first (on numeric data)
+        styler = df.style
+        
+        # Heatmap for raw counts (scaled within this section)
+        raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
+        if raw_count_cols:
+            max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            import matplotlib.colors as mcolors
+            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
+            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
+            styler = styler.background_gradient(
+                subset=raw_count_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_count,
+                vmax=max_abs_count
+            )
+        
+        # Heatmap for percentages (scaled within this section)
+        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
+        if pct_cols:
+            max_abs_pct = max(abs(df[pct_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            styler = styler.background_gradient(
+                subset=pct_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_pct,
+                vmax=max_abs_pct
+            )
+        
+        # Format numbers with commas and percentages after styling
+        format_dict = {col: '{:,}' for col in raw_count_cols}
+        format_dict.update({col: '{:.1f}%' for col in pct_cols})
+        styler = styler.format(format_dict)
+        
+        # Add border styling and make table interactive
+        styler = styler.set_table_styles([
+            {'selector': 'th', 'props': [('border', '1px solid black')]},
+            {'selector': 'td', 'props': [('border', '1px solid black')]},
+            {'selector': 'table', 'props': [('border-collapse', 'collapse')]},
+        ])
+        
+        return styler
+    
+    print("Age Group Changes")
+    print("=" * 40)
+    display(style_age_table(combined_age_numeric))
+```
+
+
+
+## Pay Grade/Plan Analysis
+
+```{python}
+#| label: grade-analysis
+
+# Analyze pay grade changes
+grade_changes = analyze_category_changes('grade')
+
+if not grade_changes.empty:
+    # Create summary table by period - INCLUDE ALL grades/plans
+    grade_summary = grade_changes.pivot_table(
+        index='category',
+        columns='period',
+        values=['pct_change', 'change', 'emp_num_before'],
+        fill_value=0
+    )
+    
+    # Reorder columns chronologically
+    available_periods = [p for p in CHRONOLOGICAL_ORDER if p in grade_summary.columns.get_level_values(1)]
+    grade_summary = grade_summary.reindex(columns=available_periods, level=1)
+    
+    # Get top 50 by total employment count (sum across all periods)
+    total_employment = grade_summary['emp_num_before'].sum(axis=1)
+    top_50_grades = total_employment.nlargest(50).index
+    grade_summary_top50 = grade_summary.loc[top_50_grades]
+    grade_summary_remaining = grade_summary.drop(top_50_grades)
+    
+    # Sort by March 2025 percentage change (ascending = biggest cuts first)
+    if 'Trump 2025' in grade_summary_top50['pct_change'].columns:
+        grade_summary_top50 = grade_summary_top50.sort_values(('pct_change', 'Trump 2025'), ascending=True)
+        grade_summary_remaining = grade_summary_remaining.sort_values(('pct_change', 'Trump 2025'), ascending=True)
+    
+    # Combine counts and percentages in one table (keep numeric for styling)
+    combined_grade_numeric_top50 = pd.concat([
+        grade_summary_top50['change'].round(0).astype(int),
+        grade_summary_top50['pct_change'].round(1)
+    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
+    
+    combined_grade_numeric_remaining = pd.concat([
+        grade_summary_remaining['change'].round(0).astype(int),
+        grade_summary_remaining['pct_change'].round(1)
+    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
+    
+    # Create styled version with heatmap colors and formatting
+    def style_grade_table(df):
+        # Apply styling first (on numeric data)
+        styler = df.style
+        
+        # Heatmap for raw counts (scaled within this section)
+        raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
+        if raw_count_cols:
+            max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            import matplotlib.colors as mcolors
+            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
+            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
+            styler = styler.background_gradient(
+                subset=raw_count_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_count,
+                vmax=max_abs_count
+            )
+        
+        # Heatmap for percentages (scaled within this section)
+        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
+        if pct_cols:
+            max_abs_pct = max(abs(df[pct_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            styler = styler.background_gradient(
+                subset=pct_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_pct,
+                vmax=max_abs_pct
+            )
+        
+        # Format numbers with commas and percentages after styling
+        format_dict = {col: '{:,}' for col in raw_count_cols}
+        format_dict.update({col: '{:.1f}%' for col in pct_cols})
+        styler = styler.format(format_dict)
+        
+        # Add border styling
+        styler = styler.set_table_styles([
+            {'selector': 'th', 'props': [('border', '1px solid black')]},
+            {'selector': 'td', 'props': [('border', '1px solid black')]},
+        ])
+        
+        return styler
+    
+    print(f"Pay Grade/Plan Changes (Top 50 by employment count)")
+    print("=" * 60)
+    display(style_grade_table(combined_grade_numeric_top50))
+    
+    # Add collapsible section for remaining grades
+    from IPython.display import HTML, display as ipython_display
+    
+    remaining_count = len(combined_grade_numeric_remaining)
+    
+    collapsible_html = f"""
+    <details style="margin-top: 20px;">
+    <summary style="cursor: pointer; font-weight: bold; padding: 10px; background-color: #f0f0f0; border: 1px solid #ddd;">
+    Show remaining {remaining_count} pay grades/plans (click to expand)
+    </summary>
+    <div style="margin-top: 10px;">
+    """
+    
+    ipython_display(HTML(collapsible_html))
+    display(style_grade_table(combined_grade_numeric_remaining))
+    ipython_display(HTML("</div></details>"))
+```
+
+
+
+## Appointment Type Analysis
+
+```{python}
+#| label: appointment-analysis
+
+# Analyze appointment type changes
+appointment_changes = analyze_category_changes('appointment')
+
+if not appointment_changes.empty:
+    # Create code-to-description mapping (prefer March 2025, fallback to historical)
+    code_desc_map = {}
+    
+    # Get all unique categories and create mapping
+    for period in INAUGURATION_PERIODS:
+        # Load data to get descriptions
+        if period['after'] == (2025, "March"):
+            period_data = load_march_2025_data('appointment')
+        elif period['before'] == (2024, "September"):
+            period_data = load_september_2024_data('appointment')
+        else:
+            period_data = load_historical_parquet_data(period['after'][0], period['after'][1], 'appointment')
+        
+        if period_data is not None and 'description' in period_data.columns:
+            for _, row in period_data.iterrows():
+                if row['category'] not in code_desc_map or period['name'] == 'Trump 2025':
+                    # Prefer March 2025 descriptions, or use first available
+                    code_desc_map[row['category']] = row['description']
+    
+    # Create summary table - INCLUDE ALL appointment types
+    appointment_summary = appointment_changes.pivot_table(
+        index='category',
+        columns='period',
+        values=['emp_num_before', 'emp_num_after', 'change', 'pct_change'],
+        fill_value=0
+    )
+    
+    # Reorder columns chronologically
+    available_periods = [p for p in CHRONOLOGICAL_ORDER if p in appointment_summary.columns.get_level_values(1)]
+    appointment_summary = appointment_summary.reindex(columns=available_periods, level=1)
+    
+    # Sort by March 2025 percentage change (ascending = biggest cuts first)
+    if 'Trump 2025' in appointment_summary['pct_change'].columns:
+        appointment_summary = appointment_summary.sort_values(('pct_change', 'Trump 2025'), ascending=True)
+    
+    # Add descriptions to the index
+    appointment_display = appointment_summary.copy()
+    appointment_display.index = [f"{code}: {code_desc_map.get(code, 'Unknown')}" for code in appointment_display.index]
+    
+    # Combine counts and percentages in one table (keep numeric for styling)
+    combined_appointment_numeric = pd.concat([
+        appointment_display['change'].round(0).astype(int),
+        appointment_display['pct_change'].round(1)
+    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
+    
+    # Create styled version with heatmap colors and formatting
+    def style_appointment_table(df):
+        # Apply styling first (on numeric data)
+        styler = df.style
+        
+        # Heatmap for raw counts (scaled within this section)
+        raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
+        if raw_count_cols:
+            max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            import matplotlib.colors as mcolors
+            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
+            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
+            styler = styler.background_gradient(
+                subset=raw_count_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_count,
+                vmax=max_abs_count
+            )
+        
+        # Heatmap for percentages (scaled within this section)
+        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
+        if pct_cols:
+            max_abs_pct = max(abs(df[pct_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            styler = styler.background_gradient(
+                subset=pct_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_pct,
+                vmax=max_abs_pct
+            )
+        
+        # Format numbers with commas and percentages after styling
+        format_dict = {col: '{:,}' for col in raw_count_cols}
+        format_dict.update({col: '{:.1f}%' for col in pct_cols})
+        styler = styler.format(format_dict)
+        
+        # Add border styling
+        styler = styler.set_table_styles([
+            {'selector': 'th', 'props': [('border', '1px solid black')]},
+            {'selector': 'td', 'props': [('border', '1px solid black')]},
+        ])
+        
+        return styler
+    
+    print("Appointment Type Changes")
+    print("=" * 40)
+    display(style_appointment_table(combined_appointment_numeric))
+```
+
+## Total Employment Changes by Inauguration Period
+
+```{python}
+#| label: total-summary
+
+# Calculate total employment changes for each period
+total_changes = []
+
+for period in INAUGURATION_PERIODS:
+    period_name = period['name']
+    
+    # Get age data for this period (use age data as proxy for total employment)
+    if not age_changes.empty:
+        period_data = age_changes[age_changes['period'] == period_name]
+        if not period_data.empty:
+            total_before = period_data['emp_num_before'].sum()
+            total_after = period_data['emp_num_after'].sum()
+            total_change = total_after - total_before
+            total_pct_change = (total_change / total_before) * 100 if total_before > 0 else 0
+            
+            total_changes.append({
+                'Period': period_name,
+                'Before': total_before,
+                'After': total_after,
+                'Change': total_change,
+                'Pct_Change': total_pct_change
+            })
+
+if total_changes:
+    totals_df = pd.DataFrame(total_changes)
+    
+    # Create combined table with formatting
+    combined_totals = pd.concat([
+        totals_df[['Before', 'After']].astype(int),
+        totals_df[['Change']].astype(int),
+        totals_df[['Pct_Change']].round(1)
+    ], axis=1, keys=['Employment Levels', 'Employment Levels', 'Change', 'Percentage Change'])
+    
+    # Set the index to period names
+    combined_totals.index = totals_df['Period']
+    
+    # Create styled version with heatmap colors and formatting
+    def style_totals_table(df):
+        # Apply styling first (on numeric data)
+        styler = df.style
+        
+        # Heatmap for raw changes
+        change_cols = [col for col in df.columns if 'Change' in str(col) and 'Percentage' not in str(col)]
+        if change_cols:
+            max_abs_change = max(abs(df[change_cols].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            import matplotlib.colors as mcolors
+            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
+            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
+            styler = styler.background_gradient(
+                subset=change_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_change,
+                vmax=max_abs_change
+            )
+        
+        # Heatmap for percentages
+        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
+        if pct_cols:
+            max_abs_pct = max(abs(totals_df['Pct_Change'].values.flatten()))
+            # Use red-green color scheme where red is negative, green is positive, centered at 0
+            import matplotlib.colors as mcolors
+            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
+            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
+            styler = styler.background_gradient(
+                subset=pct_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_pct,
+                vmax=max_abs_pct
+            )
+        
+        # Format employment numbers with commas and percentages after styling
+        employment_cols = [col for col in df.columns if 'Employment Levels' in str(col)]
+        format_dict = {}
+        for col in employment_cols + change_cols:
+            format_dict[col] = '{:,}'
+        for col in pct_cols:
+            format_dict[col] = '{:.1f}%'
+        
+        styler = styler.format(format_dict)
+        
+        # Add border styling
+        styler = styler.set_table_styles([
+            {'selector': 'th', 'props': [('border', '1px solid black')]},
+            {'selector': 'td', 'props': [('border', '1px solid black')]},
+        ])
+        
+        return styler
+    
+    print("Total Federal Employment Changes by Inauguration Period")
+    print("=" * 60)
+    display(style_totals_table(combined_totals))
+
+```
+
+```{python}
+#| label: save-results
+#| include: false
+
+# Save detailed results
+if not age_changes.empty:
+    age_changes.to_csv('inauguration_age_analysis_detailed.csv', index=False)
+    
+if not grade_changes.empty:
+    grade_changes.to_csv('inauguration_grade_analysis_detailed.csv', index=False)
+    
+if not appointment_changes.empty:
+    appointment_changes.to_csv('inauguration_appointment_analysis_detailed.csv', index=False)
+
+print("Analysis complete. Detailed results saved to CSV files.")
+```
