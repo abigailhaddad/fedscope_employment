@@ -4,6 +4,7 @@ author: "Abigail Haddad"
 date: today
 format:
   html:
+    output-file: index.html
     toc: true
     toc-depth: 3
     code-fold: true
@@ -11,6 +12,7 @@ format:
     theme: cosmo
     highlight-style: github
     df-print: paged
+    embed-resources: true
 execute:
   echo: true
   warning: false
@@ -264,6 +266,113 @@ def analyze_category_changes(data_type: str) -> pd.DataFrame:
     return pd.concat(all_changes, ignore_index=True)
 ```
 
+## Styling and Display Utilities
+
+```{python}
+#| label: styling-utilities
+#| code-fold: true
+
+def create_red_green_colormap():
+    """Create a custom red-green colormap for displaying changes."""
+    import matplotlib.colors as mcolors
+    colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
+    return mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
+
+def apply_heatmap_styling(styler, df, raw_count_cols, pct_cols):
+    """Apply consistent heatmap styling to count and percentage columns."""
+    custom_cmap = create_red_green_colormap()
+    
+    # Apply heatmap coloring for raw counts
+    if raw_count_cols:
+        max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
+        if max_abs_count > 0:  # Avoid division by zero
+            styler = styler.background_gradient(
+                subset=raw_count_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_count,
+                vmax=max_abs_count
+            )
+    
+    # Apply heatmap coloring for percentages
+    if pct_cols:
+        max_abs_pct = max(abs(df[pct_cols].values.flatten()))
+        if max_abs_pct > 0:  # Avoid division by zero
+            styler = styler.background_gradient(
+                subset=pct_cols,
+                cmap=custom_cmap,
+                vmin=-max_abs_pct,
+                vmax=max_abs_pct
+            )
+    
+    return styler
+
+def style_table(df):
+    """
+    Universal table styling function for all tables.
+    Applies consistent colors, formatting, and borders.
+    """
+    # Start with base styler
+    styler = df.style
+    
+    # Identify column types
+    raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
+    pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
+    
+    # Apply heatmap styling
+    styler = apply_heatmap_styling(styler, df, raw_count_cols, pct_cols)
+    
+    # Apply number formatting
+    format_dict = {}
+    # Format raw count columns with commas
+    for col in raw_count_cols:
+        format_dict[col] = '{:,}'
+    # Format percentage columns with % sign
+    for col in pct_cols:
+        format_dict[col] = '{:.1f}%'
+    
+    if format_dict:
+        styler = styler.format(format_dict)
+    
+    # Apply consistent border styling
+    table_styles = [
+        {'selector': 'th', 'props': [('border', '1px solid black')]},
+        {'selector': 'td', 'props': [('border', '1px solid black')]},
+        {'selector': 'table', 'props': [('border-collapse', 'collapse')]},
+    ]
+    
+    styler = styler.set_table_styles(table_styles)
+    
+    return styler
+
+def display_sortable_table(df, table_id="sortable_table"):
+    """Display a styled table."""
+    display(style_table(df))
+
+def prepare_changes_table(changes_summary, value_col='pct_change', change_col='change'):
+    """
+    Prepare a changes summary table with both raw counts and percentages.
+    
+    Args:
+        changes_summary: Pivot table with the data
+        value_col: Column name for percentage changes (default: 'pct_change')
+        change_col: Column name for raw count changes (default: 'change')
+    
+    Returns:
+        DataFrame with combined Raw Count Change and Percentage Change columns
+    """
+    # Reorder columns chronologically
+    available_periods = [p for p in CHRONOLOGICAL_ORDER if p in changes_summary.columns.get_level_values(1)]
+    changes_summary = changes_summary.reindex(columns=available_periods, level=1)
+    
+    # Combine counts and percentages in one table
+    combined_numeric = pd.concat([
+        changes_summary[change_col].round(0).astype(int),
+        changes_summary[value_col].round(1)
+    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
+    
+    return combined_numeric
+```
+
 ## Age Group Analysis
 
 ```{python}
@@ -281,11 +390,7 @@ if not age_changes.empty:
         fill_value=0
     )
     
-    # Reorder columns chronologically
-    available_periods = [p for p in CHRONOLOGICAL_ORDER if p in age_summary.columns.get_level_values(1)]
-    age_summary = age_summary.reindex(columns=available_periods, level=1)
-    
-    # Order age groups logically, but INCLUDE ALL categories
+    # Order age groups logically
     age_order = ['Less than 20', '20-24', '25-29', '30-34', '35-39', '40-44', 
                  '45-49', '50-54', '55-59', '60-64', '65 or more']
     
@@ -297,64 +402,15 @@ if not age_changes.empty:
     other_ages = [age for age in all_ages_in_data if age not in age_order]
     final_age_order = age_order_in_data + sorted(other_ages)
     
-    # Reindex to show in logical age order (keep this order, don't sort by change size)
+    # Reindex to show in logical age order
     age_summary = age_summary.reindex(final_age_order)
     
-    # Combine counts and percentages in one table (keep numeric for styling)
-    combined_age_numeric = pd.concat([
-        age_summary['change'].round(0).astype(int),
-        age_summary['pct_change'].round(1)
-    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
-    
-    # Create styled version with heatmap colors and formatting
-    def style_age_table(df):
-        # Apply styling first (on numeric data)
-        styler = df.style
-        
-        # Heatmap for raw counts (scaled within this section)
-        raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
-        if raw_count_cols:
-            max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            import matplotlib.colors as mcolors
-            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
-            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
-            styler = styler.background_gradient(
-                subset=raw_count_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_count,
-                vmax=max_abs_count
-            )
-        
-        # Heatmap for percentages (scaled within this section)
-        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
-        if pct_cols:
-            max_abs_pct = max(abs(df[pct_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            styler = styler.background_gradient(
-                subset=pct_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_pct,
-                vmax=max_abs_pct
-            )
-        
-        # Format numbers with commas and percentages after styling
-        format_dict = {col: '{:,}' for col in raw_count_cols}
-        format_dict.update({col: '{:.1f}%' for col in pct_cols})
-        styler = styler.format(format_dict)
-        
-        # Add border styling and make table interactive
-        styler = styler.set_table_styles([
-            {'selector': 'th', 'props': [('border', '1px solid black')]},
-            {'selector': 'td', 'props': [('border', '1px solid black')]},
-            {'selector': 'table', 'props': [('border-collapse', 'collapse')]},
-        ])
-        
-        return styler
+    # Prepare the table using our utility function
+    combined_age_numeric = prepare_changes_table(age_summary)
     
     print("Age Group Changes")
     print("=" * 40)
-    display(style_age_table(combined_age_numeric))
+    display_sortable_table(combined_age_numeric, "age_table")
 ```
 
 
@@ -391,65 +447,13 @@ if not grade_changes.empty:
         grade_summary_top50 = grade_summary_top50.sort_values(('pct_change', 'Trump 2025'), ascending=True)
         grade_summary_remaining = grade_summary_remaining.sort_values(('pct_change', 'Trump 2025'), ascending=True)
     
-    # Combine counts and percentages in one table (keep numeric for styling)
-    combined_grade_numeric_top50 = pd.concat([
-        grade_summary_top50['change'].round(0).astype(int),
-        grade_summary_top50['pct_change'].round(1)
-    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
-    
-    combined_grade_numeric_remaining = pd.concat([
-        grade_summary_remaining['change'].round(0).astype(int),
-        grade_summary_remaining['pct_change'].round(1)
-    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
-    
-    # Create styled version with heatmap colors and formatting
-    def style_grade_table(df):
-        # Apply styling first (on numeric data)
-        styler = df.style
-        
-        # Heatmap for raw counts (scaled within this section)
-        raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
-        if raw_count_cols:
-            max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            import matplotlib.colors as mcolors
-            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
-            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
-            styler = styler.background_gradient(
-                subset=raw_count_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_count,
-                vmax=max_abs_count
-            )
-        
-        # Heatmap for percentages (scaled within this section)
-        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
-        if pct_cols:
-            max_abs_pct = max(abs(df[pct_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            styler = styler.background_gradient(
-                subset=pct_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_pct,
-                vmax=max_abs_pct
-            )
-        
-        # Format numbers with commas and percentages after styling
-        format_dict = {col: '{:,}' for col in raw_count_cols}
-        format_dict.update({col: '{:.1f}%' for col in pct_cols})
-        styler = styler.format(format_dict)
-        
-        # Add border styling
-        styler = styler.set_table_styles([
-            {'selector': 'th', 'props': [('border', '1px solid black')]},
-            {'selector': 'td', 'props': [('border', '1px solid black')]},
-        ])
-        
-        return styler
+    # Prepare tables using our utility function
+    combined_grade_numeric_top50 = prepare_changes_table(grade_summary_top50)
+    combined_grade_numeric_remaining = prepare_changes_table(grade_summary_remaining)
     
     print(f"Pay Grade/Plan Changes (Top 50 by employment count)")
     print("=" * 60)
-    display(style_grade_table(combined_grade_numeric_top50))
+    display_sortable_table(combined_grade_numeric_top50, "grade_table_top50")
     
     # Add collapsible section for remaining grades
     from IPython.display import HTML, display as ipython_display
@@ -465,7 +469,7 @@ if not grade_changes.empty:
     """
     
     ipython_display(HTML(collapsible_html))
-    display(style_grade_table(combined_grade_numeric_remaining))
+    display_sortable_table(combined_grade_numeric_remaining, "grade_table_remaining")
     ipython_display(HTML("</div></details>"))
 ```
 
@@ -519,60 +523,12 @@ if not appointment_changes.empty:
     appointment_display = appointment_summary.copy()
     appointment_display.index = [f"{code}: {code_desc_map.get(code, 'Unknown')}" for code in appointment_display.index]
     
-    # Combine counts and percentages in one table (keep numeric for styling)
-    combined_appointment_numeric = pd.concat([
-        appointment_display['change'].round(0).astype(int),
-        appointment_display['pct_change'].round(1)
-    ], axis=1, keys=['Raw Count Change', 'Percentage Change'])
-    
-    # Create styled version with heatmap colors and formatting
-    def style_appointment_table(df):
-        # Apply styling first (on numeric data)
-        styler = df.style
-        
-        # Heatmap for raw counts (scaled within this section)
-        raw_count_cols = [col for col in df.columns if 'Raw Count Change' in str(col)]
-        if raw_count_cols:
-            max_abs_count = max(abs(df[raw_count_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            import matplotlib.colors as mcolors
-            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
-            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
-            styler = styler.background_gradient(
-                subset=raw_count_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_count,
-                vmax=max_abs_count
-            )
-        
-        # Heatmap for percentages (scaled within this section)
-        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
-        if pct_cols:
-            max_abs_pct = max(abs(df[pct_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            styler = styler.background_gradient(
-                subset=pct_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_pct,
-                vmax=max_abs_pct
-            )
-        
-        # Format numbers with commas and percentages after styling
-        format_dict = {col: '{:,}' for col in raw_count_cols}
-        format_dict.update({col: '{:.1f}%' for col in pct_cols})
-        styler = styler.format(format_dict)
-        
-        # Add border styling
-        styler = styler.set_table_styles([
-            {'selector': 'th', 'props': [('border', '1px solid black')]},
-            {'selector': 'td', 'props': [('border', '1px solid black')]},
-        ])
-        
-        return styler
+    # Prepare table using our utility function
+    combined_appointment_numeric = prepare_changes_table(appointment_display)
     
     print("Appointment Type Changes")
     print("=" * 40)
-    display(style_appointment_table(combined_appointment_numeric))
+    display_sortable_table(combined_appointment_numeric, "appointment_table")
 ```
 
 ## Total Employment Changes by Inauguration Period
@@ -606,72 +562,20 @@ for period in INAUGURATION_PERIODS:
 if total_changes:
     totals_df = pd.DataFrame(total_changes)
     
-    # Create combined table with formatting
-    combined_totals = pd.concat([
-        totals_df[['Before', 'After']].astype(int),
-        totals_df[['Change']].astype(int),
-        totals_df[['Pct_Change']].round(1)
-    ], axis=1, keys=['Employment Levels', 'Employment Levels', 'Change', 'Percentage Change'])
+    # Create table with employment levels, changes, and percentages
+    display_totals = pd.DataFrame({
+        'Before': totals_df['Before'].apply(lambda x: f"{x:,}"),
+        'After': totals_df['After'].apply(lambda x: f"{x:,}"),
+        'Change': totals_df['Change'].apply(lambda x: f"{x:,}"),
+        'Pct_Change': totals_df['Pct_Change'].apply(lambda x: f"{x:.1f}%")
+    })
     
     # Set the index to period names
-    combined_totals.index = totals_df['Period']
-    
-    # Create styled version with heatmap colors and formatting
-    def style_totals_table(df):
-        # Apply styling first (on numeric data)
-        styler = df.style
-        
-        # Heatmap for raw changes
-        change_cols = [col for col in df.columns if 'Change' in str(col) and 'Percentage' not in str(col)]
-        if change_cols:
-            max_abs_change = max(abs(df[change_cols].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            import matplotlib.colors as mcolors
-            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
-            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
-            styler = styler.background_gradient(
-                subset=change_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_change,
-                vmax=max_abs_change
-            )
-        
-        # Heatmap for percentages
-        pct_cols = [col for col in df.columns if 'Percentage Change' in str(col)]
-        if pct_cols:
-            max_abs_pct = max(abs(totals_df['Pct_Change'].values.flatten()))
-            # Use red-green color scheme where red is negative, green is positive, centered at 0
-            import matplotlib.colors as mcolors
-            colors = ['darkred', 'red', 'lightcoral', 'white', 'lightgreen', 'green', 'darkgreen']
-            custom_cmap = mcolors.LinearSegmentedColormap.from_list('custom_rg', colors)
-            styler = styler.background_gradient(
-                subset=pct_cols,
-                cmap=custom_cmap,
-                vmin=-max_abs_pct,
-                vmax=max_abs_pct
-            )
-        
-        # Format employment numbers with commas and percentages after styling
-        employment_cols = [col for col in df.columns if 'Employment Levels' in str(col)]
-        format_dict = {}
-        for col in employment_cols + change_cols:
-            format_dict[col] = '{:,}'
-        for col in pct_cols:
-            format_dict[col] = '{:.1f}%'
-        
-        styler = styler.format(format_dict)
-        
-        # Add border styling
-        styler = styler.set_table_styles([
-            {'selector': 'th', 'props': [('border', '1px solid black')]},
-            {'selector': 'td', 'props': [('border', '1px solid black')]},
-        ])
-        
-        return styler
+    display_totals.index = totals_df['Period']
     
     print("Total Federal Employment Changes by Inauguration Period")
     print("=" * 60)
-    display(style_totals_table(combined_totals))
+    display(display_totals)
 
 ```
 
