@@ -1,0 +1,455 @@
+---
+title: "Forest Service Employment Trends Over Time"
+author: "Abigail Haddad"
+date: today
+format:
+  html:
+    output-file: index.html
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: cosmo
+    highlight-style: github
+    df-print: paged
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+#| code-fold: false
+
+# Import required libraries
+import pandas as pd
+import numpy as np
+from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+from great_tables import GT
+
+# Configuration
+GITHUB_BASE_URL = "https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/"
+
+# Forest Service agency code
+FOREST_SERVICE_CODE = "AG11"  # Using the code, not the name
+
+# Define time periods to analyze (excluding Sep 2024 and Mar 2025 which we load from summary)
+TIME_PERIODS = [
+    {"year": 2013, "quarter": "March"},
+    {"year": 2013, "quarter": "September"},
+    {"year": 2014, "quarter": "March"},
+    {"year": 2014, "quarter": "September"},
+    {"year": 2015, "quarter": "March"},
+    {"year": 2015, "quarter": "September"},
+    {"year": 2016, "quarter": "March"},
+    {"year": 2016, "quarter": "September"},
+    {"year": 2017, "quarter": "March"},
+    {"year": 2017, "quarter": "September"},
+    {"year": 2018, "quarter": "March"},
+    {"year": 2018, "quarter": "September"},
+    {"year": 2019, "quarter": "March"},
+    {"year": 2019, "quarter": "September"},
+    {"year": 2020, "quarter": "March"},
+    {"year": 2020, "quarter": "September"},
+    {"year": 2021, "quarter": "March"},
+    {"year": 2021, "quarter": "September"},
+    {"year": 2022, "quarter": "March"},
+    {"year": 2022, "quarter": "September"},
+    {"year": 2023, "quarter": "March"},
+    {"year": 2023, "quarter": "September"},
+    {"year": 2024, "quarter": "March"},
+]
+```
+
+## Analysis Overview
+
+This document presents Forest Service employment data over time from March 2013 to March 2025.
+
+## Data Loading Functions
+
+```{python}
+#| label: data-loading-functions
+
+def load_historical_data(year: int, quarter: str) -> pd.DataFrame:
+    """
+    Load historical data from parquet files for Forest Service.
+    
+    Args:
+        year: Year of data
+        quarter: Quarter of data (March or September)
+        
+    Returns:
+        DataFrame with Forest Service data or empty DataFrame if not found
+    """
+    filename = f"fedscope_employment_{quarter}_{year}.parquet"
+    url = f"{GITHUB_BASE_URL}{filename}"
+    
+    try:
+        df = pd.read_parquet(url)
+        
+        # Filter for Forest Service using agency code
+        forest_service_df = df[df['agysub'] == FOREST_SERVICE_CODE].copy()
+        
+        if forest_service_df.empty:
+            print(f"No Forest Service data found for {quarter} {year}")
+            return pd.DataFrame()
+            
+        # Add time period info
+        forest_service_df['year'] = year
+        forest_service_df['quarter'] = quarter
+        forest_service_df['period'] = f"{quarter} {year}"
+        
+        return forest_service_df
+        
+    except Exception as e:
+        print(f"Error loading {filename}: {e}")
+        return pd.DataFrame()
+
+def load_summary_data(datecode: int, year: int, quarter: str) -> pd.DataFrame:
+    """
+    Load data from summary tables for September 2024 or March 2025.
+    """
+    # Using Status Employment by Agency and SubAgency
+    file_path = Path("../web_dashboard/Status Employment by Agency and SubAgency_202503_and_202409.txt")
+    
+    if not file_path.exists():
+        print(f"Summary file not found for {quarter} {year}")
+        return pd.DataFrame()
+    
+    # Read the TSV file
+    df = pd.read_csv(file_path, sep='\t')
+    
+    # Filter for specific date and Forest Service
+    forest_data = df[(df['DATECODE'] == datecode) & (df['AGYSUB'] == FOREST_SERVICE_CODE)].copy()
+    
+    if forest_data.empty:
+        print(f"No Forest Service data found for {quarter} {year}")
+        return pd.DataFrame()
+    
+    # Standardize columns to match parquet format
+    forest_data['year'] = year
+    forest_data['quarter'] = quarter
+    forest_data['period'] = f'{quarter} {year}'
+    forest_data['employment'] = forest_data['EMPCOUNT'].astype(str)
+    forest_data['agysub'] = forest_data['AGYSUB']
+    
+    return forest_data
+
+def aggregate_employment_data(all_data: list) -> pd.DataFrame:
+    """
+    Aggregate employment data across all time periods.
+    """
+    results = []
+    
+    for df in all_data:
+        if df.empty:
+            continue
+            
+        period = df['period'].iloc[0]
+        year = df['year'].iloc[0]
+        quarter = df['quarter'].iloc[0]
+        
+        # Calculate total employment
+        if 'EMPCOUNT' in df.columns:
+            # For summary data
+            total_emp = df['EMPCOUNT'].sum()
+        else:
+            # For parquet data - sum numeric employment values
+            valid_employment = df['employment'].apply(
+                lambda x: int(x) if str(x).isdigit() and str(x) not in ['REDACTED', '*****'] else 0
+            )
+            total_emp = valid_employment.sum()
+        
+        results.append({
+            'period': period,
+            'year': year,
+            'quarter': quarter,
+            'total_employment': total_emp
+        })
+    
+    return pd.DataFrame(results)
+
+def get_appointment_types(all_data: list) -> pd.DataFrame:
+    """
+    Get employment by appointment type for each period.
+    """
+    results = []
+    
+    for df in all_data:
+        if df.empty:
+            continue
+            
+        period = df['period'].iloc[0]
+        year = df['year'].iloc[0]
+        quarter = df['quarter'].iloc[0]
+        
+        # Group by appointment type code (toa)
+        if 'toa' in df.columns and 'toat' in df.columns:
+            appointment_summary = df.groupby(['toa', 'toat'])['employment'].apply(
+                lambda x: sum(int(emp) for emp in x if str(emp).isdigit() and str(emp) not in ['REDACTED', '*****'])
+            ).reset_index()
+            
+            for _, row in appointment_summary.iterrows():
+                results.append({
+                    'period': period,
+                    'year': year,
+                    'quarter': quarter,
+                    'appointment_code': row['toa'],
+                    'appointment_type': row['toat'],
+                    'employment': row['employment']
+                })
+    
+    return pd.DataFrame(results)
+```
+
+## Load and Process Data
+
+```{python}
+#| label: load-all-data
+
+# Load all historical data
+all_data = []
+
+for period in TIME_PERIODS:
+    df = load_historical_data(period['year'], period['quarter'])
+    if not df.empty:
+        all_data.append(df)
+
+# Add September 2024 and March 2025 data
+sept_2024 = load_summary_data(202409, 2024, 'September')
+if not sept_2024.empty:
+    all_data.append(sept_2024)
+
+march_2025 = load_summary_data(202503, 2025, 'March')
+if not march_2025.empty:
+    all_data.append(march_2025)
+
+print(f"Loaded data for {len(all_data)} time periods")
+```
+
+## Total Employment Trends
+
+```{python}
+#| label: total-employment-analysis
+
+# Aggregate total employment data
+employment_trends = aggregate_employment_data(all_data)
+
+if not employment_trends.empty:
+    # Sort by year and quarter
+    employment_trends['sort_key'] = employment_trends['year'] * 10 + employment_trends['quarter'].map({'March': 1, 'September': 2})
+    employment_trends = employment_trends.sort_values('sort_key')
+    
+    # Create display table using great_tables
+    display_table = employment_trends[['period', 'total_employment']].copy()
+    display_table.columns = ['Period', 'Total Employment']
+    
+    gt_table = (
+        GT(display_table)
+        .tab_header(title="Forest Service Total Employment Over Time")
+        .fmt_number(columns=['Total Employment'], decimals=0)
+    )
+    
+    gt_table.show()
+    
+    # Create line graph
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    # Separate March and September data for different colors
+    march_data = employment_trends[employment_trends['quarter'] == 'March']
+    sept_data = employment_trends[employment_trends['quarter'] == 'September']
+    
+    # Plot lines
+    ax.plot(employment_trends['period'], employment_trends['total_employment'], 
+            'k-', alpha=0.3, linewidth=1)
+    
+    # Plot points
+    ax.scatter(march_data['period'], march_data['total_employment'], 
+               color='blue', s=100, label='March', zorder=5)
+    ax.scatter(sept_data['period'], sept_data['total_employment'], 
+               color='orange', s=100, label='September', zorder=5)
+    
+    # Formatting
+    ax.set_xlabel('Period', fontsize=12)
+    ax.set_ylabel('Total Employment', fontsize=12)
+    ax.set_title('Forest Service Employment Over Time', fontsize=14, fontweight='bold')
+    
+    # Rotate x-axis labels
+    plt.xticks(rotation=45, ha='right')
+    
+    # Add grid
+    ax.grid(True, alpha=0.3)
+    
+    # Set y-axis to start at 0
+    ax.set_ylim(bottom=0)
+    
+    # Format y-axis with commas
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{int(x):,}'))
+    
+    # Add legend
+    ax.legend()
+    
+    # Tight layout
+    plt.tight_layout()
+    plt.show()
+    
+```
+
+## Appointment Type Data
+
+```{python}
+#| label: appointment-type-data
+
+# Get appointment types over time (excluding summary data which doesn't have this detail)
+appointment_data = get_appointment_types([df for df in all_data if 'toa' in df.columns])
+
+if not appointment_data.empty:
+    # Load the full appointment type descriptions from summary data
+    appointment_file = Path("../web_dashboard/Status Employment by Appointment Type_202503_and_202409.txt")
+    
+    if appointment_file.exists():
+        appt_df = pd.read_csv(appointment_file, sep='\t')
+        # Get unique appointment codes and their full descriptions
+        full_descriptions = appt_df[['TOA', 'TOAT']].drop_duplicates()
+        full_descriptions.columns = ['appointment_code', 'full_appointment_type']
+        
+        # Merge with our appointment data to get full descriptions
+        appointment_data_enhanced = appointment_data.merge(
+            full_descriptions, 
+            on='appointment_code', 
+            how='left'
+        )
+        
+        # Use full descriptions where available, fall back to original
+        appointment_data_enhanced['appointment_type_display'] = appointment_data_enhanced['full_appointment_type'].fillna(appointment_data_enhanced['appointment_type'])
+    else:
+        appointment_data_enhanced = appointment_data.copy()
+        appointment_data_enhanced['appointment_type_display'] = appointment_data_enhanced['appointment_type']
+    
+    # Create pivot table showing appointment types across periods
+    appointment_pivot = appointment_data_enhanced.pivot_table(
+        index=['appointment_code', 'appointment_type_display'],
+        columns='period',
+        values='employment',
+        fill_value=0
+    )
+    
+    # Sort by most recent total employment
+    if appointment_pivot.columns[-1] in appointment_pivot.columns:
+        appointment_pivot['total_recent'] = appointment_pivot[appointment_pivot.columns[-1]]
+        appointment_pivot = appointment_pivot.sort_values('total_recent', ascending=False)
+        appointment_pivot = appointment_pivot.drop('total_recent', axis=1)
+    
+    # Convert to great_tables format
+    appointment_pivot_reset = appointment_pivot.reset_index()
+    appointment_pivot_reset.columns = ['appointment_code', 'appointment_type'] + [col for col in appointment_pivot_reset.columns if col not in ['appointment_code', 'appointment_type_display']]
+    
+    gt_appointment = (
+        GT(appointment_pivot_reset)
+        .tab_header(title="Forest Service Employment by Appointment Type Over Time")
+        .fmt_number(columns=[col for col in appointment_pivot_reset.columns if col not in ['appointment_code', 'appointment_type']], decimals=0)
+    )
+    
+    gt_appointment.show()
+    
+    # Create a table showing all appointment type codes and their categories using full descriptions
+    all_appointment_types = appointment_data_enhanced[['appointment_code', 'appointment_type_display']].drop_duplicates()
+    
+    def categorize_appointment(appointment_type):
+        appointment_str = str(appointment_type).upper()
+        if 'NONPERMANENT' in appointment_str:
+            return 'Nonpermanent'
+        elif 'PERMANENT' in appointment_str:
+            return 'Permanent'
+        else:
+            return 'Other'
+    
+    all_appointment_types['Category'] = all_appointment_types['appointment_type_display'].apply(categorize_appointment)
+    all_appointment_types = all_appointment_types.sort_values(['Category', 'appointment_code'])
+    all_appointment_types.columns = ['appointment_code', 'appointment_type', 'Category']
+    
+    gt_categories = (
+        GT(all_appointment_types)
+        .tab_header(title="Appointment Type Categories")
+    )
+    
+    gt_categories.show()
+    
+    # Create a summary showing nonpermanent vs permanent using enhanced data
+    summary_data = []
+    for period in appointment_data_enhanced['period'].unique():
+        period_data = appointment_data_enhanced[appointment_data_enhanced['period'] == period]
+        nonperm_emp = period_data[period_data['appointment_type_display'].str.contains('NONPERMANENT', case=False, na=False)]['employment'].sum()
+        perm_emp = period_data[~period_data['appointment_type_display'].str.contains('NONPERMANENT', case=False, na=False)]['employment'].sum()
+        total_emp = nonperm_emp + perm_emp
+        
+        summary_data.append({
+            'Period': period,
+            'Nonpermanent': nonperm_emp,
+            'Permanent': perm_emp,
+            'Total': total_emp
+        })
+    
+    summary_df = pd.DataFrame(summary_data)
+    
+    gt_temp = (
+        GT(summary_df)
+        .tab_header(title="Nonpermanent vs Permanent Employment Summary")
+        .fmt_number(columns=['Nonpermanent', 'Permanent', 'Total'], decimals=0)
+    )
+    
+    gt_temp.show()
+    
+    # Create 3-line graph showing total, nonpermanent, and permanent over time
+    plot_data = []
+    for period in appointment_data_enhanced['period'].unique():
+        period_data = appointment_data_enhanced[appointment_data_enhanced['period'] == period]
+        nonperm_emp = period_data[period_data['appointment_type_display'].str.contains('NONPERMANENT', case=False, na=False)]['employment'].sum()
+        perm_emp = period_data[~period_data['appointment_type_display'].str.contains('NONPERMANENT', case=False, na=False)]['employment'].sum()
+        total_emp = nonperm_emp + perm_emp
+        plot_data.append({
+            'period': period,
+            'nonpermanent': nonperm_emp,
+            'permanent': perm_emp,
+            'total': total_emp
+        })
+    
+    plot_df = pd.DataFrame(plot_data)
+    
+    # Create the 3-line graph
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    # Plot the three lines
+    ax.plot(plot_df['period'], plot_df['total'], 'k-', linewidth=3, label='Total', marker='o', markersize=8)
+    ax.plot(plot_df['period'], plot_df['permanent'], 'b-', linewidth=2, label='Permanent', marker='s', markersize=6)
+    ax.plot(plot_df['period'], plot_df['nonpermanent'], 'r-', linewidth=2, label='Nonpermanent', marker='^', markersize=6)
+    
+    # Formatting
+    ax.set_xlabel('Period', fontsize=12)
+    ax.set_ylabel('Employment Count', fontsize=12)
+    ax.set_title('Forest Service Employment: Total, Permanent, and Nonpermanent', fontsize=14, fontweight='bold')
+    
+    # Rotate x-axis labels
+    plt.xticks(rotation=45, ha='right')
+    
+    # Add grid
+    ax.grid(True, alpha=0.3)
+    
+    # Set y-axis to start at 0
+    ax.set_ylim(bottom=0)
+    
+    # Format y-axis with commas
+    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{int(x):,}'))
+    
+    # Add legend
+    ax.legend()
+    
+    # Tight layout
+    plt.tight_layout()
+    plt.show()
+```
+
