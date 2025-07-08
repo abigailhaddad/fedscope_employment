@@ -1,0 +1,384 @@
+---
+title: "High Turnover Occupation and Agency Analysis"
+author: "Abigail Haddad"
+date: today
+format:
+  html:
+    output-file: high_turnover_analysis.html
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: cosmo
+    highlight-style: github
+    df-print: paged
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+#| code-fold: false
+
+# Import required libraries
+import pandas as pd
+import numpy as np
+from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+from great_tables import GT, style, loc
+
+# Configuration
+PARQUET_DIR = "fedscope_data/parquet/"
+GITHUB_BASE_URL = "https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/"
+
+# Minimum employee threshold (to avoid tiny groups with misleading turnover rates)
+MIN_EMPLOYEES = 50
+
+# Color configuration for heatmaps
+HIGH_TURNOVER_COLOR = "#d62728"  # Red for high turnover
+LOW_TURNOVER_COLOR = "#2ca02c"   # Green for low turnover
+```
+
+## Data Loading
+
+```{python}
+#| label: load-all-data
+
+# We need to load employment data to get baseline counts, then merge with separations
+# Load recent employment data for baseline
+employment_files = [
+    "fedscope_employment_March_2023.parquet",
+    "fedscope_employment_March_2024.parquet"
+]
+
+# Load separations data for the same periods
+separations_files = [
+    "fedscope_separations_FY2020-2024.parquet",
+    "fedscope_separations_March_2025.parquet"
+]
+
+# Load employment data
+employment_data = []
+for file in employment_files:
+    try:
+        df = pd.read_parquet(GITHUB_BASE_URL + file)
+        # Get unique agencies and occupations with employment counts
+        agency_occ = df.groupby(['agysub', 'occ']).agg({
+            'employment': lambda x: sum(int(emp) for emp in x if str(emp).isdigit() and str(emp) not in ['REDACTED', '*****'])
+        }).reset_index()
+        agency_occ['year'] = int(file.split('_')[2].split('.')[0])
+        agency_occ['quarter'] = file.split('_')[1]
+        employment_data.append(agency_occ)
+        print(f"Loaded employment data from {file}")
+    except Exception as e:
+        print(f"Error loading {file}: {e}")
+
+# Load separations data
+separations_data = []
+for file in separations_files:
+    try:
+        df = pd.read_parquet(PARQUET_DIR + file)
+        # Group by agency and occupation
+        if 'efdate' in df.columns:
+            # Extract year from efdate
+            df['year'] = df['efdate'].astype(str).str[:4].astype(int)
+        
+        agency_occ_sep = df.groupby(['agysub', 'occ', 'year']).size().reset_index(name='separations')
+        separations_data.append(agency_occ_sep)
+        print(f"Loaded separations data from {file}")
+    except Exception as e:
+        print(f"Error loading {file}: {e}")
+
+# Combine data
+all_employment = pd.concat(employment_data, ignore_index=True) if employment_data else pd.DataFrame()
+all_separations = pd.concat(separations_data, ignore_index=True) if separations_data else pd.DataFrame()
+
+print(f"\nTotal employment agency-occupation combinations: {len(all_employment):,}")
+print(f"Total separations agency-occupation combinations: {len(all_separations):,}")
+```
+
+## Calculate Turnover Rates
+
+```{python}
+#| label: calculate-turnover
+
+# Calculate annual turnover rates by agency and occupation
+if not all_employment.empty and not all_separations.empty:
+    # Get the most recent employment data as baseline
+    recent_employment = all_employment[all_employment['year'] == all_employment['year'].max()].copy()
+    recent_employment = recent_employment.rename(columns={'employment': 'baseline_employment'})
+    
+    # Aggregate separations by agency, occupation, and year
+    annual_separations = all_separations.groupby(['agysub', 'occ', 'year'])['separations'].sum().reset_index()
+    
+    # Calculate average annual separations
+    avg_separations = annual_separations.groupby(['agysub', 'occ'])['separations'].mean().reset_index()
+    avg_separations = avg_separations.rename(columns={'separations': 'avg_annual_separations'})
+    
+    # Merge with employment data
+    turnover_data = pd.merge(
+        recent_employment[['agysub', 'occ', 'baseline_employment']],
+        avg_separations,
+        on=['agysub', 'occ'],
+        how='inner'
+    )
+    
+    # Calculate turnover rate
+    turnover_data['turnover_rate'] = (turnover_data['avg_annual_separations'] / turnover_data['baseline_employment'] * 100).round(1)
+    
+    # Filter out small groups
+    turnover_data = turnover_data[turnover_data['baseline_employment'] >= MIN_EMPLOYEES].copy()
+    
+    # Load agency and occupation names from recent employment data
+    df_recent = pd.read_parquet(GITHUB_BASE_URL + "fedscope_employment_March_2024.parquet")
+    
+    # Get unique agency names
+    agency_names = df_recent[['agysub', 'agysubt']].drop_duplicates()
+    turnover_data = pd.merge(turnover_data, agency_names, on='agysub', how='left')
+    
+    # Get unique occupation names
+    occ_names = df_recent[['occ', 'occt']].drop_duplicates()
+    turnover_data = pd.merge(turnover_data, occ_names, on='occ', how='left')
+    
+    print(f"Calculated turnover rates for {len(turnover_data):,} agency-occupation combinations")
+    print(f"(Filtered to groups with at least {MIN_EMPLOYEES} employees)")
+else:
+    turnover_data = pd.DataFrame()
+```
+
+## Top High-Turnover Combinations
+
+```{python}
+#| label: top-high-turnover
+
+if not turnover_data.empty:
+    # Sort by turnover rate
+    top_turnover = turnover_data.nlargest(30, 'turnover_rate')[
+        ['agysub', 'agysubt', 'occ', 'occt', 'baseline_employment', 'avg_annual_separations', 'turnover_rate']
+    ].copy()
+    
+    # Rename columns for display
+    top_turnover.columns = ['Agency Code', 'Agency Name', 'Occ Code', 'Occupation', 
+                            'Current Employees', 'Avg Annual Separations', 'Turnover Rate (%)']
+    
+    # Create GT table
+    gt_top_turnover = (
+        GT(top_turnover)
+        .tab_header(title="Top 30 High-Turnover Agency-Occupation Combinations")
+        .fmt_number(columns=['Current Employees', 'Avg Annual Separations'], decimals=0, use_seps=True)
+        .fmt_number(columns=['Turnover Rate (%)'], decimals=1)
+        .data_color(
+            columns=['Turnover Rate (%)'],
+            palette=[f"white:{HIGH_TURNOVER_COLOR}"],
+            domain=[0, top_turnover['Turnover Rate (%)'].max()],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_top_turnover.show()
+```
+
+## Turnover by Agency
+
+```{python}
+#| label: turnover-by-agency
+
+if not turnover_data.empty:
+    # Aggregate by agency
+    agency_turnover = turnover_data.groupby(['agysub', 'agysubt']).agg({
+        'baseline_employment': 'sum',
+        'avg_annual_separations': 'sum'
+    }).reset_index()
+    
+    agency_turnover['turnover_rate'] = (agency_turnover['avg_annual_separations'] / agency_turnover['baseline_employment'] * 100).round(1)
+    
+    # Filter to agencies with significant employment
+    agency_turnover = agency_turnover[agency_turnover['baseline_employment'] >= 100].copy()
+    
+    # Sort by turnover rate
+    agency_turnover = agency_turnover.sort_values('turnover_rate', ascending=False).head(25)
+    
+    # Rename for display
+    agency_turnover.columns = ['Agency Code', 'Agency Name', 'Total Employees', 'Avg Annual Separations', 'Turnover Rate (%)']
+    
+    # Create GT table
+    gt_agency = (
+        GT(agency_turnover)
+        .tab_header(title="Top 25 Agencies by Turnover Rate")
+        .fmt_number(columns=['Total Employees', 'Avg Annual Separations'], decimals=0, use_seps=True)
+        .fmt_number(columns=['Turnover Rate (%)'], decimals=1)
+        .data_color(
+            columns=['Turnover Rate (%)'],
+            palette=[f"{LOW_TURNOVER_COLOR}:white:{HIGH_TURNOVER_COLOR}"],
+            domain=[0, agency_turnover['Turnover Rate (%)'].max()],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_agency.show()
+```
+
+## Turnover by Occupation
+
+```{python}
+#| label: turnover-by-occupation
+
+if not turnover_data.empty:
+    # Aggregate by occupation
+    occ_turnover = turnover_data.groupby(['occ', 'occt']).agg({
+        'baseline_employment': 'sum',
+        'avg_annual_separations': 'sum'
+    }).reset_index()
+    
+    occ_turnover['turnover_rate'] = (occ_turnover['avg_annual_separations'] / occ_turnover['baseline_employment'] * 100).round(1)
+    
+    # Filter to occupations with significant employment
+    occ_turnover = occ_turnover[occ_turnover['baseline_employment'] >= 500].copy()
+    
+    # Sort by turnover rate
+    occ_turnover = occ_turnover.sort_values('turnover_rate', ascending=False).head(25)
+    
+    # Rename for display
+    occ_turnover.columns = ['Occ Code', 'Occupation', 'Total Employees', 'Avg Annual Separations', 'Turnover Rate (%)']
+    
+    # Create GT table
+    gt_occ = (
+        GT(occ_turnover)
+        .tab_header(title="Top 25 Occupations by Turnover Rate (500+ employees)")
+        .fmt_number(columns=['Total Employees', 'Avg Annual Separations'], decimals=0, use_seps=True)
+        .fmt_number(columns=['Turnover Rate (%)'], decimals=1)
+        .data_color(
+            columns=['Turnover Rate (%)'],
+            palette=[f"{LOW_TURNOVER_COLOR}:white:{HIGH_TURNOVER_COLOR}"],
+            domain=[0, occ_turnover['Turnover Rate (%)'].max()],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_occ.show()
+```
+
+## Critical Staffing Risk Matrix
+
+```{python}
+#| label: risk-matrix
+
+if not turnover_data.empty:
+    # Create a risk matrix based on turnover rate and group size
+    # High turnover + small group = highest risk
+    
+    turnover_data['risk_score'] = turnover_data['turnover_rate'] * (1 + 100/turnover_data['baseline_employment'])
+    
+    # Get top risk combinations
+    high_risk = turnover_data.nlargest(20, 'risk_score')[
+        ['agysub', 'agysubt', 'occ', 'occt', 'baseline_employment', 'turnover_rate', 'risk_score']
+    ].copy()
+    
+    # Add risk category
+    def categorize_risk(row):
+        if row['turnover_rate'] > 30 and row['baseline_employment'] < 200:
+            return 'Critical'
+        elif row['turnover_rate'] > 20 and row['baseline_employment'] < 500:
+            return 'High'
+        elif row['turnover_rate'] > 15:
+            return 'Moderate'
+        else:
+            return 'Low'
+    
+    high_risk['risk_category'] = high_risk.apply(categorize_risk, axis=1)
+    
+    # Rename columns
+    high_risk.columns = ['Agency Code', 'Agency Name', 'Occ Code', 'Occupation', 
+                         'Current Employees', 'Turnover Rate (%)', 'Risk Score', 'Risk Category']
+    
+    # Create GT table with risk coloring
+    gt_risk = (
+        GT(high_risk)
+        .tab_header(title="Critical Staffing Risk: High Turnover + Small Groups")
+        .fmt_number(columns=['Current Employees'], decimals=0, use_seps=True)
+        .fmt_number(columns=['Turnover Rate (%)'], decimals=1)
+        .fmt_number(columns=['Risk Score'], decimals=1)
+        .data_color(
+            columns=['Risk Category'],
+            palette=["#2ca02c", "#ff7f0e", "#ff7f0e", "#d62728"],
+            domain=["Low", "Moderate", "High", "Critical"],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_risk.show()
+    
+    # Create scatter plot of turnover rate vs group size
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Filter to reasonable ranges for visualization
+    plot_data = turnover_data[(turnover_data['baseline_employment'] <= 2000) & 
+                              (turnover_data['turnover_rate'] <= 50)].copy()
+    
+    scatter = ax.scatter(plot_data['baseline_employment'], 
+                        plot_data['turnover_rate'],
+                        alpha=0.6, 
+                        s=50,
+                        c=plot_data['risk_score'],
+                        cmap='YlOrRd')
+    
+    # Add colorbar
+    cbar = plt.colorbar(scatter)
+    cbar.set_label('Risk Score', rotation=270, labelpad=20)
+    
+    # Formatting
+    ax.set_xlabel('Current Employees', fontsize=12)
+    ax.set_ylabel('Turnover Rate (%)', fontsize=12)
+    ax.set_title('Turnover Risk Matrix: Rate vs Group Size', fontsize=14, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    
+    # Add risk zones
+    ax.axhline(y=30, color='red', linestyle='--', alpha=0.5, label='High Turnover Threshold')
+    ax.axvline(x=200, color='orange', linestyle='--', alpha=0.5, label='Small Group Threshold')
+    
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
+```
+
+## Turnover Patterns Summary
+
+```{python}
+#| label: summary-stats
+
+if not turnover_data.empty:
+    # Calculate summary statistics
+    summary_stats = {
+        'Metric': [
+            'Total Agency-Occupation Combinations Analyzed',
+            'Average Turnover Rate (%)',
+            'Median Turnover Rate (%)',
+            'Combinations with >20% Turnover',
+            'Combinations with >30% Turnover',
+            'Total Employees in High-Turnover Groups (>20%)',
+            'Percentage of Workforce in High-Turnover Groups'
+        ],
+        'Value': [
+            f"{len(turnover_data):,}",
+            f"{turnover_data['turnover_rate'].mean():.1f}",
+            f"{turnover_data['turnover_rate'].median():.1f}",
+            f"{len(turnover_data[turnover_data['turnover_rate'] > 20]):,}",
+            f"{len(turnover_data[turnover_data['turnover_rate'] > 30]):,}",
+            f"{turnover_data[turnover_data['turnover_rate'] > 20]['baseline_employment'].sum():,}",
+            f"{(turnover_data[turnover_data['turnover_rate'] > 20]['baseline_employment'].sum() / turnover_data['baseline_employment'].sum() * 100):.1f}%"
+        ]
+    }
+    
+    summary_df = pd.DataFrame(summary_stats)
+    
+    gt_summary = (
+        GT(summary_df)
+        .tab_header(title="Turnover Analysis Summary")
+    )
+    
+    gt_summary.show()
+```

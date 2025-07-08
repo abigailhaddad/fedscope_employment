@@ -1,0 +1,474 @@
+---
+title: "Forest Service Accessions and Separations Analysis"
+author: "Abigail Haddad"
+date: today
+format:
+  html:
+    output-file: forest_service_accessions_separations.html
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: cosmo
+    highlight-style: github
+    df-print: paged
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+<style>
+/* Make the main content area wider */
+.column-page {
+  max-width: 95% !important;
+}
+
+/* Let GT tables use full available width */
+.gt_table {
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+/* Tiny tables for full historical view */
+.tiny-table {
+  margin-left: -40px !important;
+  margin-right: -40px !important;
+  max-width: calc(100% + 80px) !important;
+}
+</style>
+
+```{python}
+#| label: setup
+#| code-fold: false
+
+# Import required libraries
+import pandas as pd
+import numpy as np
+from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
+from great_tables import GT, style, loc
+
+# Configuration
+PARQUET_DIR = "fedscope_data/parquet/"
+FOREST_SERVICE_CODE = "AG11"
+
+# Define color scales for heatmaps
+ACCESSIONS_COLOR = "#1f77b4"  # Blue for accessions
+SEPARATIONS_COLOR = "#ff7f0e"  # Orange for separations
+NET_POSITIVE_COLOR = "#2ca02c"  # Green for positive net
+NET_NEGATIVE_COLOR = "#d62728"  # Red for negative net
+```
+
+## Data Loading
+
+```{python}
+#| label: load-data
+
+# Load accessions data
+accessions_files = [
+    "fedscope_accessions_FY2005-2009.parquet",
+    "fedscope_accessions_FY2010-2014.parquet", 
+    "fedscope_accessions_FY2015-2019.parquet",
+    "fedscope_accessions_FY2020-2024.parquet",
+    "fedscope_accessions_March_2025.parquet"
+]
+
+# Load separations data
+separations_files = [
+    "fedscope_separations_FY2005-2009.parquet",
+    "fedscope_separations_FY2010-2014.parquet",
+    "fedscope_separations_FY2015-2019.parquet", 
+    "fedscope_separations_FY2020-2024.parquet",
+    "fedscope_separations_March_2025.parquet"
+]
+
+# Load all accessions data
+accessions_data = []
+for file in accessions_files:
+    try:
+        df = pd.read_parquet(PARQUET_DIR + file)
+        # Handle both uppercase and lowercase column names
+        agysub_col = 'AGYSUB' if 'AGYSUB' in df.columns else 'agysub'
+        # Filter for Forest Service
+        df_forest = df[df[agysub_col] == FOREST_SERVICE_CODE].copy()
+        if not df_forest.empty:
+            accessions_data.append(df_forest)
+            print(f"Loaded {len(df_forest)} Forest Service accessions records from {file}")
+    except Exception as e:
+        print(f"Error loading {file}: {e}")
+
+# Load all separations data  
+separations_data = []
+for file in separations_files:
+    try:
+        df = pd.read_parquet(PARQUET_DIR + file)
+        # Filter for Forest Service
+        df_forest = df[df['agysub'] == FOREST_SERVICE_CODE].copy()
+        if not df_forest.empty:
+            separations_data.append(df_forest)
+            print(f"Loaded {len(df_forest)} Forest Service separations records from {file}")
+    except Exception as e:
+        print(f"Error loading {file}: {e}")
+
+# Combine all data
+all_accessions = pd.concat(accessions_data, ignore_index=True) if accessions_data else pd.DataFrame()
+all_separations = pd.concat(separations_data, ignore_index=True) if separations_data else pd.DataFrame()
+
+print(f"\nTotal Forest Service accessions records: {len(all_accessions):,}")
+print(f"Total Forest Service separations records: {len(all_separations):,}")
+```
+
+## Monthly Aggregation
+
+```{python}
+#| label: aggregate-monthly
+
+def aggregate_by_month(df, data_type):
+    """Aggregate data by month (EFDATE field)."""
+    if df.empty:
+        return pd.DataFrame()
+    
+    # Convert EFDATE to string and extract year/month
+    df['efdate_str'] = df['efdate'].astype(str)
+    df['year'] = df['efdate_str'].str[:4].astype(int)
+    df['month'] = df['efdate_str'].str[4:6].astype(int)
+    
+    # Group by year and month
+    monthly = df.groupby(['year', 'month']).size().reset_index(name='count')
+    monthly['data_type'] = data_type
+    
+    return monthly
+
+# Aggregate accessions and separations by month
+monthly_accessions = aggregate_by_month(all_accessions, 'accessions')
+monthly_separations = aggregate_by_month(all_separations, 'separations')
+
+# Merge to calculate net change
+if not monthly_accessions.empty and not monthly_separations.empty:
+    monthly_combined = pd.merge(
+        monthly_accessions[['year', 'month', 'count']],
+        monthly_separations[['year', 'month', 'count']],
+        on=['year', 'month'],
+        how='outer',
+        suffixes=('_acc', '_sep')
+    ).fillna(0)
+    
+    monthly_combined['accessions'] = monthly_combined['count_acc'].astype(int)
+    monthly_combined['separations'] = monthly_combined['count_sep'].astype(int)
+    monthly_combined['net_change'] = monthly_combined['accessions'] - monthly_combined['separations']
+    monthly_combined = monthly_combined.drop(['count_acc', 'count_sep'], axis=1)
+else:
+    monthly_combined = pd.DataFrame()
+
+print(f"Monthly data points: {len(monthly_combined)}")
+```
+
+## Accessions Heatmap
+
+```{python}
+#| label: accessions-heatmap
+
+if not monthly_combined.empty:
+    # Create pivot table for accessions
+    accessions_pivot = monthly_combined.pivot(index='month', columns='year', values='accessions')
+    
+    # Get most recent 10 years for main display
+    all_years = sorted(accessions_pivot.columns)
+    recent_years = all_years[-10:]  # Last 10 years
+    recent_accessions = accessions_pivot[recent_years]
+    
+    # Create month labels
+    month_labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    recent_accessions.index = [month_labels[i-1] for i in recent_accessions.index]
+    
+    # Create GT heatmap for accessions (recent years)
+    accessions_df = recent_accessions.reset_index()
+    accessions_df.columns = ['Month'] + [str(col) for col in recent_accessions.columns]
+    
+    gt_accessions = (
+        GT(accessions_df)
+        .tab_header(title=f"Forest Service Monthly Accessions ({recent_years[0]}-{recent_years[-1]})")
+        .fmt_number(columns=list(accessions_df.columns[1:]), decimals=0, use_seps=True)
+        .data_color(
+            columns=list(accessions_df.columns[1:]),
+            palette=["white", ACCESSIONS_COLOR],
+            domain=[0, accessions_pivot.max().max()],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_accessions.show()
+```
+
+## Separations Heatmap
+
+```{python}
+#| label: separations-heatmap
+
+if not monthly_combined.empty:
+    # Create pivot table for separations
+    separations_pivot = monthly_combined.pivot(index='month', columns='year', values='separations')
+    
+    # Get most recent 10 years for main display
+    recent_separations = separations_pivot[recent_years]
+    
+    # Create month labels
+    recent_separations.index = [month_labels[i-1] for i in recent_separations.index]
+    
+    # Create GT heatmap for separations (recent years)
+    separations_df = recent_separations.reset_index()
+    separations_df.columns = ['Month'] + [str(col) for col in recent_separations.columns]
+    
+    gt_separations = (
+        GT(separations_df)
+        .tab_header(title=f"Forest Service Monthly Separations ({recent_years[0]}-{recent_years[-1]})")
+        .fmt_number(columns=list(separations_df.columns[1:]), decimals=0, use_seps=True)
+        .data_color(
+            columns=list(separations_df.columns[1:]),
+            palette=["white", SEPARATIONS_COLOR],
+            domain=[0, separations_pivot.max().max()],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_separations.show()
+```
+
+## Net Change Heatmap
+
+```{python}
+#| label: net-change-heatmap
+
+if not monthly_combined.empty:
+    # Create pivot table for net change
+    net_pivot = monthly_combined.pivot(index='month', columns='year', values='net_change')
+    
+    # Get most recent 10 years for main display
+    recent_net = net_pivot[recent_years]
+    
+    # Create month labels
+    recent_net.index = [month_labels[i-1] for i in recent_net.index]
+    
+    # Get max absolute value for symmetric scale (from all data)
+    max_abs_val = max(abs(net_pivot.min().min()), abs(net_pivot.max().max()))
+    
+    # Create GT heatmap for net change with diverging colors (recent years)
+    net_df = recent_net.reset_index()
+    net_df.columns = ['Month'] + [str(col) for col in recent_net.columns]
+    
+    gt_net = (
+        GT(net_df)
+        .tab_header(title=f"Forest Service Monthly Net Change ({recent_years[0]}-{recent_years[-1]})")
+        .fmt_number(columns=list(net_df.columns[1:]), decimals=0, use_seps=True)
+        .data_color(
+            columns=list(net_df.columns[1:]),
+            palette=[NET_NEGATIVE_COLOR, "white", NET_POSITIVE_COLOR],
+            domain=[-max_abs_val, max_abs_val],
+            na_color="lightgray"
+        )
+    )
+    
+    gt_net.show()
+```
+
+## Annual Trends (Complete Years Only)
+
+```{python}
+#| label: annual-summary
+
+if not monthly_combined.empty:
+    # Calculate annual totals and months per year
+    annual_summary = monthly_combined.groupby('year').agg({
+        'accessions': 'sum',
+        'separations': 'sum',
+        'net_change': 'sum',
+        'month': 'count'  # Count of months with data
+    }).reset_index()
+    
+    # Only include years with 12 months of data
+    complete_years = annual_summary[annual_summary['month'] == 12].copy()
+    
+    if not complete_years.empty:
+        print(f"Showing {len(complete_years)} complete years with 12 months of data each")
+        print(f"Complete years: {sorted(complete_years['year'].tolist())}")
+        
+        # Create line plot
+        fig, ax = plt.subplots(figsize=(12, 6))
+        
+        ax.plot(complete_years['year'], complete_years['accessions'], 
+                color=ACCESSIONS_COLOR, linewidth=3, marker='o', markersize=8, label='Accessions')
+        ax.plot(complete_years['year'], complete_years['separations'], 
+                color=SEPARATIONS_COLOR, linewidth=3, marker='s', markersize=8, label='Separations')
+        ax.plot(complete_years['year'], complete_years['net_change'], 
+                color='black', linewidth=2, marker='D', markersize=6, label='Net Change', linestyle='--')
+        
+        # Add zero line
+        ax.axhline(y=0, color='gray', linestyle='-', alpha=0.5)
+        
+        # Formatting
+        ax.set_xlabel('Year', fontsize=12)
+        ax.set_ylabel('Count', fontsize=12)
+        ax.set_title('Forest Service Annual Accessions, Separations, and Net Change (Complete Years Only)', fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+        
+        # Format y-axis with commas and ensure integer x-axis
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{int(x):,}'))
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{int(x)}'))
+        
+        plt.tight_layout()
+        plt.show()
+    else:
+        print("No complete years (12 months of data) found for annual analysis")
+        
+        # Show what we have
+        print("\nYears with partial data:")
+        for _, row in annual_summary.iterrows():
+            print(f"  {row['year']}: {row['month']} months of data")
+```
+
+## Complete Historical View (All Years)
+
+::: {.tiny-table}
+```{python}
+#| label: historical-all-years
+
+if not monthly_combined.empty:
+    # Full historical pivot tables
+    accessions_pivot_full = monthly_combined.pivot(index='month', columns='year', values='accessions')
+    separations_pivot_full = monthly_combined.pivot(index='month', columns='year', values='separations')
+    net_pivot_full = monthly_combined.pivot(index='month', columns='year', values='net_change')
+    
+    # Apply month labels to all
+    for pivot in [accessions_pivot_full, separations_pivot_full, net_pivot_full]:
+        pivot.index = [month_labels[i-1] for i in pivot.index]
+    
+    # Create tiny accessions table
+    acc_df_full = accessions_pivot_full.reset_index()
+    acc_df_full.columns = ['Month'] + [str(col) for col in accessions_pivot_full.columns]
+    
+    gt_acc_full = (
+        GT(acc_df_full)
+        .tab_header(title="Forest Service Monthly Accessions (All Years)")
+        .fmt_number(columns=list(acc_df_full.columns[1:]), decimals=0, use_seps=True)
+        .data_color(
+            columns=list(acc_df_full.columns[1:]),
+            palette=["white", ACCESSIONS_COLOR],
+            domain=[0, accessions_pivot_full.max().max()],
+            na_color="lightgray"
+        )
+        .tab_options(
+            table_font_size="6px",
+            data_row_padding="1px",
+            column_labels_font_size="5px"
+        )
+    )
+    gt_acc_full.show()
+    
+    # Create tiny separations table
+    sep_df_full = separations_pivot_full.reset_index()
+    sep_df_full.columns = ['Month'] + [str(col) for col in separations_pivot_full.columns]
+    
+    gt_sep_full = (
+        GT(sep_df_full)
+        .tab_header(title="Forest Service Monthly Separations (All Years)")
+        .fmt_number(columns=list(sep_df_full.columns[1:]), decimals=0, use_seps=True)
+        .data_color(
+            columns=list(sep_df_full.columns[1:]),
+            palette=["white", SEPARATIONS_COLOR],
+            domain=[0, separations_pivot_full.max().max()],
+            na_color="lightgray"
+        )
+        .tab_options(
+            table_font_size="6px",
+            data_row_padding="1px",
+            column_labels_font_size="5px"
+        )
+    )
+    gt_sep_full.show()
+    
+    # Create tiny net change table
+    net_df_full = net_pivot_full.reset_index()
+    net_df_full.columns = ['Month'] + [str(col) for col in net_pivot_full.columns]
+    
+    max_abs_val_full = max(abs(net_pivot_full.min().min()), abs(net_pivot_full.max().max()))
+    
+    gt_net_full = (
+        GT(net_df_full)
+        .tab_header(title="Forest Service Monthly Net Change (All Years)")
+        .fmt_number(columns=list(net_df_full.columns[1:]), decimals=0, use_seps=True)
+        .data_color(
+            columns=list(net_df_full.columns[1:]),
+            palette=[NET_NEGATIVE_COLOR, "white", NET_POSITIVE_COLOR],
+            domain=[-max_abs_val_full, max_abs_val_full],
+            na_color="lightgray"
+        )
+        .tab_options(
+            table_font_size="6px",
+            data_row_padding="1px",
+            column_labels_font_size="5px"
+        )
+    )
+    gt_net_full.show()
+```
+:::
+
+## Key Insights
+
+```{python}
+#| label: insights
+
+if not monthly_combined.empty:
+    # Find months with highest accessions/separations
+    max_acc_idx = monthly_combined['accessions'].idxmax()
+    max_sep_idx = monthly_combined['separations'].idxmax()
+    max_net_pos_idx = monthly_combined[monthly_combined['net_change'] > 0]['net_change'].idxmax() if (monthly_combined['net_change'] > 0).any() else None
+    max_net_neg_idx = monthly_combined[monthly_combined['net_change'] < 0]['net_change'].idxmin() if (monthly_combined['net_change'] < 0).any() else None
+    
+    insights = []
+    
+    if not pd.isna(max_acc_idx):
+        max_acc = monthly_combined.loc[max_acc_idx]
+        insights.append({
+            'Metric': 'Highest Monthly Accessions',
+            'Month': f"{month_labels[int(max_acc['month'])-1]} {int(max_acc['year'])}",
+            'Value': f"{int(max_acc['accessions']):,}"
+        })
+    
+    if not pd.isna(max_sep_idx):
+        max_sep = monthly_combined.loc[max_sep_idx]
+        insights.append({
+            'Metric': 'Highest Monthly Separations',
+            'Month': f"{month_labels[int(max_sep['month'])-1]} {int(max_sep['year'])}",
+            'Value': f"{int(max_sep['separations']):,}"
+        })
+    
+    if max_net_pos_idx is not None and not pd.isna(max_net_pos_idx):
+        max_net_pos = monthly_combined.loc[max_net_pos_idx]
+        insights.append({
+            'Metric': 'Largest Net Gain',
+            'Month': f"{month_labels[int(max_net_pos['month'])-1]} {int(max_net_pos['year'])}",
+            'Value': f"+{int(max_net_pos['net_change']):,}"
+        })
+    
+    if max_net_neg_idx is not None and not pd.isna(max_net_neg_idx):
+        max_net_neg = monthly_combined.loc[max_net_neg_idx]
+        insights.append({
+            'Metric': 'Largest Net Loss',
+            'Month': f"{month_labels[int(max_net_neg['month'])-1]} {int(max_net_neg['year'])}",
+            'Value': f"{int(max_net_neg['net_change']):,}"
+        })
+    
+    if insights:
+        insights_df = pd.DataFrame(insights)
+        
+        gt_insights = (
+            GT(insights_df)
+            .tab_header(title="Key Insights")
+        )
+        
+        gt_insights.show()
+```
