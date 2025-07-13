@@ -42,7 +42,7 @@ def process_single_dataset(dataset_dir, extracted_dir=None, parquet_dir=None, du
         for root, dirs, files in os.walk(dataset_path):
             if any(f.upper().startswith('FACTDATA') for f in files):
                 data_dirs.append(root)
-            elif dataset_key == '2025_March' and any('Status Employment' in f for f in files):
+            elif dataset_key == '2025_March' and any(f.startswith('March_2025_Employment_') for f in files):
                 data_dirs.append(root)
         
         if not data_dirs:
@@ -118,12 +118,17 @@ def process_single_dataset(dataset_dir, extracted_dir=None, parquet_dir=None, du
 def process_march_2025_data(data_dir, dataset_key, month, year, parquet_dir, duplicate_logger):
     """Special processing for March 2025 data format."""
     try:
-        # Find all March 2025 employment files
-        employment_files = sorted(glob.glob(os.path.join(data_dir, "March_2025_Employment_*.txt")))
+        # For March 2025, we need to find files across all Part directories
+        # Get the parent directory to search all FedScope_Employment_March_2025* folders
+        parent_dir = os.path.dirname(data_dir)
         
-        if not employment_files:
-            # Try alternative pattern
-            employment_files = sorted(glob.glob(os.path.join(data_dir, "Status Employment*.txt")))
+        # Find all March 2025 employment files across all Part directories
+        employment_files = []
+        for part_dir in sorted(glob.glob(os.path.join(parent_dir, "FedScope_Employment_March_2025*"))):
+            part_files = glob.glob(os.path.join(part_dir, "March_2025_Employment_*.txt"))
+            employment_files.extend(part_files)
+        
+        employment_files = sorted(employment_files)
         
         if not employment_files:
             logger.error("No March 2025 employment files found")

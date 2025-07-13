@@ -222,30 +222,31 @@ Comparing redaction patterns between September 2024 and March 2025
 REDACTION BY COLUMN (September 2024 vs March 2025):
 Column               Sep 2024 Count  Sep 2024 %   Mar 2025 Count  Mar 2025 %  
 ---------------------------------------------------------------------------
-loct                 0               0.0        % 1,069,765       46.7       %
 loc                  0               0.0        % 1,069,765       46.7       %
+loct                 0               0.0        % 1,069,765       46.7       %
 salary               0               0.0        % 1,052,774       46.0       %
-toa                  0               0.0        % 771,384         33.7       %
 supervis             0               0.0        % 771,384         33.7       %
-los                  0               0.0        % 771,384         33.7       %
 occfam               0               0.0        % 771,384         33.7       %
-edlvl                0               0.0        % 771,384         33.7       %
-toat                 0               0.0        % 771,384         33.7       %
 agelvlt              0               0.0        % 771,384         33.7       %
-payplant             0               0.0        % 771,384         33.7       %
+los                  0               0.0        % 771,384         33.7       %
+toa                  0               0.0        % 771,384         33.7       %
 occfamt              0               0.0        % 771,384         33.7       %
+payplan              0               0.0        % 771,384         33.7       %
+payplant             0               0.0        % 771,384         33.7       %
 edlvlt               0               0.0        % 771,384         33.7       %
-worksch              0               0.0        % 771,384         33.7       %
+occt                 0               0.0        % 771,384         33.7       %
+supervist            0               0.0        % 771,384         33.7       %
 wrkscht              0               0.0        % 771,384         33.7       %
 occ                  0               0.0        % 771,384         33.7       %
-supervist            0               0.0        % 771,384         33.7       %
-occt                 0               0.0        % 771,384         33.7       %
-payplan              0               0.0        % 771,384         33.7       %
+toat                 0               0.0        % 771,384         33.7       %
+worksch              0               0.0        % 771,384         33.7       %
+edlvl                0               0.0        % 771,384         33.7       %
 
 ================================================================================
 RUNNING EXAMPLES WITH GITHUB DOWNLOADS
 ================================================================================
 
+Created directory: download
 Downloading from: https://github.com/abigailhaddad/fedscope_employment/raw/main/employment_cube/parquet/fedscope_employment_September_2024.parquet
 Saving to: download/fedscope_employment_September_2024.parquet
 This may take a moment (file is ~30-40 MB)...
@@ -356,7 +357,8 @@ Files to process: 2
 ================================================================================
 
 ✓ Found cached file → download/fedscope_employment_September_2024.parquet
-✓ Found cached file → download/fedscope_employment_September_2023.parquet
+Downloading: fedscope_employment_September_2023.parquet
+✓ Saved → download/fedscope_employment_September_2023.parquet
 
 ✓ Connected to DuckDB database: download/fedscope.duckdb
 Creating unified view from 2 files...
