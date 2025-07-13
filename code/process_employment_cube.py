@@ -65,7 +65,7 @@ def process_single_dataset(dataset_dir, extracted_dir=None, parquet_dir=None, du
         # Handle March 2025 special case
         if march_2025_files and dataset_key == '2025_March':
             logger.info(f"  Processing March 2025 format with {len(march_2025_files)} files")
-            return process_march_2025_data(data_dir, dataset_key, month, year, duplicate_logger)
+            return process_march_2025_data(data_dir, dataset_key, month, year, output_dir, duplicate_logger)
         
         fact_file = fact_files[0]
         
@@ -115,7 +115,7 @@ def process_single_dataset(dataset_dir, extracted_dir=None, parquet_dir=None, du
         traceback.print_exc()
         return None
 
-def process_march_2025_data(data_dir, dataset_key, month, year, duplicate_logger):
+def process_march_2025_data(data_dir, dataset_key, month, year, parquet_dir, duplicate_logger):
     """Special processing for March 2025 data format."""
     try:
         # Find all March 2025 employment files
@@ -146,7 +146,6 @@ def process_march_2025_data(data_dir, dataset_key, month, year, duplicate_logger
         logger.info(f"  Combined {len(combined_df):,} total records")
         
         # Get a reference dataframe for column structure
-        parquet_dir = data_dir.replace('extracted', 'parquet')
         ref_parquet = os.path.join(parquet_dir, 'fedscope_employment_September_2024.parquet')
         if os.path.exists(ref_parquet):
             ref_df = pd.read_parquet(ref_parquet)
@@ -211,11 +210,9 @@ def process_march_2025_data(data_dir, dataset_key, month, year, duplicate_logger
         # Note: For March 2025, lookups are already merged, so we skip the lookup joining
         # The duplicate logger won't find any duplicates since lookups are pre-joined
         
-        # Save to parquet - use the parquet directory passed to process_single_dataset
+        # Save to parquet - use the parquet directory passed from process_single_dataset
         output_filename = f"fedscope_employment_{month}_{year}.parquet"
-        # Get the parquet directory from the parent function's parameters
-        parquet_base_dir = data_dir.split('/extracted/')[0].replace('extracted', 'parquet')
-        output_path = os.path.join(parquet_base_dir, output_filename)
+        output_path = os.path.join(parquet_dir, output_filename)
         
         logger.info(f"  Saving to {output_filename}...")
         new_df.to_parquet(output_path, compression='zstd', index=False)
