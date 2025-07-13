@@ -1,0 +1,183 @@
+
+╔══════════════════════════════════════════════════════════════════╗
+║           FedScope Employment Data - Usage Examples              ║
+║                                                                  ║
+║  This script demonstrates working with 140+ million federal     ║
+║  employee records from 1998-2025.                               ║
+║                                                                  ║
+║  Data source: https://github.com/abigailhaddad/fedscope_employment
+╚══════════════════════════════════════════════════════════════════╝
+    
+
+================================================================================
+RUNNING EXAMPLES WITH LOCAL FILES
+================================================================================
+
+ERROR: Local file not found: fedscope_data/parquet/fedscope_employment_September_2024.parquet
+
+This script expects you to have cloned the full repository.
+If you haven't cloned the repo, the download examples below will work instead.
+
+To use local files:
+1. Clone the repository: git clone https://github.com/abigailhaddad/fedscope_employment.git
+2. Run this script from the repository root directory
+
+================================================================================
+RUNNING EXAMPLES WITH GITHUB DOWNLOADS
+================================================================================
+
+Created directory: download
+Downloading from: https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_September_2024.parquet
+Saving to: download/fedscope_employment_September_2024.parquet
+This may take a moment (file is ~30-40 MB)...
+✓ Successfully downloaded and loaded 2,313,216 records
+  Also saved locally to: download/fedscope_employment_September_2024.parquet
+
+Note: March 2025 data is only available locally (not yet on GitHub)
+
+================================================================================
+ANALYSIS EXAMPLES (DOWNLOADED FILES - SEPTEMBER 2024)
+================================================================================
+
+1. TOP 10 AGENCIES BY EMPLOYEE COUNT
+----------------------------------------
+ 1. VATA-VETERANS HEALTH ADMINISTRATION: 427,915 employees
+ 2. TR93-INTERNAL REVENUE SERVICE: 99,001 employees
+ 3. AF1M-AIR FORCE MATERIEL COMMAND: 71,804 employees
+ 4. HSBD-CUSTOMS AND BORDER PROTECTION: 66,514 employees
+ 5. HSBC-TRANSPORTATION SECURITY ADMINISTRATION: 64,433 employees
+ 6. SZ00-SOCIAL SECURITY ADMINISTRATION: 58,409 employees
+ 7. TD03-FEDERAL AVIATION ADMINISTRATION: 46,170 employees
+ 8. DD83-MILITARY TREATMENT FACILITIES UNDER DHA: 45,283 employees
+ 9. AG11-FOREST SERVICE: 39,285 employees
+10. ARCE-U.S. ARMY CORPS OF ENGINEERS: 39,127 employees
+
+2. AVERAGE SALARY BY EDUCATION LEVEL (TOP 5)
+----------------------------------------
+   Records with valid salary data: 2,024,788 (87.5%)
+   15-FIRST PROFESSIONAL: $218,063.78
+   22-POST-DOCTORATE: $165,562.58
+   16-POST-FIRST PROFESSIONAL: $159,865.70
+   21-DOCTORATE DEGREE: $152,248.00
+   20-POST-SIXTH YEAR: $144,100.56
+
+3. WORKFORCE BY TIME PERIOD
+----------------------------------------
+   2024 September: 2,313,216 employees
+
+4. LOCATION DISTRIBUTION (TOP 5 STATES)
+----------------------------------------
+   US-SUPPRESSED (SEE DATA DEFINITIONS): 276,235 employees (11.9%)
+   11-DISTRICT OF COLUMBIA: 162,489 employees (7.0%)
+   06-CALIFORNIA: 150,679 employees (6.5%)
+   51-VIRGINIA: 147,358 employees (6.4%)
+   24-MARYLAND: 144,497 employees (6.2%)
+
+5. JOB CATEGORIES (PATCO)
+----------------------------------------
+   Administrative: 924,261 employees (40.0%)
+   Professional: 658,369 employees (28.5%)
+   Technical: 363,890 employees (15.7%)
+   Blue Collar: 182,311 employees (7.9%)
+   Clerical: 99,345 employees (4.3%)
+   Other White Collar: 83,523 employees (3.6%)
+   Unspecified: 1,517 employees (0.1%)
+
+6. AGE DISTRIBUTION
+----------------------------------------
+   20-24: 59,502 employees (2.6%)
+   25-29: 145,735 employees (6.3%)
+   30-34: 214,400 employees (9.3%)
+   35-39: 286,114 employees (12.4%)
+   40-44: 337,545 employees (14.6%)
+   45-49: 309,515 employees (13.4%)
+   50-54: 307,155 employees (13.3%)
+   55-59: 297,120 employees (12.8%)
+   60-64: 221,289 employees (9.6%)
+   65 or more: 131,493 employees (5.7%)
+   Less than 20: 3,113 employees (0.1%)
+   Unspecified: 235 employees (0.0%)
+
+7. SUPERVISORY STATUS
+----------------------------------------
+   8-ALL OTHER POSITIONS: 1,945,783 employees (84.1%)
+   2-SUPERVISOR OR MANAGER: 269,740 employees (11.7%)
+   4-SUPERVISOR (CSRA): 31,912 employees (1.4%)
+   6-LEADER: 30,715 employees (1.3%)
+   7-TEAM LEADER: 17,640 employees (0.8%)
+   5-MANAGEMENT OFFICIAL (CSRA): 17,382 employees (0.8%)
+   *-UNSPECIFIED: 44 employees (0.0%)
+
+8. WORK SCHEDULE
+----------------------------------------
+   F - Full-time Nonseasonal: 2,193,991 employees (94.8%)
+   P - Part-time Nonseasonal: 43,832 employees (1.9%)
+   I - Intermittent Nonseasonal: 38,057 employees (1.6%)
+   G - Full-time Seasonal: 30,798 employees (1.3%)
+   J - Intermittent Seasonal: 3,489 employees (0.2%)
+   Q - Part-time Seasonal: 2,640 employees (0.1%)
+   R - Phased Employment/Phased Retirem: 202 employees (0.0%)
+   S - Part-time Job Sharer Nonseasonal: 192 employees (0.0%)
+   * - Unspecified: 13 employees (0.0%)
+   T - Part-time Job Sharer Seasonal: 1 employees (0.0%)
+   B - Full-time Nonseasonal Baylor Pln: 1 employees (0.0%)
+
+9. SALARY STATISTICS
+----------------------------------------
+   Valid salary records: 2,024,788
+   Mean salary: $107,721.55
+   Median salary: $99,200.00
+   Min salary: $16,074.00
+   Max salary: $519,246.00
+   Std deviation: $50,933.61
+
+================================================================================
+RUNNING DUCKDB COMBINED-YEAR EXAMPLE
+Files to process: 2
+================================================================================
+
+✓ Found cached file → download/fedscope_employment_September_2024.parquet
+Downloading: fedscope_employment_September_2023.parquet
+✓ Saved → download/fedscope_employment_September_2023.parquet
+
+✓ Connected to DuckDB database: download/fedscope.duckdb
+Creating unified view from 2 files...
+✓ Created unified employment view
+
+TOP AGENCIES BY EMPLOYEES (wide format: one row per agency)
+
+year                                              2023      2024
+agency_sub                                                      
+VATA-VETERANS HEALTH ADMINISTRATION           420013.0  427915.0
+TR93-INTERNAL REVENUE SERVICE                  89872.0   99001.0
+AF1M-AIR FORCE MATERIEL COMMAND                69737.0   71804.0
+HSBD-CUSTOMS AND BORDER PROTECTION             64546.0   66514.0
+HSBC-TRANSPORTATION SECURITY ADMINISTRATION    62948.0   64433.0
+SZ00-SOCIAL SECURITY ADMINISTRATION            61410.0   58409.0
+TD03-FEDERAL AVIATION ADMINISTRATION           45211.0   46170.0
+DD83-MILITARY TREATMENT FACILITIES UNDER DHA   45623.0   45283.0
+AG11-FOREST SERVICE                            37941.0   39285.0
+ARCE-U.S. ARMY CORPS OF ENGINEERS              37852.0   39127.0
+
+✓ DuckDB connection closed.
+
+Download folder contents:
+----------------------------------------
+  fedscope_employment_September_2023.parquet (40.3 MB)
+  fedscope_employment_September_2024.parquet (41.7 MB)
+  fedscope.duckdb (0.3 MB)
+
+Total size: 82.2 MB
+
+Delete the 'download' folder and all its contents? (y/N): y
+Removing download folder...
+✓ Cleanup complete
+
+================================================================================
+EXAMPLES COMPLETE
+================================================================================
+
+For more information:
+- Repository: https://github.com/abigailhaddad/fedscope_employment
+- Documentation: https://abigailhaddad.github.io/fedscope_employment/
+- Official FedScope: https://www.fedscope.opm.gov/

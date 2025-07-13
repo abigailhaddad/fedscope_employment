@@ -1,0 +1,9 @@
+FedScope Lookup Table Duplicates Summary
+==================================================
+
+NO DUPLICATES FOUND
+
+All lookup tables in this dataset are unique - no duplicate codes were detected.
+This means each lookup code maps to exactly one description.
+
+Log generated at: separations_accessions

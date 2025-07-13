@@ -18,11 +18,23 @@ venv.bak/
 .DS_Store
 # Data files
 data/
+# Old structure (kept for compatibility)
 fedscope_data/extracted/
 fedscope_data/march_2025_data/
+# New structure - ignore extracted folders but keep raw zips and parquet files
+employment_cube/extracted/
+separations_accessions/extracted/
+# Keep status reports folder (these are summary data we want to commit)
+!employment_cube/status_reports_march_2025/
+# Ignore most text files but keep specific ones
 *.txt
 !lookup_duplicates_summary.txt
+!examples_output.txt
+!requirements.txt
+!employment_cube/status_reports_march_2025/*.txt
+# Ignore most CSV files except analysis results
 *.csv
+!**/analysis/**/*.csv
 
 # IDE
 .vscode/

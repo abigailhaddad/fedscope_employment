@@ -1,0 +1,408 @@
+---
+title: "High Turnover Occupation and Agency Analysis"
+author: "Abigail Haddad"
+date: today
+format:
+  html:
+    output-file: high_turnover_analysis.html
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: cosmo
+    highlight-style: github
+    df-print: paged
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+#| code-fold: false
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from great_tables import GT
+from pathlib import Path
+import gc  # For garbage collection
+
+# Set up pandas display options
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', None)
+
+# Constants
+EMPLOYMENT_PARQUET_DIR = "../../employment_cube/parquet/"
+SEPARATIONS_PARQUET_DIR = "../../separations_accessions/parquet/"
+MIN_EMPLOYEES = 100  # Minimum employee threshold for meaningful analysis
+
+# Color configuration
+HIGH_TURNOVER_COLOR = "#d62728"  # Red for high turnover
+LOW_TURNOVER_COLOR = "#2ca02c"   # Green for low turnover
+```
+
+## Data Loading and Processing
+
+```{python}
+#| label: load-multi-year-data
+#| output: false
+
+# Helper function to clean employment values
+def clean_employment(x):
+    """Convert employment values to numeric, handling REDACTED and ***** values"""
+    if pd.isna(x) or x in ['REDACTED', '*****', '']:
+        return 0
+    try:
+        return int(x)
+    except:
+        return 0
+
+# Load and process employment data - just 5 years (2019-2023)
+employment_years = [2019, 2020, 2021, 2022, 2023]  # Explicit years to avoid December 2024
+employment_aggregated = []
+agency_lookups = []
+occ_lookups = []
+loading_summary = []
+
+for year in employment_years:
+    file_path = f"fedscope_employment_December_{year}.parquet"
+    try:
+        # Load data
+        df = pd.read_parquet(EMPLOYMENT_PARQUET_DIR + file_path)
+        raw_count = len(df)
+        
+        # Clean employment values
+        df['employment_num'] = df['employment'].apply(clean_employment)
+        
+        # Store lookups (only need one set)
+        if year == employment_years[0]:
+            agency_lookups = df[['agysub', 'agysubt']].drop_duplicates()
+            occ_lookups = df[['occ', 'occt']].drop_duplicates()
+        
+        # Group by agency and occupation for this year
+        grouped = df.groupby(['agysub', 'occ']).agg({
+            'employment_num': 'sum'
+        }).reset_index()
+        grouped['snapshot_year'] = year
+        grouped.rename(columns={'employment_num': 'employment'}, inplace=True)
+        
+        # Add to aggregated list
+        employment_aggregated.append(grouped)
+        aggregated_count = len(grouped)
+        
+        # Store loading summary
+        loading_summary.append({
+            'Year': year,
+            'Data Type': 'Employment',
+            'Raw Records': raw_count,
+            'Aggregated Groups': aggregated_count
+        })
+        
+        # Clear the original dataframe from memory
+        del df
+        gc.collect()
+        
+    except Exception as e:
+        continue
+
+# Combine all aggregated employment data
+employment_annual = pd.concat(employment_aggregated, ignore_index=True)
+
+# Load and process separations data
+separations_files = [
+    "fedscope_separations_FY2020-2024.parquet"  # Covers our 5 year period
+]
+
+separations_aggregated = []
+for file in separations_files:
+    try:
+        # Load data
+        df = pd.read_parquet(SEPARATIONS_PARQUET_DIR + file)
+        raw_count = len(df)
+        
+        # Extract fiscal year from efdate
+        df['fiscal_year'] = df['efdate'].astype(str).str[:4].astype(int)
+        
+        # Filter for our years of interest
+        df = df[df['fiscal_year'].isin(employment_years)]
+        
+        # Group by year, agency, and occupation
+        grouped = df.groupby(['fiscal_year', 'agysub', 'occ']).size().reset_index(name='separations')
+        
+        # Add to aggregated list
+        separations_aggregated.append(grouped)
+        aggregated_count = len(grouped)
+        
+        # Store loading summary
+        loading_summary.append({
+            'Year': '2020-2024',
+            'Data Type': 'Separations',
+            'Raw Records': raw_count,
+            'Aggregated Groups': aggregated_count
+        })
+        
+        # Clear the original dataframe from memory
+        del df
+        gc.collect()
+        
+    except Exception as e:
+        continue
+
+# Combine all aggregated separations data
+separations_annual = pd.concat(separations_aggregated, ignore_index=True)
+```
+
+## Data Loading Summary
+
+```{python}
+#| label: loading-summary-table
+
+# Create loading summary table
+loading_df = pd.DataFrame(loading_summary)
+
+gt_loading = (
+    GT(loading_df)
+    .tab_header(
+        title="Data Loading Summary",
+        subtitle="Raw records loaded and aggregated by agency-occupation groups"
+    )
+    .fmt_number(columns=['Raw Records', 'Aggregated Groups'], decimals=0, use_seps=True)
+    .cols_width({
+        'Year': '100px',
+        'Data Type': '120px',
+        'Raw Records': '140px',
+        'Aggregated Groups': '160px'
+    })
+)
+
+gt_loading.show()
+```
+
+## Annual Attrition Rate Calculation
+
+```{python}
+#| label: calculate-annual-attrition
+#| output: false
+
+# Merge employment and separations (employment year matches fiscal year)
+annual_data = pd.merge(
+    employment_annual, 
+    separations_annual, 
+    left_on=['snapshot_year', 'agysub', 'occ'],
+    right_on=['fiscal_year', 'agysub', 'occ'],
+    how='outer'
+)
+
+# Fill NaN values
+annual_data['employment'] = annual_data['employment'].fillna(0)
+annual_data['separations'] = annual_data['separations'].fillna(0)
+annual_data['year'] = annual_data['snapshot_year'].fillna(annual_data['fiscal_year'])
+
+# Calculate attrition rate
+annual_data['attrition_rate'] = np.where(
+    annual_data['employment'] > 0,
+    (annual_data['separations'] / annual_data['employment']) * 100,
+    np.nan
+)
+
+# Filter for meaningful sample sizes
+annual_data = annual_data[annual_data['employment'] >= MIN_EMPLOYEES]
+annual_data = annual_data.dropna(subset=['attrition_rate'])
+
+# Merge with agency and occupation lookups
+annual_data = pd.merge(annual_data, agency_lookups, on='agysub', how='left')
+annual_data = pd.merge(annual_data, occ_lookups, on='occ', how='left')
+```
+
+```{python}
+#| label: identify-top-500
+#| output: false
+
+# Calculate average statistics across all years for each agency-occupation combination
+summary_stats = annual_data.groupby(['agysub', 'occ', 'agysubt', 'occt']).agg({
+    'employment': 'mean',
+    'separations': 'mean', 
+    'attrition_rate': 'mean'
+}).reset_index()
+
+summary_stats.columns = ['agysub', 'occ', 'agysubt', 'occt', 'avg_employment', 'avg_separations', 'avg_attrition_rate']
+
+# Add year count for each combination
+year_counts = annual_data.groupby(['agysub', 'occ']).size().reset_index(name='years_of_data')
+summary_stats = pd.merge(summary_stats, year_counts, on=['agysub', 'occ'], how='left')
+
+# Filter for combinations with at least 3 years of data
+summary_stats = summary_stats[summary_stats['years_of_data'] >= 3]
+
+# Get top 500 by average employment
+top_500_by_size = summary_stats.nlargest(500, 'avg_employment')
+```
+
+## Top 50 Highest Turnover Rates
+
+```{python}
+#| label: annual-turnover-table
+
+# Get highest attrition combinations from the top 500 largest
+high_attrition_from_500 = top_500_by_size.nlargest(50, 'avg_attrition_rate').copy()
+
+# Get the annual data for these combinations
+high_attrition_annual = annual_data[
+    annual_data.set_index(['agysub', 'occ']).index.isin(
+        high_attrition_from_500.set_index(['agysub', 'occ']).index
+    )
+].copy()
+
+# Create pivot table with years as columns
+annual_pivot = high_attrition_annual.pivot_table(
+    index=['agysub', 'occ', 'agysubt', 'occt'],
+    columns='year',
+    values='attrition_rate',
+    aggfunc='mean'
+).reset_index()
+
+# Calculate average for sorting
+annual_pivot['avg_rate'] = annual_pivot[[2019, 2020, 2021, 2022, 2023]].mean(axis=1)
+
+# Sort by average rate descending
+annual_pivot = annual_pivot.sort_values('avg_rate', ascending=False)
+
+# Prepare display data with full agency and occupation names
+display_data = annual_pivot.copy()
+display_data['Agency_Occupation'] = display_data['agysubt'] + ' - ' + display_data['occt']
+
+# Select columns for display
+table_cols = ['Agency_Occupation'] + [2019, 2020, 2021, 2022, 2023] + ['avg_rate']
+display_data = display_data[table_cols]
+
+# Rename columns
+display_data.columns = ['Agency - Occupation', '2019', '2020', '2021', '2022', '2023', 'Avg']
+
+# Round all numeric columns
+for col in ['2019', '2020', '2021', '2022', '2023', 'Avg']:
+    display_data[col] = display_data[col].round(1)
+
+# Reset index for clean display
+display_data = display_data.reset_index(drop=True)
+
+# Create GT table with expandable view
+gt_annual = (
+    GT(display_data)
+    .tab_header(
+        title="Top 50 Highest Turnover Rates",
+        subtitle="Annual rates for 2019-2023 (percentage) - from largest federal groups"
+    )
+    .fmt_number(columns=['2019', '2020', '2021', '2022', '2023', 'Avg'], decimals=1)
+    .data_color(
+        columns=['2019', '2020', '2021', '2022', '2023', 'Avg'],
+        palette=["white", HIGH_TURNOVER_COLOR],
+        domain=[0, display_data[['2019', '2020', '2021', '2022', '2023', 'Avg']].max().max()],
+        na_color="lightgray"
+    )
+    .cols_width({
+        'Agency - Occupation': '500px',
+        '2019': '60px',
+        '2020': '60px',
+        '2021': '60px',
+        '2022': '60px',
+        '2023': '60px',
+        'Avg': '60px'
+    })
+)
+
+gt_annual.show()
+```
+
+## Top 30 Highest Agency Turnover Rates
+
+```{python}
+#| label: agency-turnover-table
+
+# Aggregate by agency only
+agency_summary = annual_data.groupby(['agysub', 'agysubt']).agg({
+    'employment': 'sum',
+    'separations': 'sum'
+}).reset_index()
+
+# Calculate agency-level attrition rate
+agency_summary['attrition_rate'] = (agency_summary['separations'] / agency_summary['employment']) * 100
+
+# Calculate annual agency data for the table
+agency_annual = annual_data.groupby(['agysub', 'agysubt', 'year']).agg({
+    'employment': 'sum',
+    'separations': 'sum'
+}).reset_index()
+
+# Calculate annual attrition rates
+agency_annual['attrition_rate'] = (agency_annual['separations'] / agency_annual['employment']) * 100
+
+# Filter for agencies with meaningful size (average 1000+ employees)
+agency_avg_employment = agency_annual.groupby(['agysub', 'agysubt'])['employment'].mean().reset_index()
+agency_avg_employment.columns = ['agysub', 'agysubt', 'avg_employment']
+large_agencies = agency_avg_employment[agency_avg_employment['avg_employment'] >= 1000]
+
+# Get annual data for large agencies only
+large_agency_annual = agency_annual[
+    agency_annual['agysub'].isin(large_agencies['agysub'])
+]
+
+# Create pivot table with years as columns
+agency_pivot = large_agency_annual.pivot_table(
+    index=['agysub', 'agysubt'],
+    columns='year',
+    values='attrition_rate',
+    aggfunc='mean'
+).reset_index()
+
+# Calculate average for sorting
+agency_pivot['avg_rate'] = agency_pivot[[2019, 2020, 2021, 2022, 2023]].mean(axis=1)
+
+# Sort by average rate descending and take top 30
+agency_pivot = agency_pivot.sort_values('avg_rate', ascending=False).head(30)
+
+# Prepare display data
+agency_display = agency_pivot.copy()
+agency_display = agency_display[['agysubt'] + [2019, 2020, 2021, 2022, 2023] + ['avg_rate']]
+
+# Rename columns
+agency_display.columns = ['Agency', '2019', '2020', '2021', '2022', '2023', 'Avg']
+
+# Round all numeric columns
+for col in ['2019', '2020', '2021', '2022', '2023', 'Avg']:
+    agency_display[col] = agency_display[col].round(1)
+
+# Reset index for clean display
+agency_display = agency_display.reset_index(drop=True)
+
+# Create GT table
+gt_agencies = (
+    GT(agency_display)
+    .tab_header(
+        title="Top 30 Highest Agency Turnover Rates",
+        subtitle="Annual rates for 2019-2023 (percentage) - agencies with 1000+ average employees"
+    )
+    .fmt_number(columns=['2019', '2020', '2021', '2022', '2023', 'Avg'], decimals=1)
+    .data_color(
+        columns=['2019', '2020', '2021', '2022', '2023', 'Avg'],
+        palette=["white", HIGH_TURNOVER_COLOR],
+        domain=[0, agency_display[['2019', '2020', '2021', '2022', '2023', 'Avg']].max().max()],
+        na_color="lightgray"
+    )
+    .cols_width({
+        'Agency': '400px',
+        '2019': '60px',
+        '2020': '60px',
+        '2021': '60px',
+        '2022': '60px',
+        '2023': '60px',
+        'Avg': '60px'
+    })
+)
+
+gt_agencies.show()
+```

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FedScope Employment Data Documentation</title>
+    <title>FedScope Employment, Separations & Accessions Data Documentation</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -116,8 +116,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>FedScope Employment Cube</h1>
-        <p>Understanding the 140+ million federal employee records (1998-2025)</p>
+        <h1>FedScope Employment, Separations & Accessions Data</h1>
+        <p>Understanding 140+ million federal employee records (1998-2025) + 9.8+ million separations & accessions (2005-2025)</p>
         <p style="background-color: #3182ce; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
             <strong>🔍 Want to see quick comparisons between September 2024 and March 2025?</strong><br>
             <a href="https://fluffy-narwhal-e5f260.netlify.app/" style="color: white; text-decoration: underline;">View the interactive dashboard →</a>
@@ -143,24 +143,47 @@
     <div class="section" id="getting-started">
         <h2>Getting Started</h2>
         
-        <p>This dataset contains <strong>140+ million records</strong> of federal civilian employees from 1998 to 2025. Each record represents one employee in a specific quarter with their job details, demographics, and compensation.</p>
+        <p>This repository contains two major datasets: <strong>140+ million employment records</strong> from quarterly snapshots (1998-2025) and <strong>9.8+ million separations & accessions records</strong> showing individual hiring and departure events (2005-2025).</p>
         
         <div class="note">
             <strong>📊 Get the Data:</strong> You can either:
             <ul style="margin-top: 0.5rem;">
-                <li><strong>Download individual files</strong> directly from <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/fedscope_data/parquet">GitHub</a> without cloning</li>
-                <li><strong>Clone the full repository</strong> (3.8GB) - see the <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for instructions</li>
+                <li><strong>Download individual files</strong> directly from GitHub without cloning:
+                    <ul>
+                        <li><a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/employment_cube/parquet">Employment Cube</a> (73 quarterly snapshots)</li>
+                        <li><a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/separations_accessions/parquet">Separations & Accessions</a> (10 multi-year files)</li>
+                    </ul>
+                </li>
+                <li><strong>Clone the full repository</strong> (~3.9GB) - see the <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for instructions</li>
             </ul>
             <strong>🚀 Quick Start:</strong> Run <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for comprehensive usage examples!
         </div>
 
         <h3>What's Included</h3>
+        
+        <h4>Employment Cube Data (Quarterly Snapshots)</h4>
         <ul>
             <li><strong>73 quarterly Parquet files</strong> from March 1998 to March 2025</li>
             <li><strong>~1.7-2.3 million employees</strong> per quarterly snapshot</li>
-            <li><strong>Most federal agencies</strong> (excludes uniformed military, postal service, intelligence)</li>
             <li><strong>52 fields per employee</strong> including demographics, job details, and pay</li>
-            <li><strong>~2.4GB Parquet files</strong> (3.8GB total repository)</li>
+            <li><strong>~2.2GB Parquet files</strong> in employment_cube/parquet/</li>
+        </ul>
+        
+        <h4>Separations & Accessions Data (Individual Events)</h4>
+        <ul>
+            <li><strong>10 multi-year Parquet files</strong> covering FY2005-2025</li>
+            <li><strong>5.3 million accessions</strong> (new hires) and <strong>4.6 million separations</strong> (departures)</li>
+            <li><strong>Same 52 fields</strong> as employment data with event-specific details</li>
+            <li><strong>~152MB Parquet files</strong> in separations_accessions/parquet/</li>
+            <li><strong>Coverage gaps:</strong> Missing Oct-Dec 2023 and Jan-Mar 2024</li>
+            <li><strong>Note:</strong> Earlier separations/accessions data (pre-2005) is available from <a href="https://www.opm.gov/data/datasets/">OPM directly</a> but not included in this repository</li>
+        </ul>
+        
+        <h4>Common Features</h4>
+        <ul>
+            <li><strong>Most federal agencies</strong> (excludes uniformed military, postal service, intelligence)</li>
+            <li><strong>Lookup tables pre-joined</strong> for human-readable agency names, job titles, locations</li>
+            <li><strong>Total repository:</strong> ~3.9GB including raw files and documentation</li>
         </ul>
         
         <div class="note">
@@ -175,17 +198,6 @@
             <strong>Data suppression policy:</strong> REDACTED values occur where required by OPM's Data Release Policy, including categorizing some employees with duty locations in MD, VA, and WV under DC.
         </div>
 
-        <h3>Useful For</h3>
-        <ul>
-            <li>Analyzing federal workforce trends over time</li>
-            <li>Studying compensation patterns by agency or occupation</li>
-            <li>Mapping government employment across states and regions</li>
-            <li>Understanding federal workforce demographics and changes</li>
-        </ul>
-
-        <div class="note">
-            <strong>Privacy:</strong> All data is anonymized - no individual employees can be identified.
-        </div>
     </div>
 
     <div class="section" id="understanding-fields">
@@ -300,15 +312,28 @@
 
         <h3>Basic Usage Patterns</h3>
 
-        <h4>Load Data</h4>
-        <pre><code># Load from GitHub (without cloning)
-df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_September_2024.parquet')
+        <h4>Load Employment Data</h4>
+        <pre><code># Load employment snapshots from GitHub (without cloning)
+df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/employment_cube/parquet/fedscope_employment_September_2024.parquet')
 
 # Or load the latest March 2025 data (see warnings above)
-df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_March_2025.parquet')
+df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/employment_cube/parquet/fedscope_employment_March_2025.parquet')
 
 # Load locally (if you've cloned the repo)
-df = pd.read_parquet('fedscope_data/parquet/fedscope_employment_September_2024.parquet')</code></pre>
+df = pd.read_parquet('employment_cube/parquet/fedscope_employment_September_2024.parquet')</code></pre>
+
+        <h4>Load Separations & Accessions Data</h4>
+        <pre><code># Load recent separations data from GitHub (5 files available)
+sep_df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/separations_accessions/parquet/fedscope_separations_FY2020-2024.parquet')
+# Also available: FY2005-2009, FY2010-2014, FY2015-2019, March_2025
+
+# Load recent accessions data from GitHub (5 files available)  
+acc_df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/separations_accessions/parquet/fedscope_accessions_FY2020-2024.parquet')
+# Also available: FY2005-2009, FY2010-2014, FY2015-2019, March_2025
+
+# Load locally (if you've cloned the repo)
+sep_df = pd.read_parquet('separations_accessions/parquet/fedscope_separations_FY2020-2024.parquet')
+acc_df = pd.read_parquet('separations_accessions/parquet/fedscope_accessions_FY2020-2024.parquet')</code></pre>
 
         <h4>Count Employees by Agency</h4>
         <pre><code># Employment is stored as strings, convert properly
@@ -625,13 +650,24 @@ result = con.execute("""
             <strong>Field Changes Over Time:</strong> Pay plan information (<code>pp</code> added in 2017, <code>ppt</code> added in 2018), so earlier years don't include these fields.
         </div>
 
-        <h3>Data Coverage by Year</h3>
+        <h3>Data Coverage</h3>
+        
+        <h4>Employment Cube (Quarterly Snapshots)</h4>
         <ul>
-            <li><strong>1998-2008:</strong> September only (1 file per year)</li>
-            <li><strong>2009:</strong> September and December (2 files)</li>
-            <li><strong>2010-2023:</strong> March, June, September, December (4 files per year)</li>
-            <li><strong>2024:</strong> March, June, September (December not available)</li>
+            <li><strong>1998-2008:</strong> September only each year</li>
+            <li><strong>2009:</strong> September and December</li>
+            <li><strong>2010-2023:</strong> March, June, September, December each year</li>
+            <li><strong>2024:</strong> March, June, September</li>
             <li><strong>2025:</strong> March only (preliminary data - see warnings above)</li>
+        </ul>
+        
+        <h4>Separations & Accessions (Individual Events)</h4>
+        <ul>
+            <li><strong>FY2005-2009:</strong> 5-year aggregated file</li>
+            <li><strong>FY2010-2014:</strong> 5-year aggregated file</li>
+            <li><strong>FY2015-2019:</strong> 5-year aggregated file</li>
+            <li><strong>FY2020-2024:</strong> 5-year aggregated file (missing Oct-Dec 2023 and Jan-Mar 2024)</li>
+            <li><strong>April 2024-March 2025:</strong> Most recent 12 months (labeled "March 2025")</li>
         </ul>
 
         <h3>What's NOT Included</h3>
@@ -643,7 +679,7 @@ result = con.execute("""
         </ul>
 
         <div class="note">
-            <strong>Employment Snapshots:</strong> This shows who was employed at specific points in time. If you need data on new hires or separations specifically, those are available in separate FedScope datasets.
+            <strong>Employment Snapshots vs Events:</strong> The employment cube shows who was employed at specific quarterly points in time. The separations and accessions data shows individual hiring and departure events. Both datasets are included in this repository (2005-2025 for separations/accessions).
         </div>
     </div>
 
@@ -654,11 +690,26 @@ result = con.execute("""
         <h3>Get Started</h3>
         <div class="links">
             <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">🚀 Run examples.py</a>
-            <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/fedscope_data/parquet">📊 Download Parquet Files</a>
+            <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/employment_cube/parquet">📊 Employment Cube Parquet Files</a>
+            <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/separations_accessions/parquet">📈 Separations & Accessions Parquet Files</a>
             <a href="https://github.com/abigailhaddad/fedscope_employment">📖 Full Repository</a>
         </div>
         
-        <p style="margin-top: 1rem;">All files are hosted directly in this GitHub repository: <strong>73 quarterly Parquet files</strong> in <code>fedscope_data/parquet/</code> and <strong>original ZIP files</strong> in <code>fedscope_data/raw/</code> for easy download and replication.</p>
+        <p style="margin-top: 1rem;">All files are hosted directly in this GitHub repository:</p>
+        <ul>
+            <li><strong>Employment Cube:</strong> 73 quarterly Parquet files in <code>employment_cube/parquet/</code> and original ZIP files in <code>employment_cube/raw/</code>
+                <ul>
+                    <li>Duplicate lookup logs: <code>employment_cube/lookup_duplicates_log.json</code> and <code>employment_cube/lookup_duplicates_summary.txt</code></li>
+                </ul>
+            </li>
+            <li><strong>Separations & Accessions:</strong> 10 multi-year Parquet files in <code>separations_accessions/parquet/</code> and original ZIP files in <code>separations_accessions/raw/</code>
+                <ul>
+                    <li>5 separations files: FY2005-2009, FY2010-2014, FY2015-2019, FY2020-2024, April 2024-March 2025</li>
+                    <li>5 accessions files: FY2005-2009, FY2010-2014, FY2015-2019, FY2020-2024, April 2024-March 2025</li>
+                    <li>Duplicate lookup logs: <code>separations_accessions/lookup_duplicates_log.json</code> and <code>separations_accessions/lookup_duplicates_summary.txt</code></li>
+                </ul>
+            </li>
+        </ul>
 
         <h3>Official Government Sources</h3>
         <div class="links">

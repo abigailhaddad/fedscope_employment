@@ -394,6 +394,72 @@ def cleanup_download_folder():
     else:
         print(f"\nNo {download_dir} folder found to clean up")
 
+def run_separations_accessions_examples():
+    """Run examples using separations and accessions data"""
+    print("\n" + "="*80)
+    print("RUNNING SEPARATIONS & ACCESSIONS DATA EXAMPLES")
+    print("="*80 + "\n")
+    
+    # Check if local files exist
+    sep_file = "separations_accessions/parquet/fedscope_separations_FY2020-2024.parquet"
+    acc_file = "separations_accessions/parquet/fedscope_accessions_FY2020-2024.parquet"
+    
+    if os.path.exists(sep_file) and os.path.exists(acc_file):
+        print("✓ Found local separations and accessions files")
+        
+        # Load separations data
+        print(f"Loading separations data from: {sep_file}")
+        df_sep = pd.read_parquet(sep_file)
+        print(f"Loaded {len(df_sep):,} separations records")
+        
+        # Load accessions data  
+        print(f"Loading accessions data from: {acc_file}")
+        df_acc = pd.read_parquet(acc_file)
+        print(f"Loaded {len(df_acc):,} accessions records")
+        
+        # Analyze separations by year
+        print("\nSEPARATIONS BY FISCAL YEAR:")
+        df_sep['fiscal_year'] = df_sep['efdate'].astype(str).str[:4].astype(int)
+        yearly_seps = df_sep.groupby('fiscal_year').size().sort_index()
+        for year, count in yearly_seps.items():
+            print(f"  FY{year}: {count:,} separations")
+        
+        # Analyze accessions by year
+        print("\nACCESSIONS BY FISCAL YEAR:")
+        df_acc['fiscal_year'] = df_acc['efdate'].astype(str).str[:4].astype(int)
+        yearly_accs = df_acc.groupby('fiscal_year').size().sort_index()
+        for year, count in yearly_accs.items():
+            print(f"  FY{year}: {count:,} accessions")
+        
+        # Net change analysis
+        print("\nNET CHANGE BY FISCAL YEAR (Accessions - Separations):")
+        all_years = set(yearly_accs.index) | set(yearly_seps.index)
+        for year in sorted(all_years):
+            accs = yearly_accs.get(year, 0)
+            seps = yearly_seps.get(year, 0)
+            net = accs - seps
+            print(f"  FY{year}: {net:+,} net change ({accs:,} acc - {seps:,} sep)")
+        
+        # Top agencies for separations
+        print("\nTOP 10 AGENCIES BY SEPARATIONS (FY2020-2024):")
+        sep_by_agency = df_sep.groupby('agysubt').size().sort_values(ascending=False).head(10)
+        for agency, count in sep_by_agency.items():
+            print(f"  {agency}: {count:,}")
+        
+        # Top agencies for accessions
+        print("\nTOP 10 AGENCIES BY ACCESSIONS (FY2020-2024):")
+        acc_by_agency = df_acc.groupby('agysubt').size().sort_values(ascending=False).head(10)
+        for agency, count in acc_by_agency.items():
+            print(f"  {agency}: {count:,}")
+        
+        return df_sep, df_acc
+    else:
+        print(f"✗ Local separations/accessions files not found at:")
+        print(f"  {sep_file}")
+        print(f"  {acc_file}")
+        print("  Run from repository root or clone the full repository to access this data")
+        return None, None
+
 def main():
     """Main function to run all examples"""
     print("""
@@ -401,7 +467,8 @@ def main():
 ║           FedScope Employment Data - Usage Examples              ║
 ║                                                                  ║
 ║  This script demonstrates working with 140+ million federal     ║
-║  employee records from 1998-2025.                               ║
+║  employee records from 1998-2025, plus 9.8+ million            ║
+║  separations and accessions records from 2005-2025.             ║
 ║                                                                  ║
 ║  Data source: https://github.com/abigailhaddad/fedscope_employment
 ╚══════════════════════════════════════════════════════════════════╝
