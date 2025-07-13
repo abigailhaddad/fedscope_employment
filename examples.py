@@ -48,8 +48,8 @@ def run_local_examples():
     print("="*80 + "\n")
     
     # Check if local files exist
-    local_file = 'fedscope_data/parquet/fedscope_employment_September_2024.parquet'
-    march_file = 'fedscope_data/parquet/fedscope_employment_March_2025.parquet'
+    local_file = 'employment_cube/parquet/fedscope_employment_September_2024.parquet'
+    march_file = 'employment_cube/parquet/fedscope_employment_March_2025.parquet'
     
     if not os.path.exists(local_file):
         print(f"ERROR: Local file not found: {local_file}")
@@ -90,7 +90,7 @@ def run_download_examples():
     ensure_directory_exists(download_dir)
     
     # Download URL - only September 2024 for now (March 2025 not yet on GitHub)
-    url = 'https://github.com/abigailhaddad/fedscope_employment/raw/main/fedscope_data/parquet/fedscope_employment_September_2024.parquet'
+    url = 'https://github.com/abigailhaddad/fedscope_employment/raw/main/employment_cube/parquet/fedscope_employment_September_2024.parquet'
     local_download_path = os.path.join(download_dir, 'fedscope_employment_September_2024.parquet')
     
     print(f"Downloading from: {url}")
@@ -293,7 +293,7 @@ def run_duckdb_examples(filenames=None):
 
     # ---------- 2. Download all requested files ----------
     base_url = ("https://github.com/abigailhaddad/fedscope_employment/"
-                "raw/main/fedscope_data/parquet/")
+                "raw/main/employment_cube/parquet/")
 
     # Helper to fetch a parquet only if we don’t have it yet
     def fetch_parquet(filename):

@@ -172,8 +172,8 @@ def process_march_2025_data(data_dir, dataset_key, month, year, duplicate_logger
             'OCCFAM': 'occfam',
             'OCCFAMT': 'occfamt',
             'OCCT': 'occt',
-            'PAYPLAN': 'pp',
-            'PAYPLANT': 'ppt',
+            'PAYPLAN': 'payplan',
+            'PAYPLANT': 'payplant',
             'SUPERVIS': 'supervis',
             'SUPERVIST': 'supervist',
             'TOA': 'toa',
@@ -211,13 +211,14 @@ def process_march_2025_data(data_dir, dataset_key, month, year, duplicate_logger
         # Note: For March 2025, lookups are already merged, so we skip the lookup joining
         # The duplicate logger won't find any duplicates since lookups are pre-joined
         
-        # Save to parquet - use the directory passed in or default
+        # Save to parquet - use the parquet directory passed to process_single_dataset
         output_filename = f"fedscope_employment_{month}_{year}.parquet"
-        output_dir = os.path.dirname(data_dir.replace('extracted', 'parquet'))
-        output_path = os.path.join(output_dir, output_filename)
+        # Get the parquet directory from the parent function's parameters
+        parquet_base_dir = data_dir.split('/extracted/')[0].replace('extracted', 'parquet')
+        output_path = os.path.join(parquet_base_dir, output_filename)
         
         logger.info(f"  Saving to {output_filename}...")
-        new_df.to_parquet(output_path, index=False)
+        new_df.to_parquet(output_path, compression='zstd', index=False)
         
         # Get file size
         size_mb = os.path.getsize(output_path) / (1024 * 1024)

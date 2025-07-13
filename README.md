@@ -5,8 +5,8 @@ This repository contains **140+ million federal employee records** from 1998-202
 **🔍 Want to see quick comparisons between September 2024 and March 2025?** See: https://fluffy-narwhal-e5f260.netlify.app/
 
 **📊 Found this repo from a Netlify site?** The source code is here:
-- `web_dashboard/` - Interactive comparison dashboard (the fluffy-narwhal site above)
-- `quarto_analyses/` - Detailed Quarto analysis reports (Forest Service, turnover, inauguration analyses)
+- [`web_dashboard/`](web_dashboard/) - Interactive comparison dashboard (the fluffy-narwhal site above)
+- [`quarto_analyses/`](quarto_analyses/) - Detailed Quarto analysis reports (Forest Service, turnover, inauguration analyses)
 
 **💻 Want to get started coding with March 2025 person-level data?** See: [analysis/employment_comparisons.ipynb](analysis/employment_comparisons.ipynb)
 

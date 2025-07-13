@@ -37,7 +37,7 @@ LOCAL_PARQUET_DIR = "../../employment_cube/parquet/"
 # Forest Service agency code
 FOREST_SERVICE_CODE = "AG11"  # Using the code, not the name
 
-# Define time periods to analyze (excluding Sep 2024 and Mar 2025 which we load from summary)
+# Define time periods to analyze (now including all periods from parquet files)
 TIME_PERIODS = [
     {"year": 2013, "quarter": "March"},
     {"year": 2013, "quarter": "September"},
@@ -62,6 +62,8 @@ TIME_PERIODS = [
     {"year": 2023, "quarter": "March"},
     {"year": 2023, "quarter": "September"},
     {"year": 2024, "quarter": "March"},
+    {"year": 2024, "quarter": "September"},
+    {"year": 2025, "quarter": "March"},
 ]
 ```
 
@@ -211,22 +213,13 @@ def get_appointment_types(all_data: list) -> pd.DataFrame:
 ```{python}
 #| label: load-all-data
 
-# Load all historical data
+# Load all data from parquet files
 all_data = []
 
 for period in TIME_PERIODS:
     df = load_historical_data(period['year'], period['quarter'])
     if not df.empty:
         all_data.append(df)
-
-# Add September 2024 and March 2025 data
-sept_2024 = load_summary_data(202409, 2024, 'September')
-if not sept_2024.empty:
-    all_data.append(sept_2024)
-
-march_2025 = load_summary_data(202503, 2025, 'March')
-if not march_2025.empty:
-    all_data.append(march_2025)
 
 print(f"Loaded data for {len(all_data)} time periods")
 ```
@@ -304,8 +297,8 @@ if not employment_trends.empty:
 ```{python}
 #| label: appointment-type-data
 
-# Get appointment types over time (excluding summary data which doesn't have this detail)
-appointment_data = get_appointment_types([df for df in all_data if 'toa' in df.columns])
+# Get appointment types over time
+appointment_data = get_appointment_types(all_data)
 
 if not appointment_data.empty:
     # Load the full appointment type descriptions from summary data
