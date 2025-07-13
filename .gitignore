@@ -32,6 +32,7 @@ separations_accessions/extracted/
 !examples_output.txt
 !requirements.txt
 !employment_cube/status_reports_march_2025/*.txt
+!web_dashboard/*.txt
 # Ignore most CSV files except analysis results
 *.csv
 !**/analysis/**/*.csv
