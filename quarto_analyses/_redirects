@@ -1,0 +1,5 @@
+# Redirects for clean URLs
+/forest-service              /forest_service/forest_service.html              200
+/inauguration                /inauguration_analysis/inauguration_analysis.html       200
+/forest-service-turnover     /forest_service_separations/forest_service_accessions_separations.html  200
+/high-turnover               /high_turnover/high_turnover_analysis.html               200

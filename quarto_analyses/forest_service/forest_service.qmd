@@ -4,7 +4,7 @@ author: "Abigail Haddad"
 date: today
 format:
   html:
-    output-file: index.html
+    output-file: forest_service.html
     toc: true
     toc-depth: 3
     code-fold: true
@@ -114,7 +114,7 @@ def load_summary_data(datecode: int, year: int, quarter: str) -> pd.DataFrame:
     Load data from summary tables for September 2024 or March 2025.
     """
     # Using Status Employment by Agency and SubAgency
-    file_path = Path("../web_dashboard/Status Employment by Agency and SubAgency_202503_and_202409.txt")
+    file_path = Path("../../employment_cube/status_reports_march_2025/Status Employment by Agency and SubAgency_202503_and_202409.txt")
     
     if not file_path.exists():
         print(f"Summary file not found for {quarter} {year}")
@@ -309,7 +309,7 @@ appointment_data = get_appointment_types([df for df in all_data if 'toa' in df.c
 
 if not appointment_data.empty:
     # Load the full appointment type descriptions from summary data
-    appointment_file = Path("../web_dashboard/Status Employment by Appointment Type_202503_and_202409.txt")
+    appointment_file = Path("../../employment_cube/status_reports_march_2025/Status Employment by Appointment Type_202503_and_202409.txt")
     
     if appointment_file.exists():
         appt_df = pd.read_csv(appointment_file, sep='\t')

@@ -4,6 +4,10 @@ This repository contains **140+ million federal employee records** from 1998-202
 
 **🔍 Want to see quick comparisons between September 2024 and March 2025?** See: https://fluffy-narwhal-e5f260.netlify.app/
 
+**📊 Found this repo from a Netlify site?** The source code is here:
+- `web_dashboard/` - Interactive comparison dashboard (the fluffy-narwhal site above)
+- `quarto_analyses/` - Detailed Quarto analysis reports (Forest Service, turnover, inauguration analyses)
+
 **💻 Want to get started coding with March 2025 person-level data?** See: [analysis/employment_comparisons.ipynb](analysis/employment_comparisons.ipynb)
 
 ## Quick Start
@@ -206,6 +210,7 @@ fedscope_employment/
 │   ├── raw/                  # Original ZIP files from OPM (1.5GB)
 │   ├── extracted/            # Extracted TXT files (9.8GB, gitignored) 
 │   ├── parquet/              # 73 quarterly Parquet files (2.2GB)
+│   ├── status_reports_march_2025/  # March 2025 summary status reports (used for Sept 2024 vs March 2025 comparisons)
 │   ├── documentation_pdfs/   # PDF documentation for each dataset
 │   ├── lookup_duplicates_log.json       # Duplicate lookup entries (JSON)
 │   └── lookup_duplicates_summary.txt    # Human-readable duplicate summary
@@ -220,12 +225,15 @@ fedscope_employment/
 │   ├── fedscope_utils.py     # Shared utilities (duplicate logging, lookups, etc.)
 │   ├── process_employment_cube.py       # Employment cube processing logic
 │   └── process_separations_accessions.py # Separations/accessions processing logic
-├── analysis/                 # Analysis notebooks and outputs (17MB)
-│   ├── separations_analysis/ # Agency-specific turnover analysis
-│   ├── inauguration_analysis/ # Presidential transition workforce analysis  
-│   ├── forest_service/      # Forest Service specific analysis
-│   ├── web_dashboard/       # Interactive comparison dashboard
+├── analysis/                 # Analysis notebooks and outputs
 │   └── employment_comparisons.ipynb  # Sept 2024 vs March 2025 comparison
+├── quarto_analyses/          # Quarto-generated analysis reports (for Netlify deployment)
+│   ├── index.html           # Main landing page with links to all analyses
+│   ├── forest_service/      # Forest Service employment analysis
+│   ├── forest_service_separations/ # Forest Service turnover analysis
+│   ├── high_turnover/       # High turnover agencies analysis
+│   └── inauguration_analysis/ # Presidential transition workforce analysis
+├── web_dashboard/           # Interactive comparison dashboard
 ├── process_employment_cube.py         # Employment cube processing pipeline
 ├── process_separations_accessions.py # Separations/accessions processing pipeline
 ├── examples.py              # Comprehensive usage examples
