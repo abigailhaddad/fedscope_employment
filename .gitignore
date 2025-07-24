@@ -85,3 +85,6 @@ htmlcov/
 
 # Documentation  
 docs/_build/
+
+# Claude Code instructions
+READ_THIS_CLAUDE_CODE.md
