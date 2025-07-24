@@ -1,5 +1,5 @@
 ---
-title: "High Turnover Occupation and Agency Analysis"
+title: "Agency Turnover Analysis (5,000+ Employees)"
 author: "Abigail Haddad"
 date: today
 format:
@@ -29,7 +29,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from great_tables import GT
 from pathlib import Path
-import gc  # For garbage collection
+import gc
+import plotly.express as px
 
 # Set up pandas display options
 pd.set_option('display.max_columns', None)
@@ -39,20 +40,18 @@ pd.set_option('display.max_colwidth', None)
 # Constants
 EMPLOYMENT_PARQUET_DIR = "../../employment_cube/parquet/"
 SEPARATIONS_PARQUET_DIR = "../../separations_accessions/parquet/"
-MIN_EMPLOYEES = 100  # Minimum employee threshold for meaningful analysis
+MIN_EMPLOYEES = 5000
+TOP_N_AGENCIES = 50
 
 # Color configuration
-HIGH_TURNOVER_COLOR = "#d62728"  # Red for high turnover
-LOW_TURNOVER_COLOR = "#2ca02c"   # Green for low turnover
-```
+HIGH_TURNOVER_COLOR = "#d62728"
+LOW_TURNOVER_COLOR = "#2ca02c"
+NET_POSITIVE_COLOR = "#2ca02c"
+NET_NEGATIVE_COLOR = "#d62728"
+ACCESSIONS_COLOR = "#1f77b4"
+SEPARATIONS_COLOR = "#ff7f0e"
 
-## Data Loading and Processing
-
-```{python}
-#| label: load-multi-year-data
-#| output: false
-
-# Helper function to clean employment values
+# Utility Functions
 def clean_employment(x):
     """Convert employment values to numeric, handling REDACTED and ***** values"""
     if pd.isna(x) or x in ['REDACTED', '*****', '']:
@@ -61,100 +60,376 @@ def clean_employment(x):
         return int(x)
     except:
         return 0
+```
 
-# Load and process employment data - just 5 years (2019-2023)
-employment_years = [2019, 2020, 2021, 2022, 2023]  # Explicit years to avoid December 2024
-employment_aggregated = []
-agency_lookups = []
-occ_lookups = []
-loading_summary = []
+## Data Loading and Processing
 
-for year in employment_years:
-    file_path = f"fedscope_employment_December_{year}.parquet"
-    try:
-        # Load data
-        df = pd.read_parquet(EMPLOYMENT_PARQUET_DIR + file_path)
-        raw_count = len(df)
-        
-        # Clean employment values
-        df['employment_num'] = df['employment'].apply(clean_employment)
-        
-        # Store lookups (only need one set)
-        if year == employment_years[0]:
-            agency_lookups = df[['agysub', 'agysubt']].drop_duplicates()
-            occ_lookups = df[['occ', 'occt']].drop_duplicates()
-        
-        # Group by agency and occupation for this year
-        grouped = df.groupby(['agysub', 'occ']).agg({
-            'employment_num': 'sum'
-        }).reset_index()
-        grouped['snapshot_year'] = year
-        grouped.rename(columns={'employment_num': 'employment'}, inplace=True)
-        
-        # Add to aggregated list
-        employment_aggregated.append(grouped)
-        aggregated_count = len(grouped)
-        
-        # Store loading summary
-        loading_summary.append({
-            'Year': year,
-            'Data Type': 'Employment',
-            'Raw Records': raw_count,
-            'Aggregated Groups': aggregated_count
-        })
-        
-        # Clear the original dataframe from memory
-        del df
-        gc.collect()
-        
-    except Exception as e:
-        continue
+```{python}
+#| label: data-loading-functions
+#| code-fold: true
 
-# Combine all aggregated employment data
-employment_annual = pd.concat(employment_aggregated, ignore_index=True)
+def load_employment_data(fiscal_years, parquet_dir):
+    """Load September employment data for fiscal year baselines."""
+    employment_aggregated = []
+    employment_tenure_aggregated = []
+    agency_lookups = None
+    loading_summary = []
+    
+    for fy in fiscal_years:
+        baseline_year = fy - 1
+        file_path = f"fedscope_employment_September_{baseline_year}.parquet"
+        try:
+            df = pd.read_parquet(parquet_dir + file_path)
+            raw_count = len(df)
+            
+            df['employment_num'] = df['employment'].apply(clean_employment)
+            
+            if agency_lookups is None:
+                agency_lookups = df[['agysub', 'agysubt']].drop_duplicates()
+            
+            # Overall employment
+            grouped = df.groupby(['agysub']).agg({'employment_num': 'sum'}).reset_index()
+            grouped['fiscal_year'] = fy
+            grouped.rename(columns={'employment_num': 'employment'}, inplace=True)
+            employment_aggregated.append(grouped)
+            
+            # Tenure-specific employment (A and B levels)
+            tenure_grouped = df[df['loslvl'].isin(['A', 'B'])].groupby(['agysub', 'loslvl']).agg({
+                'employment_num': 'sum'
+            }).reset_index()
+            tenure_grouped['fiscal_year'] = fy
+            tenure_grouped.rename(columns={'employment_num': 'employment'}, inplace=True)
+            employment_tenure_aggregated.append(tenure_grouped)
+            
+            loading_summary.append({
+                'Year': f'FY{fy}',
+                'Data Type': 'Employment (Sept)',
+                'Raw Records': raw_count,
+                'Aggregated Groups': len(grouped)
+            })
+            
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    return (pd.concat(employment_aggregated, ignore_index=True),
+            pd.concat(employment_tenure_aggregated, ignore_index=True),
+            agency_lookups,
+            loading_summary)
 
-# Load and process separations data
-separations_files = [
-    "fedscope_separations_FY2020-2024.parquet"  # Covers our 5 year period
-]
+def load_separations_data(fiscal_years, parquet_dir):
+    """Load separations data from multiple files."""
+    separations_files = [
+        "fedscope_separations_FY2015-2019.parquet",
+        "fedscope_separations_FY2020-2024.parquet",
+        "fedscope_separations_March_2025.parquet"
+    ]
+    
+    separations_aggregated = []
+    separations_tenure_aggregated = []
+    loading_summary = []
+    
+    for file in separations_files:
+        try:
+            df = pd.read_parquet(parquet_dir + file)
+            raw_count = len(df)
+            
+            df['fiscal_year'] = df['efdate'].astype(str).str[:4].astype(int)
+            df = df[df['fiscal_year'].isin(fiscal_years)]
+            
+            # Overall separations
+            grouped = df.groupby(['fiscal_year', 'agysub']).size().reset_index(name='separations')
+            separations_aggregated.append(grouped)
+            
+            # Tenure-specific separations
+            tenure_seps = df[df['loslvl'].isin(['A', 'B'])].groupby(
+                ['fiscal_year', 'agysub', 'loslvl']
+            ).size().reset_index(name='separations')
+            separations_tenure_aggregated.append(tenure_seps)
+            
+            year_range = 'March 2025' if 'March_2025' in file else (
+                '2015-2019' if '2015-2019' in file else '2020-2024'
+            )
+            loading_summary.append({
+                'Year': year_range,
+                'Data Type': 'Separations',
+                'Raw Records': raw_count,
+                'Aggregated Groups': len(grouped)
+            })
+            
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    return (pd.concat(separations_aggregated, ignore_index=True),
+            pd.concat(separations_tenure_aggregated, ignore_index=True),
+            loading_summary)
 
-separations_aggregated = []
-for file in separations_files:
-    try:
-        # Load data
-        df = pd.read_parquet(SEPARATIONS_PARQUET_DIR + file)
-        raw_count = len(df)
-        
-        # Extract fiscal year from efdate
-        df['fiscal_year'] = df['efdate'].astype(str).str[:4].astype(int)
-        
-        # Filter for our years of interest
-        df = df[df['fiscal_year'].isin(employment_years)]
-        
-        # Group by year, agency, and occupation
-        grouped = df.groupby(['fiscal_year', 'agysub', 'occ']).size().reset_index(name='separations')
-        
-        # Add to aggregated list
-        separations_aggregated.append(grouped)
-        aggregated_count = len(grouped)
-        
-        # Store loading summary
-        loading_summary.append({
-            'Year': '2020-2024',
-            'Data Type': 'Separations',
-            'Raw Records': raw_count,
-            'Aggregated Groups': aggregated_count
-        })
-        
-        # Clear the original dataframe from memory
-        del df
-        gc.collect()
-        
-    except Exception as e:
-        continue
+def load_accessions_data(fiscal_years, parquet_dir):
+    """Load accessions data from multiple files."""
+    accessions_files = [
+        "fedscope_accessions_FY2015-2019.parquet",
+        "fedscope_accessions_FY2020-2024.parquet",
+        "fedscope_accessions_March_2025.parquet"
+    ]
+    
+    accessions_aggregated = []
+    loading_summary = []
+    
+    for file in accessions_files:
+        try:
+            df = pd.read_parquet(parquet_dir + file)
+            raw_count = len(df)
+            
+            df['fiscal_year'] = df['efdate'].astype(str).str[:4].astype(int)
+            
+            if 'March_2025' not in file:
+                df = df[df['fiscal_year'].isin(fiscal_years)]
+            
+            grouped = df.groupby(['fiscal_year', 'agysub']).size().reset_index(name='accessions')
+            
+            if len(grouped) > 0:
+                accessions_aggregated.append(grouped)
+                aggregated_count = len(grouped)
+            else:
+                aggregated_count = 0
+            
+            year_range = 'March 2025' if 'March_2025' in file else (
+                '2015-2019' if '2015-2019' in file else '2020-2024'
+            )
+            loading_summary.append({
+                'Year': year_range,
+                'Data Type': 'Accessions',
+                'Raw Records': raw_count,
+                'Aggregated Groups': aggregated_count
+            })
+            
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    return pd.concat(accessions_aggregated, ignore_index=True), loading_summary
 
-# Combine all aggregated separations data
-separations_annual = pd.concat(separations_aggregated, ignore_index=True)
+def load_tenure_2plus_data(fiscal_years, employment_parquet_dir, separations_parquet_dir):
+    """Load employment and separations data for employees with 2+ years tenure."""
+    employment_2plus_aggregated = []
+    
+    for fy in fiscal_years:
+        baseline_year = fy - 1
+        file_path = f"fedscope_employment_September_{baseline_year}.parquet"
+        try:
+            df = pd.read_parquet(employment_parquet_dir + file_path)
+            df['employment_num'] = df['employment'].apply(clean_employment)
+            
+            tenure_2plus = df[~df['loslvl'].isin(['A', 'B'])].groupby(['agysub']).agg({
+                'employment_num': 'sum'
+            }).reset_index()
+            tenure_2plus['fiscal_year'] = fy
+            tenure_2plus['loslvl'] = 'C+'
+            tenure_2plus.rename(columns={'employment_num': 'employment'}, inplace=True)
+            employment_2plus_aggregated.append(tenure_2plus)
+            
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    separations_files = [
+        "fedscope_separations_FY2015-2019.parquet",
+        "fedscope_separations_FY2020-2024.parquet",
+        "fedscope_separations_March_2025.parquet"
+    ]
+    
+    separations_2plus_aggregated = []
+    for file in separations_files:
+        try:
+            df = pd.read_parquet(separations_parquet_dir + file)
+            df['fiscal_year'] = df['efdate'].astype(str).str[:4].astype(int)
+            df = df[df['fiscal_year'].isin(fiscal_years)]
+            tenure_2plus_seps = df[~df['loslvl'].isin(['A', 'B'])].groupby(
+                ['fiscal_year', 'agysub']
+            ).size().reset_index(name='separations')
+            tenure_2plus_seps['loslvl'] = 'C+'
+            separations_2plus_aggregated.append(tenure_2plus_seps)
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    return (pd.concat(employment_2plus_aggregated, ignore_index=True),
+            pd.concat(separations_2plus_aggregated, ignore_index=True))
+
+def load_monthly_data_for_heatmaps(parquet_dir):
+    """Load monthly accessions and separations data for heatmaps."""
+    files = [
+        "fedscope_accessions_FY2015-2019.parquet",
+        "fedscope_accessions_FY2020-2024.parquet",
+        "fedscope_accessions_March_2025.parquet"
+    ]
+    
+    monthly_accessions_data = {}
+    for file in files:
+        try:
+            df = pd.read_parquet(parquet_dir + file)
+            df['year'] = df['efdate'].astype(str).str[:4].astype(int)
+            df['month'] = df['efdate'].astype(str).str[4:6].astype(int)
+            df = df[df['year'].between(2016, 2025)]
+            monthly_counts = df.groupby(['agysub', 'year', 'month']).size().reset_index(name='count')
+            for agysub in monthly_counts['agysub'].unique():
+                if agysub not in monthly_accessions_data:
+                    monthly_accessions_data[agysub] = []
+                monthly_accessions_data[agysub].append(monthly_counts[monthly_counts['agysub'] == agysub])
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    # Same for separations
+    files = [
+        "fedscope_separations_FY2015-2019.parquet",
+        "fedscope_separations_FY2020-2024.parquet",
+        "fedscope_separations_March_2025.parquet"
+    ]
+    
+    monthly_separations_data = {}
+    for file in files:
+        try:
+            df = pd.read_parquet(parquet_dir + file)
+            df['year'] = df['efdate'].astype(str).str[:4].astype(int)
+            df['month'] = df['efdate'].astype(str).str[4:6].astype(int)
+            df = df[df['year'].between(2016, 2025)]
+            monthly_counts = df.groupby(['agysub', 'year', 'month']).size().reset_index(name='count')
+            for agysub in monthly_counts['agysub'].unique():
+                if agysub not in monthly_separations_data:
+                    monthly_separations_data[agysub] = []
+                monthly_separations_data[agysub].append(monthly_counts[monthly_counts['agysub'] == agysub])
+            del df
+            gc.collect()
+        except Exception as e:
+            continue
+    
+    return monthly_accessions_data, monthly_separations_data
+
+def load_employment_time_series(employment_parquet_dir, years_range):
+    """Load March and September employment data for time series."""
+    employment_time_series_data = {}
+    
+    for year in years_range:
+        # March data
+        march_file = f"fedscope_employment_March_{year}.parquet"
+        march_path = employment_parquet_dir + march_file
+        if Path(march_path).exists():
+            try:
+                df = pd.read_parquet(march_path)
+                df['employment_num'] = df['employment'].apply(clean_employment)
+                agency_totals = df.groupby('agysub')['employment_num'].sum().reset_index()
+                for _, row in agency_totals.iterrows():
+                    agysub = row['agysub']
+                    if agysub not in employment_time_series_data:
+                        employment_time_series_data[agysub] = []
+                    employment_time_series_data[agysub].append({
+                        'period': f"March {year}",
+                        'year': year,
+                        'month': 'March',
+                        'employment': int(row['employment_num'])
+                    })
+                del df
+                gc.collect()
+            except Exception as e:
+                pass
+        
+        # September data
+        sept_file = f"fedscope_employment_September_{year}.parquet"
+        sept_path = employment_parquet_dir + sept_file
+        if Path(sept_path).exists():
+            try:
+                df = pd.read_parquet(sept_path)
+                df['employment_num'] = df['employment'].apply(clean_employment)
+                agency_totals = df.groupby('agysub')['employment_num'].sum().reset_index()
+                for _, row in agency_totals.iterrows():
+                    agysub = row['agysub']
+                    if agysub not in employment_time_series_data:
+                        employment_time_series_data[agysub] = []
+                    employment_time_series_data[agysub].append({
+                        'period': f"September {year}",
+                        'year': year,
+                        'month': 'September',
+                        'employment': int(row['employment_num'])
+                    })
+                del df
+                gc.collect()
+            except Exception as e:
+                pass
+    
+    return employment_time_series_data
+
+def get_fiscal_years():
+    """Return the fiscal years for analysis."""
+    return [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
+
+def get_time_series_years():
+    """Return the years for time series analysis."""
+    return list(range(2013, 2026))
+
+def combine_loading_summaries(emp_summary, sep_summary, acc_summary):
+    """Combine all loading summaries into one list."""
+    return emp_summary + sep_summary + acc_summary
+
+def combine_tenure_data(employment_tenure_annual, employment_tenure_2plus):
+    """Combine tenure annual and 2+ years data."""
+    return pd.concat([employment_tenure_annual, employment_tenure_2plus], ignore_index=True)
+
+def load_all_data():
+    """Master function to load all data needed for the analysis."""
+    fiscal_years = get_fiscal_years()
+    time_series_years = get_time_series_years()
+    
+    employment_annual, employment_tenure_annual, agency_lookups, emp_loading_summary = \
+        load_employment_data(fiscal_years, EMPLOYMENT_PARQUET_DIR)
+    
+    separations_annual, separations_tenure_annual, sep_loading_summary = \
+        load_separations_data(fiscal_years, SEPARATIONS_PARQUET_DIR)
+    
+    accessions_annual, acc_loading_summary = \
+        load_accessions_data(fiscal_years, SEPARATIONS_PARQUET_DIR)
+    
+    employment_tenure_2plus, separations_tenure_2plus = \
+        load_tenure_2plus_data(fiscal_years, EMPLOYMENT_PARQUET_DIR, SEPARATIONS_PARQUET_DIR)
+    
+    monthly_accessions_data, monthly_separations_data = \
+        load_monthly_data_for_heatmaps(SEPARATIONS_PARQUET_DIR)
+    
+    employment_time_series_data = \
+        load_employment_time_series(EMPLOYMENT_PARQUET_DIR, time_series_years)
+    
+    loading_summary = combine_loading_summaries(emp_loading_summary, sep_loading_summary, acc_loading_summary)
+    tenure_data = combine_tenure_data(employment_tenure_annual, employment_tenure_2plus)
+    
+    return {
+        'employment_annual': employment_annual,
+        'separations_annual': separations_annual,
+        'accessions_annual': accessions_annual,
+        'tenure_data': tenure_data,
+        'separations_tenure_annual': separations_tenure_annual,
+        'separations_tenure_2plus': separations_tenure_2plus,
+        'agency_lookups': agency_lookups,
+        'loading_summary': loading_summary,
+        'monthly_accessions_data': monthly_accessions_data,
+        'monthly_separations_data': monthly_separations_data,
+        'employment_time_series_data': employment_time_series_data
+    }
+
+```
+
+```{python}
+#| label: execute-data-loading
+#| output: false
+
+# Load all data
+all_data = load_all_data()
 ```
 
 ## Data Loading Summary
@@ -162,247 +437,562 @@ separations_annual = pd.concat(separations_aggregated, ignore_index=True)
 ```{python}
 #| label: loading-summary-table
 
-# Create loading summary table
-loading_df = pd.DataFrame(loading_summary)
-
-gt_loading = (
-    GT(loading_df)
-    .tab_header(
-        title="Data Loading Summary",
-        subtitle="Raw records loaded and aggregated by agency-occupation groups"
+def create_loading_summary_table(loading_summary):
+    """Create a formatted table showing data loading summary."""
+    loading_df = pd.DataFrame(loading_summary)
+    
+    gt_loading = (
+        GT(loading_df)
+        .tab_header(
+            title="Data Loading Summary",
+            subtitle="Raw records loaded and aggregated by agency"
+        )
+        .fmt_number(columns=['Raw Records', 'Aggregated Groups'], decimals=0, use_seps=True)
+        .cols_width({
+            'Year': '100px',
+            'Data Type': '120px',
+            'Raw Records': '140px',
+            'Aggregated Groups': '160px'
+        })
     )
-    .fmt_number(columns=['Raw Records', 'Aggregated Groups'], decimals=0, use_seps=True)
-    .cols_width({
-        'Year': '100px',
-        'Data Type': '120px',
-        'Raw Records': '140px',
-        'Aggregated Groups': '160px'
-    })
-)
+    
+    return gt_loading
 
-gt_loading.show()
+# Display loading summary
+create_loading_summary_table(all_data['loading_summary']).show()
 ```
 
-## Annual Attrition Rate Calculation
+## Data Processing and Calculations
+
+### Calculate Annual Attrition Rates
 
 ```{python}
-#| label: calculate-annual-attrition
-#| output: false
+#| label: calculate-attrition-rates
 
-# Merge employment and separations (employment year matches fiscal year)
-annual_data = pd.merge(
-    employment_annual, 
-    separations_annual, 
-    left_on=['snapshot_year', 'agysub', 'occ'],
-    right_on=['fiscal_year', 'agysub', 'occ'],
-    how='outer'
+def calculate_annual_attrition_rates(employment_annual, separations_annual, agency_lookups):
+    """Calculate annual attrition rates by merging employment and separations data."""
+    # Merge employment and separations by fiscal year
+    annual_data = pd.merge(
+        employment_annual, 
+        separations_annual, 
+        on=['fiscal_year', 'agysub'],
+        how='outer'
+    )
+    
+    # Fill NaN values
+    annual_data['employment'] = annual_data['employment'].fillna(0)
+    annual_data['separations'] = annual_data['separations'].fillna(0)
+    
+    # Calculate attrition rate
+    annual_data['attrition_rate'] = np.where(
+        annual_data['employment'] > 0,
+        (annual_data['separations'] / annual_data['employment']) * 100,
+        np.nan
+    )
+    
+    # Filter for meaningful sample sizes
+    annual_data = annual_data[annual_data['employment'] >= MIN_EMPLOYEES]
+    annual_data = annual_data.dropna(subset=['attrition_rate'])
+    
+    # Merge with agency lookups
+    annual_data = pd.merge(annual_data, agency_lookups, on='agysub', how='left')
+    
+    return annual_data
+
+def calculate_tenure_attrition_rates(tenure_data, separations_tenure_annual, 
+                                   separations_tenure_2plus, agency_lookups):
+    """Calculate tenure-specific attrition rates."""
+    # Merge A and B tenure data
+    tenure_attrition = pd.merge(
+        tenure_data[tenure_data['loslvl'].isin(['A', 'B'])],
+        separations_tenure_annual,
+        on=['fiscal_year', 'agysub', 'loslvl'],
+        how='outer'
+    )
+    
+    # Merge C+ tenure data
+    tenure_2plus_attrition = pd.merge(
+        tenure_data[tenure_data['loslvl'] == 'C+'],
+        separations_tenure_2plus,
+        on=['fiscal_year', 'agysub', 'loslvl'],
+        how='outer'
+    )
+    
+    # Combine all tenure data
+    all_tenure_data = pd.concat([tenure_attrition, tenure_2plus_attrition], ignore_index=True)
+    
+    all_tenure_data['employment'] = all_tenure_data['employment'].fillna(0)
+    all_tenure_data['separations'] = all_tenure_data['separations'].fillna(0)
+    
+    all_tenure_data['attrition_rate'] = np.where(
+        all_tenure_data['employment'] > 0,
+        (all_tenure_data['separations'] / all_tenure_data['employment']) * 100,
+        np.nan
+    )
+    
+    all_tenure_data = pd.merge(all_tenure_data, agency_lookups, on='agysub', how='left')
+    
+    return all_tenure_data
+
+# Calculate rates
+annual_data = calculate_annual_attrition_rates(
+    all_data['employment_annual'], 
+    all_data['separations_annual'], 
+    all_data['agency_lookups']
 )
 
-# Fill NaN values
-annual_data['employment'] = annual_data['employment'].fillna(0)
-annual_data['separations'] = annual_data['separations'].fillna(0)
-annual_data['year'] = annual_data['snapshot_year'].fillna(annual_data['fiscal_year'])
-
-# Calculate attrition rate
-annual_data['attrition_rate'] = np.where(
-    annual_data['employment'] > 0,
-    (annual_data['separations'] / annual_data['employment']) * 100,
-    np.nan
+tenure_data = calculate_tenure_attrition_rates(
+    all_data['tenure_data'],
+    all_data['separations_tenure_annual'],
+    all_data['separations_tenure_2plus'],
+    all_data['agency_lookups']
 )
-
-# Filter for meaningful sample sizes
-annual_data = annual_data[annual_data['employment'] >= MIN_EMPLOYEES]
-annual_data = annual_data.dropna(subset=['attrition_rate'])
-
-# Merge with agency and occupation lookups
-annual_data = pd.merge(annual_data, agency_lookups, on='agysub', how='left')
-annual_data = pd.merge(annual_data, occ_lookups, on='occ', how='left')
 ```
 
-```{python}
-#| label: identify-top-500
-#| output: false
+## Analysis Results
 
-# Calculate average statistics across all years for each agency-occupation combination
-summary_stats = annual_data.groupby(['agysub', 'occ', 'agysubt', 'occt']).agg({
-    'employment': 'mean',
-    'separations': 'mean', 
-    'attrition_rate': 'mean'
-}).reset_index()
-
-summary_stats.columns = ['agysub', 'occ', 'agysubt', 'occt', 'avg_employment', 'avg_separations', 'avg_attrition_rate']
-
-# Add year count for each combination
-year_counts = annual_data.groupby(['agysub', 'occ']).size().reset_index(name='years_of_data')
-summary_stats = pd.merge(summary_stats, year_counts, on=['agysub', 'occ'], how='left')
-
-# Filter for combinations with at least 3 years of data
-summary_stats = summary_stats[summary_stats['years_of_data'] >= 3]
-
-# Get top 500 by average employment
-top_500_by_size = summary_stats.nlargest(500, 'avg_employment')
-```
-
-## Top 50 Highest Turnover Rates
+### Top 50 Highest Agency Turnover Rates
 
 ```{python}
 #| label: annual-turnover-table
 
-# Get highest attrition combinations from the top 500 largest
-high_attrition_from_500 = top_500_by_size.nlargest(50, 'avg_attrition_rate').copy()
+def get_top_turnover_agencies(annual_data, min_employees=5000, top_n=50):
+    """Get top N agencies by average attrition rate, filtered by minimum employment."""
+    # Calculate average statistics across all years for each agency
+    agency_avg_stats = annual_data.groupby(['agysub', 'agysubt']).agg({
+        'employment': 'mean',
+        'attrition_rate': 'mean'
+    }).reset_index()
+    agency_avg_stats.columns = ['agysub', 'agysubt', 'avg_employment', 'avg_attrition_rate']
+    
+    # Filter for agencies with min_employees+ employees
+    agencies_filtered = agency_avg_stats[agency_avg_stats['avg_employment'] >= min_employees]
+    
+    # Sort agencies by average attrition rate and get top N
+    return agencies_filtered.nlargest(top_n, 'avg_attrition_rate').copy()
 
-# Get the annual data for these combinations
-high_attrition_annual = annual_data[
-    annual_data.set_index(['agysub', 'occ']).index.isin(
-        high_attrition_from_500.set_index(['agysub', 'occ']).index
+def create_annual_turnover_table(annual_data, high_attrition_agencies):
+    """Create pivot table of annual turnover rates for specified agencies."""
+    # Get the annual data for these agencies
+    high_attrition_annual = annual_data[
+        annual_data['agysub'].isin(high_attrition_agencies['agysub'])
+    ].copy()
+    
+    # Create pivot table with fiscal years as columns
+    annual_pivot = high_attrition_annual.pivot_table(
+        index=['agysub', 'agysubt'],
+        columns='fiscal_year',
+        values='attrition_rate',
+        aggfunc='mean'
+    ).reset_index()
+    
+    # Calculate average for sorting
+    year_cols = [col for col in annual_pivot.columns if isinstance(col, (int, float))]
+    annual_pivot['avg_rate'] = annual_pivot[year_cols].mean(axis=1)
+    
+    # Sort by average rate descending
+    annual_pivot = annual_pivot.sort_values('avg_rate', ascending=False)
+    
+    return annual_pivot, year_cols
+
+def format_annual_turnover_table(annual_pivot, year_cols):
+    """Format the annual turnover table for display."""
+    display_data = annual_pivot.copy()
+    
+    # Select columns for display
+    table_cols = ['agysubt'] + year_cols + ['avg_rate']
+    display_data = display_data[table_cols]
+    
+    # Rename columns
+    new_columns = ['Agency'] + [f'FY{int(col)}' for col in year_cols] + ['Avg']
+    display_data.columns = new_columns
+    
+    # Round all numeric columns to integers
+    for col in display_data.columns[1:]:
+        display_data[col] = display_data[col].round(0)
+        # Convert to nullable integer to handle NaN values
+        display_data[col] = display_data[col].astype('Int64')
+    
+    # Reset index for clean display
+    display_data = display_data.reset_index(drop=True)
+    
+    # Create GT table
+    gt_annual = (
+        GT(display_data.head(50))
+        .tab_header(
+            title="Top 50 Highest Agency Turnover Rates",
+            subtitle="Annual attrition rates by fiscal year (percentage) - agencies with 5000+ employees - FY2016-FY2023"
+        )
+        .fmt_number(columns=list(display_data.columns[1:]), decimals=0, pattern="{x}%")
+        .data_color(
+            columns=list(display_data.columns[1:]),
+            palette=["white", HIGH_TURNOVER_COLOR],
+            domain=[0, display_data[display_data.columns[1:]].max().max()],
+            na_color="lightgray"
+        )
+        .cols_width({
+            'Agency': '400px'
+        })
     )
-].copy()
+    
+    return gt_annual
 
-# Create pivot table with years as columns
-annual_pivot = high_attrition_annual.pivot_table(
-    index=['agysub', 'occ', 'agysubt', 'occt'],
-    columns='year',
-    values='attrition_rate',
-    aggfunc='mean'
-).reset_index()
-
-# Calculate average for sorting
-annual_pivot['avg_rate'] = annual_pivot[[2019, 2020, 2021, 2022, 2023]].mean(axis=1)
-
-# Sort by average rate descending
-annual_pivot = annual_pivot.sort_values('avg_rate', ascending=False)
-
-# Prepare display data with full agency and occupation names
-display_data = annual_pivot.copy()
-display_data['Agency_Occupation'] = display_data['agysubt'] + ' - ' + display_data['occt']
-
-# Select columns for display
-table_cols = ['Agency_Occupation'] + [2019, 2020, 2021, 2022, 2023] + ['avg_rate']
-display_data = display_data[table_cols]
-
-# Rename columns
-display_data.columns = ['Agency - Occupation', '2019', '2020', '2021', '2022', '2023', 'Avg']
-
-# Round all numeric columns
-for col in ['2019', '2020', '2021', '2022', '2023', 'Avg']:
-    display_data[col] = display_data[col].round(1)
-
-# Reset index for clean display
-display_data = display_data.reset_index(drop=True)
-
-# Create GT table with expandable view
-gt_annual = (
-    GT(display_data)
-    .tab_header(
-        title="Top 50 Highest Turnover Rates",
-        subtitle="Annual rates for 2019-2023 (percentage) - from largest federal groups"
-    )
-    .fmt_number(columns=['2019', '2020', '2021', '2022', '2023', 'Avg'], decimals=1)
-    .data_color(
-        columns=['2019', '2020', '2021', '2022', '2023', 'Avg'],
-        palette=["white", HIGH_TURNOVER_COLOR],
-        domain=[0, display_data[['2019', '2020', '2021', '2022', '2023', 'Avg']].max().max()],
-        na_color="lightgray"
-    )
-    .cols_width({
-        'Agency - Occupation': '500px',
-        '2019': '60px',
-        '2020': '60px',
-        '2021': '60px',
-        '2022': '60px',
-        '2023': '60px',
-        'Avg': '60px'
-    })
-)
-
+# Execute the analysis
+high_attrition_agencies = get_top_turnover_agencies(annual_data, MIN_EMPLOYEES, 50)
+annual_pivot, year_cols = create_annual_turnover_table(annual_data, high_attrition_agencies)
+gt_annual = format_annual_turnover_table(annual_pivot, year_cols)
 gt_annual.show()
 ```
 
-## Top 30 Highest Agency Turnover Rates
+### Tenure-Specific Turnover Analysis
 
 ```{python}
-#| label: agency-turnover-table
+#| label: tenure-turnover-analysis
 
-# Aggregate by agency only
-agency_summary = annual_data.groupby(['agysub', 'agysubt']).agg({
-    'employment': 'sum',
-    'separations': 'sum'
-}).reset_index()
-
-# Calculate agency-level attrition rate
-agency_summary['attrition_rate'] = (agency_summary['separations'] / agency_summary['employment']) * 100
-
-# Calculate annual agency data for the table
-agency_annual = annual_data.groupby(['agysub', 'agysubt', 'year']).agg({
-    'employment': 'sum',
-    'separations': 'sum'
-}).reset_index()
-
-# Calculate annual attrition rates
-agency_annual['attrition_rate'] = (agency_annual['separations'] / agency_annual['employment']) * 100
-
-# Filter for agencies with meaningful size (average 1000+ employees)
-agency_avg_employment = agency_annual.groupby(['agysub', 'agysubt'])['employment'].mean().reset_index()
-agency_avg_employment.columns = ['agysub', 'agysubt', 'avg_employment']
-large_agencies = agency_avg_employment[agency_avg_employment['avg_employment'] >= 1000]
-
-# Get annual data for large agencies only
-large_agency_annual = agency_annual[
-    agency_annual['agysub'].isin(large_agencies['agysub'])
-]
-
-# Create pivot table with years as columns
-agency_pivot = large_agency_annual.pivot_table(
-    index=['agysub', 'agysubt'],
-    columns='year',
-    values='attrition_rate',
-    aggfunc='mean'
-).reset_index()
-
-# Calculate average for sorting
-agency_pivot['avg_rate'] = agency_pivot[[2019, 2020, 2021, 2022, 2023]].mean(axis=1)
-
-# Sort by average rate descending and take top 30
-agency_pivot = agency_pivot.sort_values('avg_rate', ascending=False).head(30)
-
-# Prepare display data
-agency_display = agency_pivot.copy()
-agency_display = agency_display[['agysubt'] + [2019, 2020, 2021, 2022, 2023] + ['avg_rate']]
-
-# Rename columns
-agency_display.columns = ['Agency', '2019', '2020', '2021', '2022', '2023', 'Avg']
-
-# Round all numeric columns
-for col in ['2019', '2020', '2021', '2022', '2023', 'Avg']:
-    agency_display[col] = agency_display[col].round(1)
-
-# Reset index for clean display
-agency_display = agency_display.reset_index(drop=True)
-
-# Create GT table
-gt_agencies = (
-    GT(agency_display)
-    .tab_header(
-        title="Top 30 Highest Agency Turnover Rates",
-        subtitle="Annual rates for 2019-2023 (percentage) - agencies with 1000+ average employees"
+def create_tenure_analysis_table(tenure_data, high_attrition_agencies):
+    """Create tenure-specific turnover analysis for specified agencies."""
+    # Get tenure data for the same agencies
+    tenure_summary_filtered = tenure_data[
+        tenure_data['agysub'].isin(high_attrition_agencies['agysub'])
+    ].groupby(['agysub', 'agysubt', 'loslvl']).agg({
+        'employment': 'mean',
+        'separations': 'mean',
+        'attrition_rate': 'mean'
+    }).reset_index()
+    
+    # Pivot tenure data to show side-by-side comparison
+    tenure_pivot = tenure_summary_filtered.pivot_table(
+        index=['agysub', 'agysubt'],
+        columns='loslvl',
+        values='attrition_rate',
+        aggfunc='mean'
+    ).reset_index()
+    
+    # Add overall attrition rate from the high_attrition_agencies data
+    overall_rates = high_attrition_agencies[['agysub', 'avg_attrition_rate', 'avg_employment']].copy()
+    tenure_pivot = pd.merge(
+        tenure_pivot,
+        overall_rates,
+        on='agysub',
+        how='left'
     )
-    .fmt_number(columns=['2019', '2020', '2021', '2022', '2023', 'Avg'], decimals=1)
-    .data_color(
-        columns=['2019', '2020', '2021', '2022', '2023', 'Avg'],
-        palette=["white", HIGH_TURNOVER_COLOR],
-        domain=[0, agency_display[['2019', '2020', '2021', '2022', '2023', 'Avg']].max().max()],
-        na_color="lightgray"
-    )
-    .cols_width({
-        'Agency': '400px',
-        '2019': '60px',
-        '2020': '60px',
-        '2021': '60px',
-        '2022': '60px',
-        '2023': '60px',
-        'Avg': '60px'
-    })
-)
+    
+    # Sort by average attrition rate to match the order from the previous table
+    tenure_pivot = tenure_pivot.sort_values('avg_attrition_rate', ascending=False).head(50)
+    
+    return tenure_pivot
 
-gt_agencies.show()
+def format_tenure_table(tenure_pivot):
+    """Format the tenure analysis table for display."""
+    # Prepare display data
+    tenure_cols = ['agysubt', 'A', 'B', 'C+', 'avg_attrition_rate', 'avg_employment']
+    available_cols = [col for col in tenure_cols if col in tenure_pivot.columns]
+    tenure_display = tenure_pivot[available_cols].copy()
+    
+    # Rename columns
+    col_mapping = {
+        'agysubt': 'Agency',
+        'A': '<1 Year', 
+        'B': '1-2 Years',
+        'C+': '2+ Years',
+        'avg_attrition_rate': 'Overall',
+        'avg_employment': 'Average Employment'
+    }
+    tenure_display.rename(columns=col_mapping, inplace=True)
+    
+    # Round numeric columns to integers
+    turnover_cols = ['<1 Year', '1-2 Years', '2+ Years', 'Overall']
+    for col in turnover_cols:
+        if col in tenure_display.columns:
+            tenure_display[col] = tenure_display[col].round(0).astype('Int64')
+    if 'Average Employment' in tenure_display.columns:
+        tenure_display['Average Employment'] = tenure_display['Average Employment'].round(0).astype('Int64')
+    
+    # Reset index
+    tenure_display = tenure_display.reset_index(drop=True)
+    
+    # Find the maximum value across all turnover columns for color scaling
+    turnover_cols_present = [col for col in turnover_cols if col in tenure_display.columns]
+    max_turnover = tenure_display[turnover_cols_present].max().max()
+    
+    # Create GT table
+    gt_tenure = (
+        GT(tenure_display)
+        .tab_header(
+            title="Annual Agency Turnover by Employee Tenure",
+            subtitle="Average annual attrition rates by tenure group and overall (FY2016-FY2023)"
+        )
+        .fmt_number(columns=turnover_cols_present, decimals=0, pattern="{x}%")
+        .fmt_number(columns=['Average Employment'], decimals=0, use_seps=True)
+        .data_color(
+            columns=turnover_cols_present,
+            palette=["white", HIGH_TURNOVER_COLOR],
+            domain=[0, max_turnover],
+            na_color="lightgray"
+        )
+        .cols_width({
+            'Agency': '350px',
+            '<1 Year': '80px',
+            '1-2 Years': '80px',
+            '2+ Years': '80px',
+            'Overall': '80px',
+            'Average Employment': '120px'
+        })
+    )
+    
+    return gt_tenure
+
+# Execute the analysis
+tenure_pivot = create_tenure_analysis_table(tenure_data, high_attrition_agencies)
+gt_tenure = format_tenure_table(tenure_pivot)
+gt_tenure.show()
+```
+
+### Average Employment vs. Turnover Rate
+
+```{python}
+#| label: scatter-plot-analysis
+
+def create_scatter_plot_data(annual_data, min_employees=5000):
+    """Prepare data for average employment vs turnover scatter plot."""
+    scatter_data = annual_data.groupby(['agysub', 'agysubt']).agg({
+        'employment': 'mean',
+        'attrition_rate': 'mean'
+    }).reset_index()
+    scatter_data.columns = ['agysub', 'agysubt', 'avg_employment', 'avg_attrition_rate']
+    scatter_data = scatter_data[scatter_data['avg_employment'] >= min_employees]
+    scatter_data['avg_attrition_rate'] = scatter_data['avg_attrition_rate'].round(0)
+    scatter_data['avg_employment'] = scatter_data['avg_employment'].round(0)
+    return scatter_data
+
+def create_scatter_plot(scatter_data):
+    """Create interactive scatter plot of average employment vs turnover."""
+    fig = px.scatter(
+        scatter_data, 
+        x='avg_employment', 
+        y='avg_attrition_rate',
+        hover_data={'agysubt': True, 'avg_employment': ':,.0f', 'avg_attrition_rate': ':.0f'},
+        labels={
+            'avg_employment': 'Average Annual Employment',
+            'avg_attrition_rate': 'Average Annual Attrition Rate (%)',
+            'agysubt': 'Agency'
+        },
+        title='Average Employment vs. Turnover Rate'
+    )
+    
+    # Update layout
+    fig.update_traces(
+        marker=dict(size=10, color=HIGH_TURNOVER_COLOR, opacity=0.7),
+        hovertemplate='<b>%{customdata[0]}</b><br>' +
+                      'Average Employment: %{x:,.0f}<br>' +
+                      'Turnover: %{y:.0f}%<br>' +
+                      '<extra></extra>'
+    )
+    
+    fig.update_layout(
+        xaxis_title="Average Annual Employment",
+        yaxis_title="Average Annual Attrition Rate (%)",
+        hovermode='closest',
+        height=600,
+        annotations=[
+            dict(
+                text="Federal Agencies with 5,000+ Employees (FY2016-FY2023)",
+                showarrow=False,
+                xref="paper",
+                yref="paper",
+                x=0.5,
+                y=1.05,
+                xanchor="center",
+                yanchor="bottom",
+                font=dict(size=12, color="gray")
+            )
+        ]
+    )
+    
+    return fig
+
+# Execute the analysis
+scatter_data = create_scatter_plot_data(annual_data, MIN_EMPLOYEES)
+fig = create_scatter_plot(scatter_data)
+fig.show()
+```
+
+## Detailed Analysis of Top 10 High-Turnover Agencies
+
+### Net Change Heatmaps
+
+```{python}
+#| label: net-change-heatmap
+
+def get_top_10_turnover_agencies(annual_data, min_employees=5000):
+    """Get top 10 agencies by turnover rate."""
+    agency_stats = annual_data.groupby(['agysub', 'agysubt']).agg({
+        'employment': 'mean',
+        'attrition_rate': 'mean'
+    }).reset_index()
+    agency_stats.columns = ['agysub', 'agysubt', 'avg_employment', 'avg_attrition_rate']
+    agency_stats = agency_stats[agency_stats['avg_employment'] >= min_employees]
+    return agency_stats.nlargest(10, 'avg_attrition_rate').copy()
+
+def create_agency_heatmap(agency_code, agency_name, avg_turnover, 
+                         monthly_accessions_data, monthly_separations_data):
+    """Create net change heatmap for a single agency."""
+    # Get monthly data for this agency
+    monthly_acc_data = monthly_accessions_data.get(agency_code, [])
+    monthly_sep_data = monthly_separations_data.get(agency_code, [])
+    
+    if monthly_acc_data and monthly_sep_data:
+        # Combine monthly data
+        monthly_accessions = pd.concat(monthly_acc_data).groupby(['year', 'month'])['count'].sum().reset_index()
+        monthly_separations = pd.concat(monthly_sep_data).groupby(['year', 'month'])['count'].sum().reset_index()
+        
+        # Merge accessions and separations
+        monthly_combined = pd.merge(
+            monthly_accessions, 
+            monthly_separations, 
+            on=['year', 'month'], 
+            how='outer',
+            suffixes=('_acc', '_sep')
+        ).fillna(0)
+        
+        monthly_combined['accessions'] = monthly_combined['count_acc'].astype(int)
+        monthly_combined['separations'] = monthly_combined['count_sep'].astype(int)
+        monthly_combined['net_change'] = monthly_combined['accessions'] - monthly_combined['separations']
+        monthly_combined = monthly_combined.drop(['count_acc', 'count_sep'], axis=1)
+        
+        # Create pivot table for net change
+        net_pivot = monthly_combined.pivot(index='month', columns='year', values='net_change')
+        
+        # Ensure all years 2016-2025 are present
+        all_years = list(range(2016, 2026))
+        for year in all_years:
+            if year not in net_pivot.columns:
+                net_pivot[year] = np.nan
+        net_pivot = net_pivot[all_years]
+        
+        # Create dataframe for GT table
+        net_df = net_pivot.reset_index()
+        net_df['month'] = pd.to_datetime(net_df['month'], format='%m').dt.strftime('%B')
+        
+        # Convert year columns to strings
+        net_df.columns = ['month'] + [str(col) for col in net_df.columns[1:]]
+        
+        # Calculate max absolute value for symmetric color scale
+        max_abs_val = abs(net_pivot.fillna(0).values).max()
+        
+        # Create GT table
+        year_columns = [col for col in net_df.columns if col != 'month']
+        gt_net = (
+            GT(net_df)
+            .tab_header(
+                title=f"{agency_name}",
+                subtitle=f"Monthly Net Change (2016-2025) - Average Turnover: {avg_turnover:.0f}%"
+            )
+            .fmt_number(columns=year_columns, decimals=0, use_seps=True)
+            .data_color(
+                columns=year_columns,
+                palette=[NET_NEGATIVE_COLOR, "white", NET_POSITIVE_COLOR],
+                domain=[-max_abs_val, max_abs_val],
+                na_color="lightgray"
+            )
+            .cols_width({
+                'month': '100px'
+            })
+        )
+        
+        return gt_net
+    return None
+
+def display_all_heatmaps(annual_data, monthly_accessions_data, monthly_separations_data):
+    """Display heatmaps for all top 10 agencies."""
+    high_turnover_agencies = get_top_10_turnover_agencies(annual_data, MIN_EMPLOYEES)
+    
+    for idx, agency_row in high_turnover_agencies.iterrows():
+        agency_code = agency_row['agysub']
+        agency_name = agency_row['agysubt']
+        avg_turnover = agency_row['avg_attrition_rate']
+        
+        gt_table = create_agency_heatmap(
+            agency_code, agency_name, avg_turnover,
+            monthly_accessions_data, 
+            monthly_separations_data
+        )
+        
+        if gt_table:
+            gt_table.show()
+
+# Execute the heatmap display
+display_all_heatmaps(annual_data, all_data['monthly_accessions_data'], all_data['monthly_separations_data'])
+```
+
+### Employment Over Time
+
+```{python}
+#| label: employment-over-time
+
+def create_employment_graph(agency_code, agency_name, employment_time_series_data):
+    """Create employment over time graph for a single agency."""
+    employment_timeline = employment_time_series_data.get(agency_code, [])
+    
+    if employment_timeline:
+        # Convert to DataFrame and sort
+        emp_df = pd.DataFrame(employment_timeline)
+        emp_df['sort_key'] = emp_df['year'] * 10 + emp_df['month'].map({'March': 1, 'September': 2})
+        emp_df = emp_df.sort_values('sort_key')
+        
+        # Create line graph
+        fig, ax = plt.subplots(figsize=(12, 6))
+        
+        # Separate March and September data for different colors
+        march_data = emp_df[emp_df['month'] == 'March']
+        sept_data = emp_df[emp_df['month'] == 'September']
+        
+        # Plot lines
+        ax.plot(emp_df['period'], emp_df['employment'], 
+                'k-', alpha=0.3, linewidth=1)
+        
+        # Plot points
+        if not march_data.empty:
+            ax.scatter(march_data['period'], march_data['employment'], 
+                      color='blue', s=100, label='March', zorder=5)
+        if not sept_data.empty:
+            ax.scatter(sept_data['period'], sept_data['employment'], 
+                      color='orange', s=100, label='September', zorder=5)
+        
+        # Formatting
+        ax.set_xlabel('Period', fontsize=12)
+        ax.set_ylabel('Total Employment', fontsize=12)
+        ax.set_title(f'{agency_name} Employment Over Time', fontsize=14, fontweight='bold')
+        
+        # Rotate x-axis labels
+        plt.xticks(rotation=45, ha='right')
+        
+        # Add grid
+        ax.grid(True, alpha=0.3)
+        
+        # Set y-axis to start at 0
+        ax.set_ylim(bottom=0)
+        
+        # Format y-axis with commas
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{int(x):,}'))
+        
+        # Add legend
+        ax.legend()
+        
+        # Tight layout
+        plt.tight_layout()
+        plt.show()
+
+def display_all_employment_graphs(annual_data, employment_time_series_data):
+    """Display employment graphs for all top 10 agencies."""
+    high_turnover_agencies = get_top_10_turnover_agencies(annual_data, MIN_EMPLOYEES)
+    
+    for idx, agency_row in high_turnover_agencies.iterrows():
+        agency_code = agency_row['agysub']
+        agency_name = agency_row['agysubt']
+        
+        create_employment_graph(agency_code, agency_name, employment_time_series_data)
+
+# Execute the employment graph display
+display_all_employment_graphs(annual_data, all_data['employment_time_series_data'])
 ```
