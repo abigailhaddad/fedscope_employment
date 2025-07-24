@@ -19,6 +19,10 @@ execute:
   message: false
 ---
 
+<div style="background-color: #ff0000; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 30px;">
+THIS IS A DRAFT! Please talk to me before you use this.
+</div>
+
 ```{python}
 #| label: setup
 #| code-fold: false
