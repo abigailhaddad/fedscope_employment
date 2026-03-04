@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedScope Employment, Separations & Accessions Data Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #1a365d;
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        .section {
+            background-color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #1a365d;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        h3 {
+            color: #2d3748;
+            margin-top: 1.5rem;
+        }
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .field-table th {
+            background-color: #f7fafc;
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .field-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .field-table tr:hover {
+            background-color: #f7fafc;
+        }
+        code {
+            background-color: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .note {
+            background-color: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .links a {
+            background-color: #3182ce;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .links a:hover {
+            background-color: #2c5282;
+        }
+        .toc {
+            background-color: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 0.5rem 0;
+        }
+        .toc a {
+            color: #3182ce;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div style="background:#dc3545;color:white;padding:16px 24px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:16px;position:sticky;top:0;z-index:9999;"><strong>DEPRECATED</strong> — This site is no longer maintained. For current federal workforce data, see <a href="https://github.com/abigailhaddad/fedscope_new" style="color:#fff;text-decoration:underline;">fedscope_new</a> or <a href="https://data.opm.gov/" style="color:#fff;text-decoration:underline;">data.opm.gov</a>.</div>
+    <div class="header">
+        <h1>FedScope Employment, Separations & Accessions Data</h1>
+        <p>Understanding 140+ million federal employee records (1998-2025) + 9.8+ million separations & accessions (2005-2025)</p>
+        <p style="background-color: #3182ce; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+            <strong>🔍 Want to see quick comparisons between September 2024 and March 2025?</strong><br>
+            <a href="https://fluffy-narwhal-e5f260.netlify.app/" style="color: white; text-decoration: underline;">View the interactive dashboard →</a>
+        </p>
+        <p style="background-color: #e53e3e; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+            <strong>⚠️ This is unofficial processed data. For official information, visit <a href="https://www.fedscope.opm.gov/" style="color: white;">fedscope.opm.gov</a></strong>
+        </p>
+    </div>
+
+    <div class="toc section">
+        <h2>Quick Navigation</h2>
+        <ul>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#understanding-fields">Understanding the Data Fields</a></li>
+            <li><a href="#important-fields">Selected Key Fields</a></li>
+            <li><a href="#code-examples">Code Examples</a></li>
+            <li><a href="#data-quality">Data Notes & Limitations</a></li>
+            <li><a href="#field-reference">Complete Field Reference</a></li>
+            <li><a href="#resources">Resources & Links</a></li>
+        </ul>
+    </div>
+
+    <div class="section" id="getting-started">
+        <h2>Getting Started</h2>
+        
+        <p>This repository contains two major datasets: <strong>140+ million employment records</strong> from quarterly snapshots (1998-2025) and <strong>9.8+ million separations & accessions records</strong> showing individual hiring and departure events (2005-2025).</p>
+        
+        <div class="note">
+            <strong>📊 Get the Data:</strong> You can either:
+            <ul style="margin-top: 0.5rem;">
+                <li><strong>Download individual files</strong> directly from GitHub without cloning:
+                    <ul>
+                        <li><a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/employment_cube/parquet">Employment Cube</a> (73 quarterly snapshots)</li>
+                        <li><a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/separations_accessions/parquet">Separations & Accessions</a> (10 multi-year files)</li>
+                    </ul>
+                </li>
+                <li><strong>Clone the full repository</strong> (~3.9GB) - see the <a href="https://github.com/abigailhaddad/fedscope_employment">README</a> for instructions</li>
+            </ul>
+            <strong>🚀 Quick Start:</strong> Run <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for comprehensive usage examples!
+        </div>
+
+        <h3>What's Included</h3>
+        
+        <h4>Employment Cube Data (Quarterly Snapshots)</h4>
+        <ul>
+            <li><strong>73 quarterly Parquet files</strong> from March 1998 to March 2025</li>
+            <li><strong>~1.7-2.3 million employees</strong> per quarterly snapshot</li>
+            <li><strong>52 fields per employee</strong> including demographics, job details, and pay</li>
+            <li><strong>~2.2GB Parquet files</strong> in employment_cube/parquet/</li>
+        </ul>
+        
+        <h4>Separations & Accessions Data (Individual Events)</h4>
+        <ul>
+            <li><strong>10 multi-year Parquet files</strong> covering FY2005-2025</li>
+            <li><strong>5.3 million accessions</strong> (new hires) and <strong>4.6 million separations</strong> (departures)</li>
+            <li><strong>Same 52 fields</strong> as employment data with event-specific details</li>
+            <li><strong>~152MB Parquet files</strong> in separations_accessions/parquet/</li>
+            <li><strong>Coverage gaps:</strong> Missing Oct-Dec 2023 and Jan-Mar 2024</li>
+            <li><strong>Note:</strong> Earlier separations/accessions data (pre-2005) is available from <a href="https://www.opm.gov/data/datasets/">OPM directly</a> but not included in this repository</li>
+        </ul>
+        
+        <h4>Common Features</h4>
+        <ul>
+            <li><strong>Most federal agencies</strong> (excludes uniformed military, postal service, intelligence)</li>
+            <li><strong>Lookup tables pre-joined</strong> for human-readable agency names, job titles, locations</li>
+            <li><strong>Total repository:</strong> ~3.9GB including raw files and documentation</li>
+        </ul>
+        
+        <div class="note">
+            <strong>⚠️ March 2025 Data Warnings:</strong>
+            <ul style="margin-top: 0.5rem;">
+                <li><strong>Preliminary data</strong> subject to revision</li>
+                <li><strong>Increased redaction:</strong> 13% of cells contain "REDACTED" values</li>
+                <li><strong>Location suppression:</strong> 46.7% of location data is redacted per OPM policy</li>
+                <li><strong>Includes employees on leave</strong> who may not be currently working</li>
+                <li><strong>Format differences:</strong> Raw data structure differs (processed to match historical schema)</li>
+            </ul>
+            <strong>Data suppression policy:</strong> REDACTED values occur where required by OPM's Data Release Policy, including categorizing some employees with duty locations in MD, VA, and WV under DC.
+        </div>
+
+    </div>
+
+    <div class="section" id="understanding-fields">
+        <h2>Understanding the Data Fields</h2>
+        
+        <p>Each employee record has <strong>52 fields</strong> that fall into three categories:</p>
+
+        <div class="note">
+            <strong>Field Format Structure:</strong> The dataset contains three types of fields:
+            <ul style="margin-top: 0.5rem;">
+                <li><strong>Code Fields</strong>: Short codes used for categorization (e.g., <code>agelvl</code>, <code>occ</code>)</li>
+                <li><strong>Description Fields</strong>: Human-readable labels (e.g., <code>agelvlt</code>, <code>occt</code>)</li>
+                <li><strong>Data Fields</strong>: Actual values for analysis (e.g., <code>salary</code>, <code>employment</code>)</li>
+            </ul>
+            <strong>Tip:</strong> Use the description fields (ending in 't') for most analysis - they're much easier to understand!
+        </div>
+
+        <h3>Field Categories</h3>
+        <ul>
+            <li><strong>When & Where:</strong> Year, quarter, agency, location</li>
+            <li><strong>Who:</strong> Age group, education level, length of service</li>
+            <li><strong>What Job:</strong> Occupation, grade level, supervisory status</li>
+            <li><strong>How Much:</strong> Salary, salary range</li>
+            <li><strong>Work Details:</strong> Full/part-time, appointment type, work status</li>
+        </ul>
+    </div>
+
+    <div class="section" id="important-fields">
+        <h2>Selected Key Fields</h2>
+        
+        <p>Start with these key fields for most analyses:</p>
+
+        <table class="field-table">
+            <tr>
+                <th>Field</th>
+                <th>What It Shows</th>
+                <th>Example Values</th>
+            </tr>
+            <tr>
+                <td><code>year</code>, <code>quarter</code></td>
+                <td>When the data was collected</td>
+                <td>2024, "September"</td>
+            </tr>
+            <tr>
+                <td><code>agysubt</code></td>
+                <td>Which agency/department</td>
+                <td>"Department of Defense", "Internal Revenue Service"</td>
+            </tr>
+            <tr>
+                <td><code>loct</code></td>
+                <td>Where they work</td>
+                <td>"CALIFORNIA", "DISTRICT OF COLUMBIA"</td>
+            </tr>
+            <tr>
+                <td><code>occt</code></td>
+                <td>Their job title</td>
+                <td>"Accountant", "Computer Scientist", "Human Resources Specialist"</td>
+            </tr>
+            <tr>
+                <td><code>patcot</code></td>
+                <td>Job category</td>
+                <td>"Professional", "Administrative", "Technical"</td>
+            </tr>
+            <tr>
+                <td><code>salary</code></td>
+                <td>Annual salary (dollars)</td>
+                <td>65000, 95000, null (when private)</td>
+            </tr>
+            <tr>
+                <td><code>sallvlt</code></td>
+                <td>Salary range</td>
+                <td>"$60,000 - $69,999", "$90,000 - $99,999"</td>
+            </tr>
+            <tr>
+                <td><code>agelvlt</code></td>
+                <td>Age group</td>
+                <td>"25-29 YEARS", "45-49 YEARS"</td>
+            </tr>
+            <tr>
+                <td><code>edlvlt</code></td>
+                <td>Education level</td>
+                <td>"Bachelor's Degree", "Master's Degree"</td>
+            </tr>
+            <tr>
+                <td><code>employment</code></td>
+                <td>Person count (always 1)</td>
+                <td>1</td>
+            </tr>
+        </table>
+
+        <div class="note">
+            <strong>Important Data Handling:</strong> 
+            <ul style="margin-top: 0.5rem;">
+                <li>Each row = one employee. Sum up <code>employment</code> to count total people.</li>
+                <li>Numeric fields like <code>employment</code> and <code>salary</code> are stored as <strong>strings</strong></li>
+                <li>Salary values of <code>*****</code> are redacted and should be filtered out</li>
+                <li>See <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for proper conversion techniques</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section" id="code-examples">
+        <h2>Code Examples</h2>
+        
+        <div class="note">
+            <strong>🚀 Complete Examples:</strong> Run <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for comprehensive usage examples with both local and download methods!
+            <ul style="margin-top: 0.5rem;">
+                <li>Output is saved to <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples_output.txt">examples_output.txt</a></li>
+                <li>Includes DuckDB examples for querying multiple years efficiently</li>
+            </ul>
+        </div>
+
+        <h3>Basic Usage Patterns</h3>
+
+        <h4>Load Employment Data</h4>
+        <pre><code># Load employment snapshots from GitHub (without cloning)
+df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/employment_cube/parquet/fedscope_employment_September_2024.parquet')
+
+# Or load the latest March 2025 data (see warnings above)
+df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/employment_cube/parquet/fedscope_employment_March_2025.parquet')
+
+# Load locally (if you've cloned the repo)
+df = pd.read_parquet('employment_cube/parquet/fedscope_employment_September_2024.parquet')</code></pre>
+
+        <h4>Load Separations & Accessions Data</h4>
+        <pre><code># Load recent separations data from GitHub (5 files available)
+sep_df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/separations_accessions/parquet/fedscope_separations_FY2020-2024.parquet')
+# Also available: FY2005-2009, FY2010-2014, FY2015-2019, March_2025
+
+# Load recent accessions data from GitHub (5 files available)  
+acc_df = pd.read_parquet('https://github.com/abigailhaddad/fedscope_employment/raw/main/separations_accessions/parquet/fedscope_accessions_FY2020-2024.parquet')
+# Also available: FY2005-2009, FY2010-2014, FY2015-2019, March_2025
+
+# Load locally (if you've cloned the repo)
+sep_df = pd.read_parquet('separations_accessions/parquet/fedscope_separations_FY2020-2024.parquet')
+acc_df = pd.read_parquet('separations_accessions/parquet/fedscope_accessions_FY2020-2024.parquet')</code></pre>
+
+        <h4>Count Employees by Agency</h4>
+        <pre><code># Employment is stored as strings, convert properly
+agency_counts = df.groupby('agysubt')['employment'].apply(
+    lambda x: sum(int(i) for i in x)
+).sort_values(ascending=False).head(10)</code></pre>
+
+        <h4>Analyze Salaries by Education</h4>
+        <pre><code># Convert salary to numeric, handling edge cases
+df['salary_numeric'] = df['salary'].apply(lambda x: int(float(x)) if x not in [None, 'nan', '*****', ''] and pd.notna(x) else None)
+df_with_salary = df[df['salary_numeric'].notna()]
+salary_by_edu = df_with_salary.groupby('edlvlt')['salary_numeric'].mean().sort_values(ascending=False)</code></pre>
+
+        <h4>Track Workforce Over Time</h4>
+        <pre><code># Group by time periods
+quarterly = df.groupby(['year', 'quarter'])['employment'].apply(
+    lambda x: sum(int(i) for i in x)
+)</code></pre>
+
+        <div class="note">
+            <strong>💡 Key Points:</strong>
+            <ul style="margin-top: 0.5rem;">
+                <li>Numeric fields are stored as <strong>strings</strong> - convert with <code>int(i)</code></li>
+                <li>Filter salary data: <code>df['salary'] != '*****'</code> removes redacted values</li>
+                <li>Each record represents one employee (<code>employment</code> is always '1')</li>
+            </ul>
+        </div>
+
+        <h3>Using DuckDB for Multi-Year Analysis</h3>
+        <p>Query multiple years efficiently using DuckDB:</p>
+        
+        <pre><code>import duckdb
+
+# Create a view from multiple Parquet files
+con = duckdb.connect('fedscope.duckdb')
+con.execute("""
+    CREATE VIEW employment AS 
+    SELECT * FROM read_parquet('fedscope_employment_September_2024.parquet')
+    UNION ALL
+    SELECT * FROM read_parquet('fedscope_employment_September_2023.parquet')
+""")
+
+# Query across years
+result = con.execute("""
+    SELECT year, agysubt, SUM(CAST(employment AS INTEGER)) as employees
+    FROM employment
+    GROUP BY year, agysubt
+    ORDER BY year, employees DESC
+""").fetchdf()</code></pre>
+
+        <div class="note">
+            <strong>📊 DuckDB Benefits:</strong>
+            <ul style="margin-top: 0.5rem;">
+                <li>Query multiple years without loading all data into memory</li>
+                <li>SQL interface for complex aggregations</li>
+                <li>Efficient columnar processing of Parquet files</li>
+                <li>See <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">examples.py</a> for complete DuckDB usage</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section" id="field-reference">
+        <h2>Complete Field Reference</h2>
+        
+        <div class="note">
+            <strong>Field Format Structure:</strong> The dataset contains three types of fields:
+            <ul style="margin-top: 0.5rem;">
+                <li><strong>Code Fields</strong>: Original FedScope codes used for categorization and joining (e.g., <code>agelvl</code>, <code>edlvl</code>, <code>occ</code>)</li>
+                <li><strong>Description Fields</strong>: Human-readable labels derived from lookup tables (e.g., <code>agelvlt</code>, <code>edlvlt</code>, <code>occt</code>)</li>
+                <li><strong>Data Fields</strong>: Actual analytical values (e.g., <code>employment</code>, <code>salary</code>, <code>year</code>)</li>
+            </ul>
+            <strong>Naming Pattern:</strong> Description fields follow the pattern of adding 't' to the code field name (e.g., <code>agelvl</code> → <code>agelvlt</code>).<br>
+            <strong>For Analysis:</strong> Use the description fields (ending in 't') which provide human-readable values. Code fields are primarily for data processing and joins.
+        </div>
+        
+        <h3>Core Identifiers</h3>
+        <table class="field-table">
+            <tr>
+                <th>Field Name</th>
+                <th>Description</th>
+                <th>Type</th>
+            </tr>
+            <tr>
+                <td><code>dataset_key</code></td>
+                <td>Unique identifier for each quarterly dataset</td>
+                <td>String</td>
+            </tr>
+            <tr>
+                <td><code>year</code></td>
+                <td>Calendar year of the snapshot</td>
+                <td>Integer</td>
+            </tr>
+            <tr>
+                <td><code>quarter</code></td>
+                <td>Quarter of the snapshot (March, June, September, December)</td>
+                <td>String</td>
+            </tr>
+        </table>
+
+        <h3>Demographics</h3>
+        <table class="field-table">
+            <tr>
+                <th>Code Field</th>
+                <th>Description Field</th>
+                <th>Description</th>
+                <th>Example Values</th>
+            </tr>
+            <tr>
+                <td><code>agelvl</code></td>
+                <td><code>agelvlt</code></td>
+                <td>Age level (5-year bands)</td>
+                <td>A: < 20, B: 20-24, C: 25-29, etc.</td>
+            </tr>
+            <tr>
+                <td><code>edlvl</code></td>
+                <td><code>edlvlt</code></td>
+                <td>Education level</td>
+                <td>00-22 (High school through Doctorate)</td>
+            </tr>
+            <tr>
+                <td><code>los</code></td>
+                <td><em>N/A</em></td>
+                <td>Length of service (data field)</td>
+                <td>Years of federal service</td>
+            </tr>
+        </table>
+
+        <h3>Job Characteristics</h3>
+        <table class="field-table">
+            <tr>
+                <th>Code Field</th>
+                <th>Description Field</th>
+                <th>Description</th>
+                <th>Details</th>
+            </tr>
+            <tr>
+                <td><code>occ</code></td>
+                <td><code>occt</code></td>
+                <td>Occupation code and series</td>
+                <td>4-digit OPM occupation codes</td>
+            </tr>
+            <tr>
+                <td><code>patco</code></td>
+                <td><code>patcot</code></td>
+                <td>PATCO category</td>
+                <td>Professional, Administrative, Technical, Clerical, Other</td>
+            </tr>
+            <tr>
+                <td><code>pp</code></td>
+                <td><code>ppt</code></td>
+                <td>Pay plan</td>
+                <td>GS, ES, SL, ST, etc. (pp added in 2017, ppt added in 2018)</td>
+            </tr>
+            <tr>
+                <td><code>ppgrd</code></td>
+                <td><code>ppgrdt</code></td>
+                <td>Pay plan and grade</td>
+                <td>Combined pay plan and grade level</td>
+            </tr>
+            <tr>
+                <td><code>gsegrd</code></td>
+                <td><code>gsegrdt</code></td>
+                <td>GS equivalent grade</td>
+                <td>01-15, SES, or blank</td>
+            </tr>
+            <tr>
+                <td><code>supervis</code></td>
+                <td><code>supervist</code></td>
+                <td>Supervisory status</td>
+                <td>2: Supervisor, 4: Manager, 6: Leader, 8: Non-supervisor</td>
+            </tr>
+        </table>
+
+        <h3>Compensation & Work Details</h3>
+        <table class="field-table">
+            <tr>
+                <th>Code Field</th>
+                <th>Description Field</th>
+                <th>Description</th>
+                <th>Notes</th>
+            </tr>
+            <tr>
+                <td><code>salary</code></td>
+                <td><em>N/A</em></td>
+                <td>Annual salary (data field)</td>
+                <td>Adjusted basic pay (null when redacted with asterisks)</td>
+            </tr>
+            <tr>
+                <td><code>sallvl</code></td>
+                <td><code>sallvlt</code></td>
+                <td>Salary level</td>
+                <td>Salary ranges in $10K bands</td>
+            </tr>
+            <tr>
+                <td><code>wrksch</code></td>
+                <td><code>wrkscht</code></td>
+                <td>Work schedule</td>
+                <td>F: Full-time, P: Part-time, etc.</td>
+            </tr>
+            <tr>
+                <td><code>toa</code></td>
+                <td><code>toat</code></td>
+                <td>Type of appointment</td>
+                <td>Permanent, temporary, term, etc.</td>
+            </tr>
+            <tr>
+                <td><code>wkstat</code></td>
+                <td><code>wkstatt</code></td>
+                <td>Work status</td>
+                <td>Active, leave without pay, etc.</td>
+            </tr>
+        </table>
+
+        <h3>Organization & Location</h3>
+        <table class="field-table">
+            <tr>
+                <th>Code Field</th>
+                <th>Description Field</th>
+                <th>Description</th>
+                <th>Format</th>
+            </tr>
+            <tr>
+                <td><code>agy</code></td>
+                <td><em>N/A</em></td>
+                <td>Agency code (from lookup)</td>
+                <td>4-character agency identifier</td>
+            </tr>
+            <tr>
+                <td><code>agysub</code></td>
+                <td><code>agysubt</code></td>
+                <td>Sub-agency code</td>
+                <td>4-character sub-agency identifier</td>
+            </tr>
+            <tr>
+                <td><code>loc</code></td>
+                <td><code>loct</code></td>
+                <td>Location code</td>
+                <td>State abbreviation or country code</td>
+            </tr>
+            <tr>
+                <td><code>stemocc</code></td>
+                <td><code>stemocct</code></td>
+                <td>STEM occupation indicator</td>
+                <td>1: STEM, 0: Non-STEM</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section" id="coding-schemes">
+        <h2>Coding Schemes</h2>
+        
+        <h3>Age Levels (agelvl)</h3>
+        <p>Age is reported in 5-year bands to protect privacy:</p>
+        <ul>
+            <li><strong>A:</strong> Less than 20 years</li>
+            <li><strong>B:</strong> 20-24 years</li>
+            <li><strong>C:</strong> 25-29 years</li>
+            <li><strong>D:</strong> 30-34 years</li>
+            <li><strong>E:</strong> 35-39 years</li>
+            <li><strong>F:</strong> 40-44 years</li>
+            <li><strong>G:</strong> 45-49 years</li>
+            <li><strong>H:</strong> 50-54 years</li>
+            <li><strong>I:</strong> 55-59 years</li>
+            <li><strong>J:</strong> 60-64 years</li>
+            <li><strong>K:</strong> 65 years and over</li>
+        </ul>
+
+        <h3>Education Levels (edlvl)</h3>
+        <p>Education codes range from 00 to 22:</p>
+        <ul>
+            <li><strong>00-05:</strong> Less than high school</li>
+            <li><strong>06-11:</strong> High school diploma/GED</li>
+            <li><strong>12-14:</strong> Some college</li>
+            <li><strong>15:</strong> Bachelor's degree</li>
+            <li><strong>16-17:</strong> Some graduate work</li>
+            <li><strong>18:</strong> Master's degree</li>
+            <li><strong>19-21:</strong> Professional/Doctoral degree</li>
+            <li><strong>22:</strong> Post-doctoral</li>
+        </ul>
+
+        <h3>PATCO Categories</h3>
+        <ul>
+            <li><strong>P:</strong> Professional - Requires knowledge in specialized field (engineers, scientists, doctors)</li>
+            <li><strong>A:</strong> Administrative - Management or staff functions (HR, budget, procurement)</li>
+            <li><strong>T:</strong> Technical - Support to professional/administrative (technicians, assistants)</li>
+            <li><strong>C:</strong> Clerical - Structured work support (data entry, filing)</li>
+            <li><strong>O:</strong> Other - Trades, crafts, labor, protective services</li>
+        </ul>
+
+        <h3>Major Pay Plans</h3>
+        <ul>
+            <li><strong>GS:</strong> General Schedule (most common)</li>
+            <li><strong>ES:</strong> Senior Executive Service</li>
+            <li><strong>SL/ST:</strong> Senior Level/Scientific & Technical</li>
+            <li><strong>AD:</strong> Administratively Determined</li>
+            <li><strong>FW:</strong> Federal Wage System</li>
+        </ul>
+    </div>
+
+    <div class="section" id="data-quality">
+        <h2>Data Notes & Limitations</h2>
+        
+        <h3>What You Should Know</h3>
+        
+        <div class="note">
+            <strong>Missing Salaries:</strong> Some salary information is marked as private (shows as null). This affects about 8% of records.
+        </div>
+
+        <div class="note">
+            <strong>Agency Name Changes:</strong> Government agencies get reorganized and renamed over 26 years. The same agency might appear with different names in different time periods.
+        </div>
+
+        <div class="note">
+            <strong>Field Changes Over Time:</strong> Pay plan information (<code>pp</code> added in 2017, <code>ppt</code> added in 2018), so earlier years don't include these fields.
+        </div>
+
+        <h3>Data Coverage</h3>
+        
+        <h4>Employment Cube (Quarterly Snapshots)</h4>
+        <ul>
+            <li><strong>1998-2008:</strong> September only each year</li>
+            <li><strong>2009:</strong> September and December</li>
+            <li><strong>2010-2023:</strong> March, June, September, December each year</li>
+            <li><strong>2024:</strong> March, June, September</li>
+            <li><strong>2025:</strong> March only (preliminary data - see warnings above)</li>
+        </ul>
+        
+        <h4>Separations & Accessions (Individual Events)</h4>
+        <ul>
+            <li><strong>FY2005-2009:</strong> 5-year aggregated file</li>
+            <li><strong>FY2010-2014:</strong> 5-year aggregated file</li>
+            <li><strong>FY2015-2019:</strong> 5-year aggregated file</li>
+            <li><strong>FY2020-2024:</strong> 5-year aggregated file (missing Oct-Dec 2023 and Jan-Mar 2024)</li>
+            <li><strong>April 2024-March 2025:</strong> Most recent 12 months (labeled "March 2025")</li>
+        </ul>
+
+        <h3>What's NOT Included</h3>
+        <ul>
+            <li>Military personnel (separate dataset)</li>
+            <li>Postal Service employees</li>
+            <li>Intelligence agencies</li>
+            <li>Contractor information</li>
+        </ul>
+
+        <div class="note">
+            <strong>Employment Snapshots vs Events:</strong> The employment cube shows who was employed at specific quarterly points in time. The separations and accessions data shows individual hiring and departure events. Both datasets are included in this repository (2005-2025 for separations/accessions).
+        </div>
+    </div>
+
+
+    <div class="section" id="resources">
+        <h2>Resources & Links</h2>
+        
+        <h3>Get Started</h3>
+        <div class="links">
+            <a href="https://github.com/abigailhaddad/fedscope_employment/blob/main/examples.py">🚀 Run examples.py</a>
+            <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/employment_cube/parquet">📊 Employment Cube Parquet Files</a>
+            <a href="https://github.com/abigailhaddad/fedscope_employment/tree/main/separations_accessions/parquet">📈 Separations & Accessions Parquet Files</a>
+            <a href="https://github.com/abigailhaddad/fedscope_employment">📖 Full Repository</a>
+        </div>
+        
+        <p style="margin-top: 1rem;">All files are hosted directly in this GitHub repository:</p>
+        <ul>
+            <li><strong>Employment Cube:</strong> 73 quarterly Parquet files in <code>employment_cube/parquet/</code> and original ZIP files in <code>employment_cube/raw/</code>
+                <ul>
+                    <li>Duplicate lookup logs: <code>employment_cube/lookup_duplicates_log.json</code> and <code>employment_cube/lookup_duplicates_summary.txt</code></li>
+                </ul>
+            </li>
+            <li><strong>Separations & Accessions:</strong> 10 multi-year Parquet files in <code>separations_accessions/parquet/</code> and original ZIP files in <code>separations_accessions/raw/</code>
+                <ul>
+                    <li>5 separations files: FY2005-2009, FY2010-2014, FY2015-2019, FY2020-2024, April 2024-March 2025</li>
+                    <li>5 accessions files: FY2005-2009, FY2010-2014, FY2015-2019, FY2020-2024, April 2024-March 2025</li>
+                    <li>Duplicate lookup logs: <code>separations_accessions/lookup_duplicates_log.json</code> and <code>separations_accessions/lookup_duplicates_summary.txt</code></li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>Official Government Sources</h3>
+        <div class="links">
+            <a href="https://www.fedscope.opm.gov/">🏛️ FedScope Web Interface</a>
+            <a href="https://www.opm.gov/data/datasets/">📁 Original ZIP Files</a>
+        </div>
+
+        <h3>Need Help?</h3>
+        <ul>
+            <li><strong>Understanding the data:</strong> Read this guide or check the <a href="https://github.com/abigailhaddad/fedscope_employment">README</a></li>
+            <li><strong>Technical issues:</strong> <a href="https://github.com/abigailhaddad/fedscope_employment/issues">Report on GitHub</a></li>
+            <li><strong>Official questions:</strong> Contact <a href="https://www.opm.gov/data/">OPM directly</a></li>
+        </ul>
+
+        <h3>Citation</h3>
+        <p>If you use this dataset, please cite:</p>
+        <div style="background-color: #f7fafc; padding: 1rem; border-radius: 4px; font-family: monospace;">
+Haddad, A. (2025). FedScope Employment Cube Dataset [Data set]. GitHub. https://github.com/abigailhaddad/fedscope_employment
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 2rem; color: #718096;">
+        <p><strong>This is UNOFFICIAL documentation</strong> created as part of an independent data processing project</p>
+        <p>For official information, visit <a href="https://www.fedscope.opm.gov/">fedscope.opm.gov</a></p>
+        <p>Last updated: 2025</p>
+    </div>
+</body>
+</html>

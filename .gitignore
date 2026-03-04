@@ -1,0 +1,90 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+myenv/
+ENV/
+env.bak/
+venv.bak/
+
+# DuckDB
+*.duckdb
+*.duckdb.wal
+*.duckdb.tmp
+.DS_Store
+# Data files
+data/
+# Old structure (kept for compatibility)
+fedscope_data/extracted/
+fedscope_data/march_2025_data/
+# New structure - ignore extracted folders but keep raw zips and parquet files
+employment_cube/extracted/
+separations_accessions/extracted/
+# Keep status reports folder (these are summary data we want to commit)
+!employment_cube/status_reports_march_2025/
+# Ignore most text files but keep specific ones
+*.txt
+!lookup_duplicates_summary.txt
+!examples_output.txt
+!requirements.txt
+!employment_cube/status_reports_march_2025/*.txt
+!web_dashboard/*.txt
+# Ignore most CSV files except analysis results
+*.csv
+!**/analysis/**/*.csv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation  
+docs/_build/
+
+# Claude Code instructions
+READ_THIS_CLAUDE_CODE.md
