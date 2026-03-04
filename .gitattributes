@@ -1,4 +1,0 @@
-fedscope_data/parquet/*.parquet filter=lfs diff=lfs merge=lfs -text
-employment_cube/parquet/*.parquet filter=lfs diff=lfs merge=lfs -text
-separations_accessions/parquet/*.parquet filter=lfs diff=lfs merge=lfs -text
-*.parquet filter=lfs diff=lfs merge=lfs -text
